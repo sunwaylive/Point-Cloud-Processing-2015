@@ -86,6 +86,9 @@
     <CustomBuild Include="calculationthread.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="mainwindow.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_normal_para.h">
@@ -285,5 +288,157 @@
     <ClCompile Include="GLDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_mainwindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icons\apn.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\upsample-xw5.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\90.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\91.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\93.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\98.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\109.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\115.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\118.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\125.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\brush.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\color_blue.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\color_green.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\color_red_ggr.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\color_red_grg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\edgecollapse.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\edgesplit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\eraser.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\flat.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\folder_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\folder_open_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\gameboid_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\gowalla_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\heyzap_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\lightoff.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\lighton.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\open.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\points.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\reload.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\rgbt.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\save.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sel_rect.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sel_rect_minus.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sel_rect_plus.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\select_face.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\select_face_rect.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\selected.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\settings_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\sleepbot_128x128-32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\smooth.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\snapshot.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\triangle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\vertex.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\points -upsample.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\xw-upsample.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\xw-upsample.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\upsample-xw.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\upsample-xw.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icons\upsample-xw2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
