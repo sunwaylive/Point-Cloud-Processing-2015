@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Algorithm">
+      <UniqueIdentifier>{aa63d73b-05eb-4a6d-9955-c87790019db6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helper">
+      <UniqueIdentifier>{0ee4c494-ac58-4f0f-a2e1-f6a2bce6d6b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{f9dfeeda-e279-4113-b082-9c74963907a9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Parameter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLDrawer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\WLOP.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\dlg_wlop_para.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\dlg_normal_para.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\std_para_dlg.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="calculationthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\NormalSmoother.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="plylib.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="trackball.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="trackmode.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\Skeletonization.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\Skeleton.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\dlg_skeleton_para.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\dlg_upsampling_para.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\Upsampler.cpp">
+      <Filter>Algorithm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="mainwindow.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mainwindow.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\dlg_wlop_para.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\para_wlop.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\dlg_normal_para.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\normal_para.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\std_para_dlg.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\para_skeletonization.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\dlg_skeleton_para.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\upsampling_para.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="UI\dlg_upsampling_para.h">
+      <Filter>UI</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\anistropicPCA_Normal.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\NormalSmoother.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\normal_extrapolation.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\PointCloudAlgorithm.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\Skeleton.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\Skeletonization.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\Upsampler.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Algorithm\WLOP.h">
+      <Filter>Algorithm</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Console.h">
+      <Filter>Helper</Filter>
+    </CustomBuild>
+    <CustomBuild Include="plylib.h">
+      <Filter>Helper</Filter>
+    </CustomBuild>
+    <CustomBuild Include="plystuff.h">
+      <Filter>Helper</Filter>
+    </CustomBuild>
+    <CustomBuild Include="trackball.h">
+      <Filter>Helper</Filter>
+    </CustomBuild>
+    <CustomBuild Include="trackmode.h">
+      <Filter>Helper</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
