@@ -266,15 +266,21 @@ void GLArea::paintGL()
 		drawPickRect();
 	}
 
+  /* The following are semitransparent, careful for the rendering order*/
+  glDepthMask(GL_FALSE);
+
   if (para->getBool("Show Radius")&& !(takeSnapTile && para->getBool("No Snap Radius"))) 
   {
     drawNeighborhoodRadius();
   }
 
+  glDepthMask(GL_TRUE);
+
 	glPopMatrix();
 	glPopMatrix();
 
-	if (takeSnapTile){
+	if (takeSnapTile)
+  {
 		cout << "snap shot!" << endl;
 		pasteTile();
 
@@ -448,115 +454,89 @@ void GLArea::drawPickRect()
 
 void GLArea::drawNeighborhoodRadius()
 {
-	Point3f p;
-	if(!pickList.empty() && pickList[0] >= 0)
-	{
-		int id = pickList[0];
-		if (id >= 0 && id < dataMgr.getCurrentSamples()->vert.size())
-		{
-			p = dataMgr.getCurrentSamples()->vert[id].P();
-		}
-		else
-		{
-			p = dataMgr.getCurrentSamples()->vert[0].P();
-		}
-	}
-	else
-	{
-		p = dataMgr.getCurrentSamples()->vert[0].P();
-	}
+  if (dataMgr.getCurrentSamples()->vert.empty()) return;
 
-	double h_Gaussian_para = global_paraMgr.wLop.getDouble("H Gaussian Para");
-	double grid_radius = global_paraMgr.data.getDouble("CGrid Radius");
-
-	if (!takeSnapTile && para->getBool("Show Red Radius Line"))
-	{
-		glColor3f(1, 0, 0);
-		glLineWidth(3);
-
-		glBegin(GL_LINES);
-
-		glVertex3f(p[0], p[1], p[2]);
-		glVertex3f(p[0], p[1] + grid_radius, p[2]);
-		glEnd();
-	}
-
-	static const GLfloat light_position[] = {1.0f, 1.0f, -1.0f, 1.0f};
-	static const GLfloat light_ambient[]   = {0.2f, 0.2f, 0.2f, 1.0f};
-	static const GLfloat light_diffuse[]   = {1.0f, 1.0f, 1.0f, 1.0f};
-	static const GLfloat light_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT,   light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,   light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHTING);
-  glEnable(GL_DEPTH_TEST);
-
-	glMatrixMode(GL_MODELVIEW_MATRIX);
-	
-	glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE);
-	double trans_value = para->getDouble("Radius Ball Transparency");
-	glColor4f(0,0,1,trans_value);
-	glShadeModel(GL_SMOOTH);
-
-  if (para->getBool("Show Samples Dot"))
+  Point3f p;
+  if(!pickList.empty() && pickList[0] >= 0)
   {
-    glDepthMask(GL_FALSE);//not for quad
+    int id = pickList[0];
+    if (id >= 0 && id < dataMgr.getCurrentSamples()->vert.size())
+    {
+      p = dataMgr.getCurrentSamples()->vert[id].P();
+    }
+    else
+    {
+      p = dataMgr.getCurrentSamples()->vert[0].P();
+    }
   }
   else
   {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_DEPTH_TEST);
+    p = dataMgr.getCurrentSamples()->vert[0].P();
   }
-	//glEnable(GL_CULL_FACE);
 
-	CMesh* samples = dataMgr.getCurrentSamples();
-	
-	if (para->getBool("Show All Radius") && samples->vn < 1000)
-	{
-		for(int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			glPushMatrix();
-			glTranslatef(v.P()[0], v.P()[1], v.P()[2]);
-			//glutSolidSphere(grid_radius  / sqrt(h_Gaussian_para), 40, 40);
-			glPopMatrix();
-		}
-	}
-	else
-	{
-		glPushMatrix();
-		glTranslatef(p[0], p[1], p[2]);
-		//glutSolidSphere(grid_radius  / sqrt(h_Gaussian_para), 40, 40);
+  double h_Gaussian_para = global_paraMgr.wLop.getDouble("H Gaussian Para");
+  double grid_radius = global_paraMgr.data.getDouble("CGrid Radius");
+
+  if (!takeSnapTile && para->getBool("Show Red Radius Line"))
+  {
+    glColor3f(1, 0, 0);
+    glLineWidth(3);
+
+    glBegin(GL_LINES);
+
+    glVertex3f(p[0], p[1], p[2]);
+    glVertex3f(p[0], p[1] + grid_radius, p[2]);
+    glEnd();
+  }
+
+  glMatrixMode(GL_MODELVIEW_MATRIX);
+
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  double trans_value = para->getDouble("Radius Ball Transparency");
+  glColor4f(0,0,1,trans_value);
+  glShadeModel(GL_SMOOTH);
+
+
+  CMesh* samples = dataMgr.getCurrentSamples();
+
+  if (para->getBool("Show All Radius") && samples->vn < 1000)
+  {
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      glPushMatrix();
+      glTranslatef(v.P()[0], v.P()[1], v.P()[2]);
+      glutSolidSphere(grid_radius  / sqrt(h_Gaussian_para), 40, 40);
+      glPopMatrix();
+    }
+  }
+  else
+  {
+    glPushMatrix();
+    glTranslatef(p[0], p[1], p[2]);
+    glutSolidSphere(grid_radius  / sqrt(h_Gaussian_para), 40, 40);
 
     if (para->getBool("Show Red Radius Line") 
-        && para->getBool("Show Skeleton")
-        && !dataMgr.getCurrentSkeleton()->isEmpty())
+      && para->getBool("Show Skeleton")
+      && !dataMgr.getCurrentSkeleton()->isEmpty())
     {
       double branch_merge_radius = global_paraMgr.skeleton.getDouble("Branches Merge Max Dist");
       glColor4f(0,1,0.5,0.4);
-      //glutSolidSphere(branch_merge_radius, 40, 40);
+      glutSolidSphere(branch_merge_radius, 40, 40);
 
     }
+    glPopMatrix();
+  }
 
-		glPopMatrix();
-	}
+  if (para->getBool("Show Samples Dot"))
+  {
+    glDepthMask(GL_TRUE);
+  }
 
-	if (para->getBool("Show Samples Dot"))
-	{
-		glDepthMask(GL_TRUE);
-		//glDisable(GL_DEPTH_TEST);
-	}
-
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-	glDisable(GL_BLEND);
-	//glDisable(GL_CULL_FACE);
-
-
-	//initLight();
+  glDisable(GL_LIGHTING);
+  glDisable(GL_LIGHT0);
+  glDisable(GL_BLEND);
+  glDisable(GL_CULL_FACE); 
 }
 
 void GLArea::drawLightBall()
