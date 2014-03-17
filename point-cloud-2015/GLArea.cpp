@@ -233,7 +233,8 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
     if (para->getBool("Show Samples Sphere"))
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
-
+    glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), 
+                                     dataMgr.getCurrentDualSamples());
   }
 
 	if (para->getBool("Show Normal")) 

@@ -332,9 +332,12 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
   dual_samples.vert.clear();
   for (int i = 0; i < samples.vert.size(); i++)
   {
-    dual_samples.vert.push_back(samples.vert[i]);
+    CVertex v = samples.vert[i];
+    v.is_dual_sample = true;
+    dual_samples.vert.push_back(v);
   }
   dual_samples.bbox = samples.bbox;
+  dual_samples.vn = samples.vn;
 
   getInitRadiuse();
 }

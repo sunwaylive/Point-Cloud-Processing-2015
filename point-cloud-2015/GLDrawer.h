@@ -60,6 +60,7 @@ public:
 	void drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_as_dot);
 	void setRGBNormals(vector<Point3f>& normals){RGB_normals = normals; }
 
+  void drawDualSampleRelations(CMesh* samples, CMesh* dual_samples);
 private:
 	GLColor getColorByType(const CVertex& v);
 	void draw(DrawType type);
