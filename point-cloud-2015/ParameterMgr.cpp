@@ -73,6 +73,8 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Samples Circle", false) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
+  glarea.addParam(new RichBool("Show Dual Samples", true) );
+
 
 	glarea.addParam(new RichBool("Show Original", true) );
 	glarea.addParam(new RichBool("Show Original Quad", false) );

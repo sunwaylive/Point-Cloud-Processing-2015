@@ -176,10 +176,6 @@ public:
 		eigen_vector0 = new_m3_to_m5;
 		eigen_vector1 = new_m6_to_m8;
 
-		//eigen_vector0 = N() ^ Point3d(0.12345, 0.12346, 0.12347);
-		//eigen_vector0.Normalize();
-		//eigen_vector1 = eigen_vector0 ^ N();
-		//eigen_vector1.Normalize();
 	}
 };
 

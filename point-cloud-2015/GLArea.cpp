@@ -223,6 +223,19 @@ void GLArea::paintGL()
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
 	}
 
+  if(para->getBool("Show Dual Samples"))
+  {
+    if(para->getBool("Show Samples Quad"))
+      glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
+    if(para->getBool("Show Samples Dot"))
+      glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+    if(para->getBool("Show Samples Circle"))
+      glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
+    if (para->getBool("Show Samples Sphere"))
+      glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
+
+  }
+
 	if (para->getBool("Show Normal")) 
 	{
 		if(para->getBool("Show Samples"))

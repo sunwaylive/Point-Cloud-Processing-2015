@@ -193,6 +193,24 @@ CMesh* DataMgr::getCurrentSamples()
 	return & samples;
 }
 
+CMesh* DataMgr::getCurrentDualSamples()
+{
+  if(&dual_samples == NULL)
+  {
+    //cout << "DataMgr::getCurrentSamples samples = NULL!!" <<endl;
+    return NULL;
+  }
+
+  if(dual_samples.vert.empty())
+  {
+    //cout << "DataMgr::getCurrentSamples samples.vert.empty()!!" <<endl;
+    //return NULL;
+    return & dual_samples;
+  }
+
+  return & dual_samples;
+}
+
 CMesh* DataMgr::getCurrentOriginal()
 {
   if(&original == NULL)
@@ -310,6 +328,13 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 	{
 		vi->bIsOriginal = false;
 	}
+
+  dual_samples.vert.clear();
+  for (int i = 0; i < samples.vert.size(); i++)
+  {
+    dual_samples.vert.push_back(samples.vert[i]);
+  }
+  dual_samples.bbox = samples.bbox;
 
   getInitRadiuse();
 }

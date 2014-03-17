@@ -36,6 +36,7 @@ public:
   bool isSkeletonEmpty();
 
 	CMesh* getCurrentSamples();
+  CMesh* getCurrentDualSamples();
 	CMesh* getCurrentOriginal();
 	Skeleton* getCurrentSkeleton();
 
@@ -62,6 +63,8 @@ private:
 public:
 	CMesh original;
 	CMesh samples;
+  CMesh dual_samples;
+
 	Skeleton skeleton;
 	//cv::Mat image;
 
