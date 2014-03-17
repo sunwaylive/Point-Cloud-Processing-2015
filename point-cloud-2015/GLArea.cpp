@@ -223,7 +223,8 @@ void GLArea::paintGL()
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
 	}
 
-  if(para->getBool("Show Dual Samples"))
+  //if(para->getBool("Show Dual Samples"))
+  if(para->getBool("Show Skeleton"))
   {
     if(para->getBool("Show Samples Quad"))
       glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());

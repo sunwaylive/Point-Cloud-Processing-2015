@@ -605,6 +605,15 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   }
   strStream << endl;
 
+  strStream << "DSN " << dual_samples.vert.size() << endl;
+  for(int i = 0; i < dual_samples.vert.size(); i++)
+  {
+    CVertex& v = dual_samples.vert[i];
+    strStream << v.P()[0] << "	" << v.P()[1] << "	" << v.P()[2] << "	";
+    strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
+  }
+  strStream << endl;
+
 	outfile.write( strStream.str().c_str(), strStream.str().size() ); 
 	outfile.close();
 }
@@ -899,6 +908,23 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
     }
   }
   
+  sem >> str;
+  if (str == "DSN")
+  {
+    sem >> num;
+    for (int i = 0; i < num; i++)
+    {
+      CVertex v;
+      v.bIsOriginal = false;
+      v.is_dual_sample = true;
+      v.m_index = i;
+      sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+      sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+      dual_samples.vert.push_back(v);
+      dual_samples.bbox.Add(v.P());
+    }
+    dual_samples.vn = dual_samples.vert.size();
+  }
 
 	skeleton.generateBranchSampleMap();
 }
