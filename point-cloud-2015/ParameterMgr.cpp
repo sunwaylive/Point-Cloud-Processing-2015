@@ -161,6 +161,10 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.5));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.0));
+
+  wLop.addParam(new RichDouble("Sample Average Mu3", 0.3));
+  wLop.addParam(new RichBool("Need Sample Average", false));
+
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
 

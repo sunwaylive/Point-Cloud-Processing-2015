@@ -41,6 +41,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+  if(!connect(ui->sample_average_mu3,SIGNAL(valueChanged(double)),this,SLOT(getMu3(double))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
 	if(!connect(ui->iter,SIGNAL(valueChanged(int)),this,SLOT(getIter(int))))
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -53,6 +57,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+  if(!connect(ui->Need_sample_average,SIGNAL(clicked(bool)),this,SLOT(needSampleAverage(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -74,12 +82,18 @@ bool WlopParaDlg::initWidgets()
 	/*ui->rep_pow->setValue(m_paras->wLop.getDouble("Repulsion Power"));
 	ui->fit_pow->setValue(m_paras->wLop.getDouble("Average Power"));*/
 	ui->iter->setValue(m_paras->wLop.getDouble("Num Of Iterate Time"));
+  ui->sample_average_mu3->setValue(m_paras->wLop.getDouble("Sample Average Mu3"));
+
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
 	ui->compute_density->setCheckState(state);
 
 	state = m_paras->wLop.getBool("Need Compute PCA") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
 	ui->compute_pca->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Need Sample Average") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Need_sample_average->setCheckState(state);
+
 	update();
 	repaint();
 	return true;
@@ -120,7 +134,12 @@ void WlopParaDlg::getIter(int _val)
 
 void WlopParaDlg::getMu(double _val)
 {
-	m_paras->wLop.setValue("Repulsion Mu",DoubleValue(_val));
+	m_paras->wLop.setValue("Repulsion Mu", DoubleValue(_val));
+}
+
+void WlopParaDlg::getMu3(double _val)
+{
+  m_paras->wLop.setValue("Sample Average Mu3", DoubleValue(_val));
 }
 
 void WlopParaDlg::isDensity(bool _val)
@@ -131,6 +150,12 @@ void WlopParaDlg::isDensity(bool _val)
 		area->wlop.setFirstIterate();
 	}
 }
+
+ void WlopParaDlg::needSampleAverage(bool _val)
+ {
+   m_paras->wLop.setValue("Need Sample Average", BoolValue(_val));
+
+ }
 
 void WlopParaDlg::isPca(bool _val)
 {

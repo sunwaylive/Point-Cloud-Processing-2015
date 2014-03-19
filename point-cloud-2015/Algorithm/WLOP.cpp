@@ -368,11 +368,18 @@ double WLOP::iterate()
 	computeRepulsionTerm(samples);
 	time.end();
 
-  time.start("Compute Repulsion Term");
-  computeSampleAverageTerm(samples);
-  time.end();
+  bool need_sample_average_term = false;
+  if (para->getBool("Need Sample Average"))
+  {
+    time.start("Compute Repulsion Term");
+    computeSampleAverageTerm(samples);
+    time.end();
+    need_sample_average_term = true;
+  }
+
 
 	double mu = para->getDouble("Repulsion Mu");
+  double mu3 = para->getDouble("Sample Average Mu3");
 	Point3f c;
 
 	for(int i = 0; i < samples->vert.size(); i++)
@@ -390,16 +397,15 @@ double WLOP::iterate()
 			v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
 		}
 
-    if (samples_average_weight_sum[i] > 1e-20 && mu >= 0)
+    if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
     {
-      v.P() +=  samples_average[i] * (mu / samples_average_weight_sum[i]);
+      v.P() +=  samples_average[i] * (mu3 / samples_average_weight_sum[i]);
     }
 
-		if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
+		if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20 )
 		{
 			Point3f diff = v.P() - c; 
 			double move_error = sqrt(diff.SquaredNorm());
-
 			error_x += move_error; 
 		}
 	}

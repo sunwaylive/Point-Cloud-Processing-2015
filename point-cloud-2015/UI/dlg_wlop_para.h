@@ -32,8 +32,12 @@ class WlopParaDlg : public QFrame
 		void getFitPow(double _val);
 		void getIter(int _val);
 		void getMu(double _val);
+    void getMu3(double _val);
+
 		void isDensity(bool _val);
 		void isPca(bool _val);
+    void needSampleAverage(bool _val);
+
 		//
 		void applyWlop();
     void applyDualWlop();
