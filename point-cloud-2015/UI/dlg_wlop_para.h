@@ -36,7 +36,9 @@ class WlopParaDlg : public QFrame
 		void isPca(bool _val);
 		//
 		void applyWlop();
+    void applyDualWlop();
 		void applyAnisotropicLop();
+
 	private:
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;

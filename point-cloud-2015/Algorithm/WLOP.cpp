@@ -44,6 +44,10 @@ void WLOP::setInput(DataMgr* pData)
 		samples = _samples;
 		original = _original;
 
+    if (para->getBool("Run Dual WLOP"))
+    {
+      samples = pData->getCurrentDualSamples();
+    }
 		samples_density.assign(samples->vn, 1);
 	}
 	else
@@ -91,6 +95,9 @@ void WLOP::initVertexes()
 
 	repulsion_weight_sum.assign(samples->vn, 0);
 	average_weight_sum.assign(samples->vn, 0);
+
+  samples_average.assign(samples->vn, vcg::Point3f(0, 0, 0));
+  samples_average_weight_sum.assign(samples->vn, 0);
 
 	if (para->getBool("Need Compute PCA"))
 	{
@@ -207,6 +214,41 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	}
 }
 
+void WLOP::computeSampleAverageTerm(CMesh* samples)
+{
+  double repulsion_power = para->getDouble("Repulsion Power");
+  bool need_density = para->getBool("Need Compute Density");
+  double radius = para->getDouble("CGrid Radius"); 
+
+  double radius2 = radius * radius;
+  double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+
+  cout << endl<< endl<< "Sample Neighbor Size:" << samples->vert[0].neighbors.size() << endl<< endl;
+  for(int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      Point3f diff = v.P() - t.P();
+
+      double dist2  = diff.SquaredNorm();
+      double len = sqrt(dist2);
+      if(len <= 0.001 * radius) len = radius*0.001;
+
+      double w = exp(dist2*iradius16);
+      double rep = w * pow(1.0 / len, repulsion_power);
+
+      if (need_density)
+      {
+        rep *= samples_density[t.m_index];
+      }
+
+      samples_average[i] += t.P() * rep;  
+      samples_average_weight_sum[i] += rep;
+    }
+  }
+}
 
 void WLOP::computeDensity(bool isOriginal, double radius)
 {
@@ -326,6 +368,10 @@ double WLOP::iterate()
 	computeRepulsionTerm(samples);
 	time.end();
 
+  time.start("Compute Repulsion Term");
+  computeSampleAverageTerm(samples);
+  time.end();
+
 	double mu = para->getDouble("Repulsion Mu");
 	Point3f c;
 
@@ -343,6 +389,11 @@ double WLOP::iterate()
 		{
 			v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
 		}
+
+    if (samples_average_weight_sum[i] > 1e-20 && mu >= 0)
+    {
+      v.P() +=  samples_average[i] * (mu / samples_average_weight_sum[i]);
+    }
 
 		if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
 		{

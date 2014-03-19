@@ -38,6 +38,9 @@ private:
 
 	double iterate();
 	void computeAverageTerm(CMesh* samples, CMesh* original);
+
+  void computeSampleAverageTerm(CMesh* samples);
+
 	void computeRepulsionTerm(CMesh* samples);
 
 	void computeDensity(bool isOriginal, double radius);
@@ -60,6 +63,9 @@ private:
 
 	vector<Point3f> repulsion;
 	vector<double>  repulsion_weight_sum;
+
+  vector<Point3f> samples_average;
+  vector<double>  samples_average_weight_sum;
 
 	vector<Point3f> average;
 	vector<double>  average_weight_sum;

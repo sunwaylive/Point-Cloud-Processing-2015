@@ -58,6 +58,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::applyWlop()." << endl;
 	}
+  if(!connect(ui->dual_wlop_apply,SIGNAL(clicked()),this,SLOT(applyDualWlop())))
+  {
+    cerr << "cannot connect WlopParaDlg::applyDualWlop()." << endl;
+  }
 	connect(ui->anisotropic_lop_apply,SIGNAL(clicked()),this,SLOT(applyAnisotropicLop()));
 
 }
@@ -154,6 +158,32 @@ void WlopParaDlg::applyWlop()
   }
 
 }
+
+ void WlopParaDlg::applyDualWlop()
+ {
+   double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius*0.2));
+
+   m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+   area->runWlop();
+   m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
+
+   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+
+   //if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
+   //{
+   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+   //  area->runWlop();
+   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
+   //}
+   //else
+   //{ 
+   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+   //  global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
+   //  calculation_thread.setArea(area);
+   //  calculation_thread.start();
+   //}
+ }
 
 void WlopParaDlg::applyAnisotropicLop()
 {
