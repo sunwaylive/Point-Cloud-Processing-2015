@@ -618,7 +618,7 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 {
   if (samples->vn != dual_samples->vn)
   {
-    cout << "No dual sampels!!!" << endl;
+    //cout << "No dual sampels!!!" << endl;
     return;
   }
 

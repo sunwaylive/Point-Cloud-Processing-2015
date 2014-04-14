@@ -113,6 +113,13 @@ void WLOP::run()
 	{
 		cout << "Run Anisotropic LOP" << endl;
 	}
+
+  if (para->getBool("Run Step Forward"))
+  {
+    cout << "Run Step Forward" << endl;
+    stepForward();
+    return;
+  }
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -122,6 +129,93 @@ void WLOP::run()
 		cout << "Iterated: " << nTimeIterated << endl;
 	}
 	cout << "**************iterate Number: " << nTimeIterated << endl;
+}
+
+void WLOP::computeAverageAddSampleTerm(CMesh* samples, CMesh* original)
+{
+  double average_power = para->getDouble("Average Power");
+  bool need_density = para->getBool("Need Compute Density");
+  double radius = para->getDouble("CGrid Radius"); 
+
+  double radius2 = radius * radius;
+  double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+
+  for(int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    for (int j = 0; j < v.original_neighbors.size(); j++)
+    {
+      CVertex& t = original->vert[v.original_neighbors[j]];
+
+      Point3f diff = v.P() - t.P();
+      double dist2  = diff.SquaredNorm();
+
+      double w = 1;
+      if (para->getBool("Run Anisotropic LOP"))
+      {
+        double len = sqrt(dist2);
+        if(len <= 0.001 * radius) len = radius*0.001;
+        double hn = diff * v.N();
+        double phi = exp(hn * hn * iradius16);
+        w = phi / pow(len, 2 - average_power);
+      }
+      else if (average_power < 2)
+      {
+        double len = sqrt(dist2);
+        if(len <= 0.001 * radius) len = radius*0.001;
+        w = exp(dist2 * iradius16) / pow(len, 2 - average_power);
+      }
+      else
+      {
+        w = exp(dist2 * iradius16);
+      }
+
+      if (need_density)
+      {
+        w *= original_density[t.m_index];
+      }
+
+      average[i] += t.P() * w;  
+      average_weight_sum[i] += w;  
+    }
+
+    for (int k = 0; k < v.neighbors.size(); k++)
+    {
+      CVertex& t = samples->vert[v.neighbors[k]];
+
+      Point3f diff = v.P() - t.P();
+      double dist2  = diff.SquaredNorm();
+
+      double w = 1;
+      if (para->getBool("Run Anisotropic LOP"))
+      {
+        double len = sqrt(dist2);
+        if(len <= 0.001 * radius) len = radius*0.001;
+        double hn = diff * v.N();
+        double phi = exp(hn * hn * iradius16);
+        w = phi / pow(len, 2 - average_power);
+      }
+      else if (average_power < 2)
+      {
+        double len = sqrt(dist2);
+        if(len <= 0.001 * radius) len = radius*0.001;
+        w = exp(dist2 * iradius16) / pow(len, 2 - average_power);
+      }
+      else
+      {
+        w = exp(dist2 * iradius16);
+      }
+
+      if (need_density)
+      {
+        w *= 1.0 / (samples_density[t.m_index] * samples_density[t.m_index]);
+      }
+
+      average[i] += t.P() * w;  
+      average_weight_sum[i] += w;  
+    }
+  }
 }
 
 void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
@@ -233,19 +327,26 @@ void WLOP::computeSampleAverageTerm(CMesh* samples)
       Point3f diff = v.P() - t.P();
 
       double dist2  = diff.SquaredNorm();
-      double len = sqrt(dist2);
-      if(len <= 0.001 * radius) len = radius*0.001;
+//       double len = sqrt(dist2);
+//       if(len <= 0.001 * radius) len = radius*0.001;
 
       double w = exp(dist2*iradius16);
-      double rep = w * pow(1.0 / len, repulsion_power);
+      //double rep = w * pow(1.0 / len, repulsion_power);
 
       if (need_density)
       {
-        rep *= samples_density[t.m_index];
+        w *= samples_density[t.m_index];
       }
 
-      samples_average[i] += t.P() * rep;  
-      samples_average_weight_sum[i] += rep;
+      //w = 1.0;
+
+      samples_average[i] += t.P() * w;  
+
+//       if (i < 5)
+//       {
+//         cout << t.P().X() << "  " << t.P().Y() << " " << t.P().Z() << endl;
+//       }
+      samples_average_weight_sum[i] += w;
     }
   }
 }
@@ -360,8 +461,15 @@ double WLOP::iterate()
 		para->getDouble("CGrid Radius"), box);
 	time.end();
 
-	time.start("Compute Average Term");
-	computeAverageTerm(samples, original);
+  time.start("Compute Average Term");
+  if (para->getBool("Original Combine Sample"))
+  {
+    computeAverageAddSampleTerm(samples, original);
+  }
+  else
+  {
+    computeAverageTerm(samples, original);
+  }
 	time.end();
 
 	time.start("Compute Repulsion Term");
@@ -392,7 +500,7 @@ double WLOP::iterate()
 			v.P() = average[i] / average_weight_sum[i];
 		}
 
-		if (repulsion_weight_sum[i] > 1e-20 && mu >= 0)
+		if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
 		{
 			v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
 		}
@@ -448,4 +556,15 @@ void WLOP::recomputePCA_Normal()
 		}
 		v.recompute_m_render();
 	}
+}
+
+void WLOP::stepForward()
+{
+  float pace_size = 0.1 * para->getDouble("CGrid Radius");
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    v.P() += v.N() * pace_size;
+  }
+  //recomputePCA_Normal();
 }

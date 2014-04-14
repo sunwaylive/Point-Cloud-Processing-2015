@@ -37,11 +37,13 @@ class WlopParaDlg : public QFrame
 		void isDensity(bool _val);
 		void isPca(bool _val);
     void needSampleAverage(bool _val);
+    void needOriginalCombineSample(bool _val);
 
 		//
 		void applyWlop();
     void applyDualWlop();
 		void applyAnisotropicLop();
+    void applyStepForward();
 
 	private:
 		Ui::para_wlop * ui;

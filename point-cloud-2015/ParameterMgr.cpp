@@ -159,16 +159,19 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Average Power", 1.0));
 	wLop.addParam(new RichBool("Need Compute Density", true));
 	wLop.addParam(new RichBool("Need Compute PCA", false));
-	wLop.addParam(new RichDouble("Repulsion Mu", 0.5));
-	wLop.addParam(new RichDouble("Repulsion Mu2", 0.0));
+	wLop.addParam(new RichDouble("Repulsion Mu", 0.45));
+	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 
-  wLop.addParam(new RichDouble("Sample Average Mu3", 0.3));
+  wLop.addParam(new RichDouble("Sample Average Mu3", 0.1));
   wLop.addParam(new RichBool("Need Sample Average", false));
 
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
+  wLop.addParam(new RichBool("Run Step Forward", false));
+  wLop.addParam(new RichBool("Original Combine Sample", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
+
 }
 
 void ParameterMgr::initSkeletonParameter()

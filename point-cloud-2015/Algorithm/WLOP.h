@@ -38,6 +38,7 @@ private:
 
 	double iterate();
 	void computeAverageTerm(CMesh* samples, CMesh* original);
+  void computeAverageAddSampleTerm(CMesh* samples, CMesh* original);
 
   void computeSampleAverageTerm(CMesh* samples);
 
@@ -45,6 +46,8 @@ private:
 
 	void computeDensity(bool isOriginal, double radius);
 	void recomputePCA_Normal();
+
+  void stepForward();
 
 
 private:

@@ -61,6 +61,10 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
+  if(!connect(ui->Need_original_combine_sample,SIGNAL(clicked(bool)),this,SLOT(needOriginalCombineSample(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -71,6 +75,8 @@ void WlopParaDlg::initConnects()
     cerr << "cannot connect WlopParaDlg::applyDualWlop()." << endl;
   }
 	connect(ui->anisotropic_lop_apply,SIGNAL(clicked()),this,SLOT(applyAnisotropicLop()));
+
+  connect(ui->step_forward,SIGNAL(clicked()),this,SLOT(applyStepForward()));
 
 }
 
@@ -93,6 +99,9 @@ bool WlopParaDlg::initWidgets()
 
   state = m_paras->wLop.getBool("Need Sample Average") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Need_sample_average->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Original Combine Sample") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Need_original_combine_sample->setCheckState(state);
 
 	update();
 	repaint();
@@ -163,6 +172,11 @@ void WlopParaDlg::isPca(bool _val)
 
 }
 
+void WlopParaDlg::needOriginalCombineSample(bool _val)
+{
+  m_paras->wLop.setValue("Original Combine Sample", BoolValue(_val));
+}
+
 // apply
 void WlopParaDlg::applyWlop()
 {
@@ -227,6 +241,16 @@ void WlopParaDlg::applyAnisotropicLop()
 	}
 
 }
+
+void WlopParaDlg::applyStepForward()
+{
+  m_paras->wLop.setValue("Run Step Forward", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Step Forward", BoolValue(false));
+
+  
+}
+
 
 WlopParaDlg::~WlopParaDlg()
 {
