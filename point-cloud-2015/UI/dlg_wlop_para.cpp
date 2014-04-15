@@ -78,8 +78,8 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::applyDualWlop()." << endl;
   }
-	connect(ui->anisotropic_lop_apply,SIGNAL(clicked()),this,SLOT(applyAnisotropicLop()));
 
+	connect(ui->anisotropic_lop_apply,SIGNAL(clicked()),this,SLOT(applyAnisotropicLop()));
   connect(ui->step_forward,SIGNAL(clicked()),this,SLOT(applyStepForward()));
 
 }

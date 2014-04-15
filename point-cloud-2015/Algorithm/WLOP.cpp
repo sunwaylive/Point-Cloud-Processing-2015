@@ -505,10 +505,16 @@ double WLOP::iterate()
     {
       CVertex& v = samples->vert[i];
 
-      Point3f temp_p = Point3f(0., 0, 0);
+      Point3f temp_p = v.P();
+
+      if (average_weight_sum[i] > 1e-20)
+      {
+        temp_p = average[i] / average_weight_sum[i];
+      }
+
       if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
       {
-        temp_p = v.P() +  repulsion[i] * (mu / repulsion_weight_sum[i]);
+        temp_p += repulsion[i] * (mu / repulsion_weight_sum[i]);
       }
 
       Point3f move_vector = temp_p - v.P();
@@ -532,13 +538,17 @@ double WLOP::iterate()
         float dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
         float w = exp(dist2 * iradius16);
 
-        sum_move_proj += w * dist2;
+        sum_move_proj += w * neighbor_move_proj;
         sum_w += w;
       }
 
       float avg_move_proj = sum_move_proj / sum_w;
 
-      v.P() += v.N() * avg_move_proj;
+      if (sum_w > 0.0)
+      {
+        v.P() += v.N() * avg_move_proj;
+      }
+
     }
   }
   else
