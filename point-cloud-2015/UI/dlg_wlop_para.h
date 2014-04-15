@@ -38,6 +38,7 @@ class WlopParaDlg : public QFrame
 		void isPca(bool _val);
     void needSampleAverage(bool _val);
     void needOriginalCombineSample(bool _val);
+    void needAverageMovement(bool _val);
 
 		//
 		void applyWlop();

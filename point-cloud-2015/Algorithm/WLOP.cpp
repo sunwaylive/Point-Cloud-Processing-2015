@@ -485,39 +485,94 @@ double WLOP::iterate()
     need_sample_average_term = true;
   }
 
-
 	double mu = para->getDouble("Repulsion Mu");
   double mu3 = para->getDouble("Sample Average Mu3");
 	Point3f c;
 
-	for(int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		c = v.P();
+  vector<Point3f> new_sample_positions;
+  vector<float> move_proj_vec;
 
-		if (average_weight_sum[i] > 1e-20)
-		{
-			v.P() = average[i] / average_weight_sum[i];
-		}
+  double radius = para->getDouble("CGrid Radius");
+  double radius2 = radius * radius;
+  double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
 
-		if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
-		{
-			v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
-		}
+  if (para->getBool("Need Averaging Movement"))
+  {
+    new_sample_positions.assign(samples->vert.size(), Point3f(0.,0.,0.));
+    move_proj_vec.assign(samples->vert.size(), 0.);
 
-    if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
+    for (int i = 0; i < samples->vert.size(); i++)
     {
-      v.P() +=  samples_average[i] * (mu3 / samples_average_weight_sum[i]);
+      CVertex& v = samples->vert[i];
+
+      Point3f temp_p = Point3f(0., 0, 0);
+      if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+      {
+        temp_p = v.P() +  repulsion[i] * (mu / repulsion_weight_sum[i]);
+      }
+
+      Point3f move_vector = temp_p - v.P();
+      float move_proj = move_vector * v.N();
+      move_proj_vec[i] = move_proj;
     }
 
-		if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20 )
-		{
-			Point3f diff = v.P() - c; 
-			double move_error = sqrt(diff.SquaredNorm());
-			error_x += move_error; 
-		}
-	}
-	error_x = error_x / samples->vn;
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      float sum_move_proj = 0.0;
+      float sum_w = 0.0;
+
+      for (int j = 0; j < v.neighbors.size(); j++)
+      {
+        int neighbor_idx = v.neighbors[j];
+        CVertex& t = samples->vert[neighbor_idx];
+        float neighbor_move_proj = move_proj_vec[neighbor_idx];
+
+        float dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+        float w = exp(dist2 * iradius16);
+
+        sum_move_proj += w * dist2;
+        sum_w += w;
+      }
+
+      float avg_move_proj = sum_move_proj / sum_w;
+
+      v.P() += v.N() * avg_move_proj;
+    }
+  }
+  else
+  {
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      c = v.P();
+
+      if (average_weight_sum[i] > 1e-20)
+      {
+        v.P() = average[i] / average_weight_sum[i];
+      }
+
+      if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+      {
+        v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
+      }
+
+      if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
+      {
+        v.P() +=  samples_average[i] * (mu3 / samples_average_weight_sum[i]);
+      }
+
+      if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20 )
+      {
+        Point3f diff = v.P() - c; 
+        double move_error = sqrt(diff.SquaredNorm());
+        error_x += move_error; 
+      }
+    }
+    error_x = error_x / samples->vn;
+  }
+
 
 	para->setValue("Current Movement Error", DoubleValue(error_x));
 	cout << "****finished compute WLOP error:	" << error_x << endl;

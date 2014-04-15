@@ -168,7 +168,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
   wLop.addParam(new RichBool("Run Step Forward", false));
+ 
   wLop.addParam(new RichBool("Original Combine Sample", false));
+  wLop.addParam(new RichBool("Need Averaging Movement", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
 
@@ -179,7 +181,6 @@ void ParameterMgr::initSkeletonParameter()
   /// 
   skeleton.addParam(new RichDouble("Repulsion Power", 1.0));
   skeleton.addParam(new RichDouble("Average Power", 2.0));
-
 
   /// 
   skeleton.addParam(new RichDouble("Num Of Iterate Time", 1));

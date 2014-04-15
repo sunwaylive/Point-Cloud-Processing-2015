@@ -65,6 +65,10 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
+  if(!connect(ui->Need_averaging_movement,SIGNAL(clicked(bool)),this,SLOT(needAverageMovement(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -102,6 +106,9 @@ bool WlopParaDlg::initWidgets()
 
   state = m_paras->wLop.getBool("Original Combine Sample") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Need_original_combine_sample->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Need Averaging Movement") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Need_averaging_movement->setCheckState(state);
 
 	update();
 	repaint();
@@ -175,6 +182,11 @@ void WlopParaDlg::isPca(bool _val)
 void WlopParaDlg::needOriginalCombineSample(bool _val)
 {
   m_paras->wLop.setValue("Original Combine Sample", BoolValue(_val));
+}
+
+void WlopParaDlg::needAverageMovement(bool _val)
+{
+  m_paras->wLop.setValue("Need Averaging Movement", BoolValue(_val));
 }
 
 // apply
