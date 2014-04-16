@@ -39,6 +39,9 @@ private:
 	void clearAllThresholdFlag();
 	void insertPointsByThreshold();
 
+  void runConstantUpsampling();
+
+  void runGetConstantPredictThreshold();
 	double getPredictThreshold();
 	double getPredictThresholdFirstTime(); 
 

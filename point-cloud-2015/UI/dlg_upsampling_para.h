@@ -36,6 +36,7 @@ class UpsamplingParaDlg : public QFrame
 		//Threshold Method
 		void setThreshold(double _val);
 		void setUsingThresholdProcess(bool _val);
+    void setUseConstantThreshold(bool _val);
 
 		void getSnapShotResolution(double _val);
 		void getSnapShotIndex(double _val);

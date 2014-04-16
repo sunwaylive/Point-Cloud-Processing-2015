@@ -151,14 +151,14 @@ void ParameterMgr::initDrawerParameter()
 void ParameterMgr::initWLopParameter()
 {
 	wLop.addParam(new RichString("Algorithm Name", "WLOP") );
-	wLop.addParam(new RichDouble("Num Of Iterate Time", 5));
+	wLop.addParam(new RichDouble("Num Of Iterate Time", 1));
 
 	wLop.addParam(new RichDouble("CGrid Radius", grid_r));
 	wLop.addParam(new RichDouble("H Gaussian Para", 4));
 	wLop.addParam(new RichDouble("Repulsion Power", 1.0));
 	wLop.addParam(new RichDouble("Average Power", 1.0));
 	wLop.addParam(new RichBool("Need Compute Density", true));
-	wLop.addParam(new RichBool("Need Compute PCA", false));
+	wLop.addParam(new RichBool("Need Compute PCA", true));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.3));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 
@@ -276,7 +276,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 30));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 30));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 60));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 
@@ -293,12 +293,16 @@ void ParameterMgr::initUpsamplingParameter()
 
 	upsampling.addParam(new RichDouble("CGrid Radius", 0.08) );
 	upsampling.addParam(new RichInt("Number of Add Point", 50000) );
-	upsampling.addParam(new RichDouble("Feature Sigma", 30));
+	upsampling.addParam(new RichDouble("Feature Sigma", 60));
 
 	upsampling.addParam(new RichBool("Using Threshold Process", true) );
 	upsampling.addParam(new RichDouble("Dist Threshold", 0.02));
 	upsampling.addParam(new RichDouble("Edge Parameter", 0.0));
 	upsampling.addParam(new RichDouble("Z Parameter", 0.1));
+
+  upsampling.addParam(new RichBool("Use Constant Threshold", false) );
+  upsampling.addParam(new RichBool("Run Predict Constant Threshold", false) );
+
 
 	upsampling.addParam(new RichBool("Auto Recompute Radius For Dist", true) );
 	upsampling.addParam(new RichDouble("Min Dist Rate", 2.0));

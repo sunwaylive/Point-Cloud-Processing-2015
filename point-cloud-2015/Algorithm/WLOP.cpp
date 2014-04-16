@@ -504,7 +504,6 @@ double WLOP::iterate()
     for (int i = 0; i < samples->vert.size(); i++)
     {
       CVertex& v = samples->vert[i];
-
       Point3f temp_p = v.P();
 
       if (average_weight_sum[i] > 1e-20)

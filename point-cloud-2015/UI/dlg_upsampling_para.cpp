@@ -31,7 +31,9 @@ void UpsamplingParaDlg::initConnects()
 
 	connect(ui->add_num,SIGNAL(valueChanged(int)),this,SLOT(setNum(int)));
 	connect(ui->using_threshol_process,SIGNAL(clicked(bool)),this,SLOT(setUsingThresholdProcess(bool)));
-	connect(ui->threshold,SIGNAL(valueChanged(double)),this,SLOT(setThreshold(double)));
+  connect(ui->use_constant_threshold,SIGNAL(clicked(bool)),this,SLOT(setUseConstantThreshold(bool)));
+
+  connect(ui->threshold,SIGNAL(valueChanged(double)),this,SLOT(setThreshold(double)));
 	connect(ui->apply_add_point,SIGNAL(clicked()),this,SLOT(runAddPts()));
 	connect(ui->pushButton_Projection,SIGNAL(clicked()),this,SLOT(runProjection()));
 
@@ -57,7 +59,10 @@ bool UpsamplingParaDlg::initWidgets()
 	Qt::CheckState state = m_paras->upsampling.getBool("Using Threshold Process") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
 	ui->using_threshol_process->setCheckState(state);
 	
-	state = m_paras->upsampling.getBool("Auto Recompute Radius For Dist") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+	//state = m_paras->upsampling.getBool("Auto Recompute Radius For Dist") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+
+  state = m_paras->upsampling.getBool("Use Constant Threshold") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->use_constant_threshold->setCheckState(state);
 
 	ui->threshold->setValue(m_paras->upsampling.getDouble("Dist Threshold"));
 	ui->edge_paramete->setValue(m_paras->upsampling.getDouble("Edge Parameter"));
@@ -85,7 +90,6 @@ void UpsamplingParaDlg::getSigma(double _val)
 {
 	m_paras->upsampling.setValue("Feature Sigma",DoubleValue(_val));
 }
-
 
 
 void UpsamplingParaDlg::runAddPts()
@@ -119,6 +123,18 @@ void UpsamplingParaDlg::setThreshold(double _val)
 void UpsamplingParaDlg::setUsingThresholdProcess(bool _val)
 {
 	m_paras->upsampling.setValue("Using Threshold Process", BoolValue(_val));
+}
+
+void UpsamplingParaDlg::setUseConstantThreshold(bool _val)
+{
+  m_paras->upsampling.setValue("Use Constant Threshold", BoolValue(_val));
+
+  if (_val)
+  {
+    m_paras->upsampling.setValue("Run Predict Constant Threshold", BoolValue(true));
+    area->runUpsampling();
+    m_paras->upsampling.setValue("Run Predict Constant Threshold", BoolValue(false));
+  }
 }
 
 

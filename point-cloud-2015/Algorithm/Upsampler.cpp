@@ -50,7 +50,14 @@ void Upsampler::run()
 		cout << "projection" <<endl;
 		optimizeProjection();
 		return;
-	}
+  }
+
+  if (para->getBool("Run Predict Constant Threshold"))
+  {
+    cout << "Run Predict Constant Threshold" << endl;
+    runGetConstantPredictThreshold();
+    return;
+  }
 
 	sigma = para->getDouble("Feature Sigma");
 	G_value = para->getDouble("Edge Parameter");
@@ -61,6 +68,13 @@ void Upsampler::run()
 		radius = para->getDouble("CGrid Radius");
 	}
 
+  if ("Use Constant Threshold")
+  {
+    radius = para->getDouble("CGrid Radius");
+    clearAllThresholdFlag();
+    runConstantUpsampling();
+    return;
+  }
 
 	doUpsampling();	
 }
@@ -249,7 +263,6 @@ double Upsampler::findMaxMidpoint(CVertex & v, int & neighbor_index)
 			bestDist = minDist;
 			neighbor_index = v.neighbors[i];
 		}
-
 	} // for
 
 	return bestDist;// for dist threshold
@@ -259,19 +272,20 @@ double Upsampler::findMaxMidpoint(CVertex & v, int & neighbor_index)
 
 
 
-double Upsampler::getPredictThreshold()
-{
-	int testNumber = 50;
-	float sumDist = 0.0;
-	for(int i = 0; i < samples->vert.size() && i < testNumber; i++)
-	{
-		CVertex& v = samples->vert[i];
-		int secondVertIndx = -1;
-		sumDist += findMaxMidpoint(v, secondVertIndx);
-	}
+//double Upsampler::getPredictThreshold()
+//{
+//	int testNumber = 50;
+//	float sumDist = 0.0;
+//	for(int i = 0; i < samples->vert.size() && i < testNumber; i++)
+//	{
+//		CVertex& v = samples->vert[i];
+//		int secondVertIndx = -1;
+//		sumDist += findMaxMidpoint(v, secondVertIndx);
+//	}
+//
+//	return (sumDist / testNumber) * 0.8;
+//}
 
-	return (sumDist / testNumber) * 0.8;
-}
 
 double Upsampler::getPredictThresholdFirstTime()
 {
@@ -318,119 +332,258 @@ double Upsampler::getPredictThresholdFirstTime()
 }
 // end
 
+
+void Upsampler::runGetConstantPredictThreshold()
+{
+  GlobalFun::computeBallNeighbors(samples, NULL, 
+    para->getDouble("CGrid Radius"), samples->bbox);
+
+
+  float sumDist = 0.0;
+  int testNumber = 0;
+
+  for(int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    int secondVertIndx = -1;
+    sumDist += findMaxMidpoint(v, secondVertIndx);
+    testNumber++;
+  }
+
+  para->setValue("Dist Threshold", DoubleValue((sumDist / testNumber)*2.));
+}
+
+double Upsampler::getPredictThreshold()
+{
+  float sumDist = 0.0;
+  int testNumber = 0;
+
+  for(int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    int secondVertIndx = -1;
+    sumDist += findMaxMidpoint(v, secondVertIndx);
+    testNumber++;
+  }
+
+  return (sumDist / testNumber) * 0.8;
+}
+
+void Upsampler::runConstantUpsampling()
+{
+  int abandonCounter = 0;
+  int loopCounter = 0;
+  double addCounter = 0;
+  int MAX_LOOP = 1;
+
+  while(1)
+  {
+    abandonCounter = 0;
+    loopCounter++;
+
+    int print_threshold_num = 50;
+
+    double dist_threshold = para->getDouble("Dist Threshold");
+
+    cout << "threshold: " << dist_threshold << endl;
+
+    samples->vn = samples->vert.size();
+
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      if(is_abandon_by_threshold[v.m_index])
+      {
+        abandonCounter ++;
+        continue;
+      }
+
+      int firstVertInex = v.m_index;
+      int secondVertIndx = -1;
+      double bestDist = findMaxMidpoint(v, secondVertIndx);
+      //bestDist = sqrt(bestDist);
+
+      if(secondVertIndx < 0)
+        continue;
+
+      if(bestDist < dist_threshold)
+      {
+        if(i < print_threshold_num)
+          cout << bestDist << endl;
+
+        is_abandon_by_threshold[v.m_index] = true;
+        continue;
+      }
+
+      //assert(secondVertIndx >= 0 && secondVertIndx < samples->vert.size());
+      CVertex & t = samples->vert[secondVertIndx];
+
+      //assert(secondVertIndx == t.m_index);  
+
+      CVertex newv;
+      newv.P() = (v.P() + t.P()) / 2.0;  // mass center
+      newv.m_index = samples->vert.size();
+
+      // add new point
+      samples->vert.push_back(newv);
+      is_abandon_by_threshold.push_back(false);
+      addCounter++;
+
+      // get its temporary neighbors to the set
+      set<int> setNewVertexNeighors;
+      getLineVertNeighorsIndex(setNewVertexNeighors, firstVertInex, secondVertIndx);
+      CVertex & pv = samples->vert[samples->vert.size()-1];
+
+      // compute new vertex's temporary neighbors, its will update until project it
+      getNewPointNeighbors(pv, setNewVertexNeighors, false);
+
+
+      //computeNewVertexNormAvgMethod(pv, firstVertInex, secondVertIndx);// 7-11 not sure
+      computeNewVertexProjDist_Sigma(pv, firstVertInex, secondVertIndx);
+
+
+      if(wd != 0.0)
+        pv.P() = pv.P() + pv.N() * (d / wd);
+
+      // update new vertex's neighbors
+      pv.neighbors.clear();
+      getNewPointNeighbors(pv, setNewVertexNeighors, true);
+    }
+
+    if(abandonCounter == samples->vert.size() || loopCounter > MAX_LOOP)
+      break;
+    else
+    {
+      cout << "current size: " << samples->vert.size() << endl;
+      cout << "abandent : " << abandonCounter << endl << endl; 
+    }
+  }
+
+  samples->vn = samples->vert.size();
+
+
+  computeEigenVerctorForRendering();
+}
+
 void Upsampler::insertPointsByThreshold()
 {
-	int abandonCounter = 0;
-	int loopCounter = 0;
-	double addCounter = 0;
-	int MAX_LOOP = 5;
-	int oldSize = samples->vert.size();
-	
-	int max_add_number = para->getInt("Number of Add Point");
+  int abandonCounter = 0;
+  int loopCounter = 0;
+  double addCounter = 0;
+  int MAX_LOOP = 5;
+  int oldSize = samples->vert.size();
 
-	while(1)
-	{
-		abandonCounter = 0;
-		loopCounter++;
+  int max_add_number = para->getInt("Number of Add Point");
 
-		int print_threshold_num = 50;
+  while(1)
+  {
+    abandonCounter = 0;
+    loopCounter++;
 
-		double dist_threshold = para->getDouble("Dist Threshold");
+    int print_threshold_num = 50;
 
-		cout << "threshold: " << dist_threshold << endl;
+    double dist_threshold = para->getDouble("Dist Threshold");
 
-		samples->vn = samples->vert.size();
+    cout << "threshold: " << dist_threshold << endl;
 
-		for(int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			if(is_abandon_by_threshold[v.m_index])
-			{
-				abandonCounter ++;
-				continue;
-			}
+    samples->vn = samples->vert.size();
 
-			int firstVertInex = v.m_index;
-			int secondVertIndx = -1;
-			double bestDist = findMaxMidpoint(v, secondVertIndx);
-			//bestDist = sqrt(bestDist);
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
 
-			if(secondVertIndx < 0)
-				continue;
+      if (v.neighbors.empty())
+      {
+        cout << "empty neighbors!!!" << endl;
+        continue;
+      }
 
-			if(bestDist < dist_threshold)
-			{
-				if(i < print_threshold_num)
-					cout << bestDist << endl;
+      if(is_abandon_by_threshold[v.m_index])
+      {
+        abandonCounter ++;
+        continue;
+      }
 
-				is_abandon_by_threshold[v.m_index] = true;
-				continue;
-			}
+      int firstVertInex = v.m_index;
+      int secondVertIndx = -1;
+      double bestDist = findMaxMidpoint(v, secondVertIndx);
+      //bestDist = sqrt(bestDist);
 
-			//assert(secondVertIndx >= 0 && secondVertIndx < samples->vert.size());
-			CVertex & t = samples->vert[secondVertIndx];
+      if(secondVertIndx < 0)
+        continue;
 
-			//assert(secondVertIndx == t.m_index);  
+      if(bestDist < dist_threshold)
+      {
+        if(i < print_threshold_num)
+          cout << bestDist << endl;
 
-			CVertex newv;
-			newv.P() = (v.P() + t.P()) / 2.0;  // mass center
-			newv.m_index = samples->vert.size();
+        is_abandon_by_threshold[v.m_index] = true;
+        continue;
+      }
 
-			// add new point
-			samples->vert.push_back(newv);
-			is_abandon_by_threshold.push_back(false);
-			addCounter++;
+      //assert(secondVertIndx >= 0 && secondVertIndx < samples->vert.size());
+      CVertex & t = samples->vert[secondVertIndx];
 
-			// get its temporary neighbors to the set
-			set<int> setNewVertexNeighors;
-			getLineVertNeighorsIndex(setNewVertexNeighors, firstVertInex, secondVertIndx);
-			CVertex & pv = samples->vert[samples->vert.size()-1];
+      //assert(secondVertIndx == t.m_index);  
 
-			// compute new vertex's temporary neighbors, its will update until project it
-			getNewPointNeighbors(pv, setNewVertexNeighors, false);
+      CVertex newv;
+      newv.P() = (v.P() + t.P()) / 2.0;  // mass center
+      newv.m_index = samples->vert.size();
 
-      
-			//computeNewVertexNormAvgMethod(pv, firstVertInex, secondVertIndx);// 7-11 not sure
-			computeNewVertexProjDist_Sigma(pv, firstVertInex, secondVertIndx);
+      // add new point
+      samples->vert.push_back(newv);
+      is_abandon_by_threshold.push_back(false);
+      addCounter++;
+
+      // get its temporary neighbors to the set
+      set<int> setNewVertexNeighors;
+      getLineVertNeighorsIndex(setNewVertexNeighors, firstVertInex, secondVertIndx);
+      CVertex & pv = samples->vert[samples->vert.size()-1];
+
+      // compute new vertex's temporary neighbors, its will update until project it
+      getNewPointNeighbors(pv, setNewVertexNeighors, false);
 
 
-			if(wd != 0.0)
-				pv.P() = pv.P() + pv.N() * (d / wd);
+      //computeNewVertexNormAvgMethod(pv, firstVertInex, secondVertIndx);// 7-11 not sure
+      computeNewVertexProjDist_Sigma(pv, firstVertInex, secondVertIndx);
 
-			// update new vertex's neighbors
+
+      if(wd != 0.0)
+        pv.P() = pv.P() + pv.N() * (d / wd);
+
+      // update new vertex's neighbors
       pv.neighbors.clear();
-			getNewPointNeighbors(pv, setNewVertexNeighors, true);
+      getNewPointNeighbors(pv, setNewVertexNeighors, true);
 
-			if (addCounter > max_add_number)
-			{
-				break;
-			}
-		}
+      if (addCounter > max_add_number)
+      {
+        break;
+      }
+    }
 
-		if(abandonCounter == samples->vert.size() || loopCounter > MAX_LOOP || addCounter > max_add_number)
-			break;
-		else
-		{
-			cout << "current size: " << samples->vert.size() << endl;
-			cout << "add point: " << samples->vert.size() - oldSize << endl;
-			oldSize = samples->vert.size();
-			cout << "abandent : " << abandonCounter << endl << endl; 
-		}
+    if(abandonCounter == samples->vert.size() || loopCounter > MAX_LOOP || addCounter > max_add_number)
+      break;
+    else
+    {
+      cout << "current size: " << samples->vert.size() << endl;
+      cout << "add point: " << samples->vert.size() - oldSize << endl;
+      oldSize = samples->vert.size();
+      cout << "abandent : " << abandonCounter << endl << endl; 
+    }
 
-	}
+  }
 
-	samples->vn = samples->vert.size();
+  samples->vn = samples->vert.size();
 
-	if (addCounter > max_add_number)
-	{
-		cout << "exeed max add number" << endl;
-	}
+  if (addCounter > max_add_number)
+  {
+    cout << "exeed max add number" << endl;
+  }
   para->setValue("Dist Threshold", DoubleValue(getPredictThreshold()));
   cout << "getPredictThreshold" << getPredictThreshold() << endl;
 
-	computeEigenVerctorForRendering();
+  computeEigenVerctorForRendering();
 }
-
 
 
 
