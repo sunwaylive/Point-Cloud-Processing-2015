@@ -49,6 +49,8 @@ private:
 	void computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV);
 	void computeEigenVerctorForRendering();
 
+  void removeOneNeighbor(vector<int>& neighbors, int remove_idx);
+
 
 	
 protected:

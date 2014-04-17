@@ -280,7 +280,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 30));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 75));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 90));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 
@@ -297,7 +297,7 @@ void ParameterMgr::initUpsamplingParameter()
 
 	upsampling.addParam(new RichDouble("CGrid Radius", 0.08) );
 	upsampling.addParam(new RichInt("Number of Add Point", 50000) );
-	upsampling.addParam(new RichDouble("Feature Sigma", 60));
+	upsampling.addParam(new RichDouble("Feature Sigma", 90));
 
 	upsampling.addParam(new RichBool("Using Threshold Process", true) );
 	upsampling.addParam(new RichDouble("Dist Threshold", 0.02));

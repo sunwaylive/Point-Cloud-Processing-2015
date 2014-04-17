@@ -153,6 +153,11 @@ void Upsampler::initVertexes()
 void Upsampler::getNewPointNeighbors(CVertex & newv, set<int> & set_nbs, bool isBoth)
 {
 	double radius2 = radius * radius;
+
+  //if (global_paraMgr.wLop.getBool("Use Adaptive Sample Neighbor"))
+  //{
+  //  radius2 /= 4;
+  //}
 	// 
 	set<int>::iterator setIter,setEndIter;
 	setEndIter = set_nbs.end();
@@ -174,6 +179,26 @@ void Upsampler::getNewPointNeighbors(CVertex & newv, set<int> & set_nbs, bool is
 }
 
 
+void Upsampler::removeOneNeighbor(vector<int>& neighbors, int remove_idx)
+{
+  int location = -1;
+  for (int i = 0; i < neighbors.size(); i++)
+  {
+    if (neighbors[i] == remove_idx)
+    {
+      location = i;
+      break;
+    }
+  }
+
+  if (location < 0)
+  {
+    cout << "no way" << endl;
+    system("Pause");
+  }
+
+  neighbors.erase(neighbors.begin() + location);
+}
 
 void Upsampler::getLineVertNeighorsIndex(set<int> & neighbors, int firstV, int secV)
 {
@@ -181,6 +206,12 @@ void Upsampler::getLineVertNeighorsIndex(set<int> & neighbors, int firstV, int s
 
 	CVertex & v = samples->vert[firstV];
 	CVertex & t = samples->vert[secV];
+
+//  if (global_paraMgr.wLop.getBool("Use Adaptive Sample Neighbor"))
+//  {
+////     removeOneNeighbor(v.neighbors, t.m_index);
+////     removeOneNeighbor(t.neighbors, v.m_index);
+//  }
 
 	vector<int>::iterator iter;
 
