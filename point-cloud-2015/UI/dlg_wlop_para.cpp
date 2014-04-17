@@ -69,6 +69,16 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
+
+  if(!connect(ui->Use_Elliptical_Original_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useEllipticalOriginalNeighbor(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
+  if(!connect(ui->Use_KNN_Sample_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useKNNSampleNeighbor(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
+
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -109,6 +119,12 @@ bool WlopParaDlg::initWidgets()
 
   state = m_paras->wLop.getBool("Need Averaging Movement") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Need_averaging_movement->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Use Elliptical Original Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Use_Elliptical_Original_Neighbor->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Use KNN Sample Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Use_KNN_Sample_Neighbor->setCheckState(state);
 
 	update();
 	repaint();
@@ -187,6 +203,16 @@ void WlopParaDlg::needOriginalCombineSample(bool _val)
 void WlopParaDlg::needAverageMovement(bool _val)
 {
   m_paras->wLop.setValue("Need Averaging Movement", BoolValue(_val));
+}
+
+void WlopParaDlg::useEllipticalOriginalNeighbor(bool _val)
+{
+  m_paras->wLop.setValue("Use Elliptical Original Neighbor", BoolValue(_val));
+}
+
+void WlopParaDlg::useKNNSampleNeighbor(bool _val)
+{
+  m_paras->wLop.setValue("Use KNN Sample Neighbor", BoolValue(_val));
 }
 
 // apply

@@ -172,8 +172,10 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", true));
 
-	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
+  wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
+  wLop.addParam(new RichBool("Use KNN Sample Neighbor", false));
 
+	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
 }
 
 void ParameterMgr::initSkeletonParameter()

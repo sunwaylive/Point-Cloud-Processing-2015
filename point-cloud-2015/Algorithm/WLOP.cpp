@@ -222,6 +222,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 {
 	double average_power = para->getDouble("Average Power");
 	bool need_density = para->getBool("Need Compute Density");
+  bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
 	double radius = para->getDouble("CGrid Radius"); 
 
 	double radius2 = radius * radius;
@@ -236,7 +237,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 		{
 			CVertex& t = original->vert[v.original_neighbors[j]];
 			
-			Point3f diff = v.P() - t.P();
+			Point3f diff = t.P() - v.P();
+      double proj_dist = diff * v.N();
+      double proj_dist2 = proj_dist * proj_dist;
+
 			double dist2  = diff.SquaredNorm();
 
 			double w = 1;
@@ -258,6 +262,11 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			{
 				w = exp(dist2 * iradius16);
 			}
+
+      if (use_elliptical_neighbor)
+      {
+        w *= exp(proj_dist2 * iradius16);
+      }
 
 			if (need_density)
 			{
