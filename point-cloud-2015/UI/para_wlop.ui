@@ -168,7 +168,7 @@
     <item>
      <widget class="QCheckBox" name="Use_KNN_Sample_Neighbor">
       <property name="text">
-       <string>Use_KNN_Sample_Neighbor</string>
+       <string>Use_Adaptive_Sample_Neighbor</string>
       </property>
      </widget>
     </item>

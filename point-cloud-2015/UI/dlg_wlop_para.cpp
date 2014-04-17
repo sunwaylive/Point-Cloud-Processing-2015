@@ -74,7 +74,7 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
-  if(!connect(ui->Use_KNN_Sample_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useKNNSampleNeighbor(bool))))
+  if(!connect(ui->Use_KNN_Sample_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useAdaptiveSampleNeighbor(bool))))
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
@@ -123,7 +123,7 @@ bool WlopParaDlg::initWidgets()
   state = m_paras->wLop.getBool("Use Elliptical Original Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Use_Elliptical_Original_Neighbor->setCheckState(state);
 
-  state = m_paras->wLop.getBool("Use KNN Sample Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  state = m_paras->wLop.getBool("Use Adaptive Sample Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Use_KNN_Sample_Neighbor->setCheckState(state);
 
 	update();
@@ -210,9 +210,16 @@ void WlopParaDlg::useEllipticalOriginalNeighbor(bool _val)
   m_paras->wLop.setValue("Use Elliptical Original Neighbor", BoolValue(_val));
 }
 
-void WlopParaDlg::useKNNSampleNeighbor(bool _val)
+void WlopParaDlg::useAdaptiveSampleNeighbor(bool _val)
 {
-  m_paras->wLop.setValue("Use KNN Sample Neighbor", BoolValue(_val));
+  m_paras->wLop.setValue("Use Adaptive Sample Neighbor", BoolValue(_val));
+
+  if (_val)
+  {
+    m_paras->wLop.setValue("Run Compute Initial Sample Neighbor", BoolValue(true));
+    area->runWlop();
+    m_paras->wLop.setValue("Run Compute Initial Sample Neighbor", BoolValue(false));
+  }
 }
 
 // apply

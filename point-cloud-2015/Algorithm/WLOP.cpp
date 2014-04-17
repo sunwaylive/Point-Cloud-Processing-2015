@@ -60,7 +60,9 @@ void WLOP::setInput(DataMgr* pData)
 
 void WLOP::initVertexes()
 {
-	box.SetNull();
+  bool use_current_neighbor = para->getBool("Use Adaptive Sample Neighbor");
+	
+  box.SetNull();
 	CMesh::VertexIterator vi, vi_end;
 
 	int i = 0;
@@ -68,7 +70,10 @@ void WLOP::initVertexes()
 	for(vi = samples->vert.begin(); vi != vi_end; ++vi) 
 	{
 		vi->m_index = i++;
-		vi->neighbors.clear();
+    if (!use_current_neighbor)
+    {
+      vi->neighbors.clear();
+    }
 		vi->original_neighbors.clear();
 
 		if (vi->is_skel_ignore)
@@ -120,6 +125,13 @@ void WLOP::run()
     stepForward();
     return;
   }
+
+  if (para->getBool("Run Compute Initial Sample Neighbor"))
+  {
+    computeInitialSampleNeighbor();
+    return;
+  }
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -434,10 +446,14 @@ double WLOP::iterate()
 		para->getDouble("CGrid Radius"), box);
 	time.end();
 
-	time.start("Sample Sample Neighbor Tree");
-	GlobalFun::computeBallNeighbors(samples, NULL, 
-		para->getDouble("CGrid Radius"), samples->bbox);
-	time.end();
+  if (!para->getBool("Use Adaptive Sample Neighbor"))
+  {
+    time.start("Sample Sample Neighbor Tree");
+    GlobalFun::computeBallNeighbors(samples, NULL, 
+      para->getDouble("CGrid Radius"), samples->bbox);
+    time.end();
+  }
+
 	
 	if (nTimeIterated == 0) 
 	{
@@ -607,28 +623,80 @@ double WLOP::iterate()
 
 void WLOP::recomputePCA_Normal()
 {
-	for(int i = 0; i < samples->vn; i++)
-	{
-		mesh_temp[i].P() = samples->vert[i].P();
-	}
+  if (para->getBool("Use Adaptive Sample Neighbor"))
+  {
+    double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+    double radius = para->getDouble("CGrid Radius"); 
 
-	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-	vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
+    double radius2 = radius * radius;
+    double iradius16 = -4 / radius2;
 
-	for(int i = 0; i < samples->vn; i++)
-	{
-		Point3f& new_normal = mesh_temp[i].N();
-		CVertex& v = samples->vert[i];
-		if (v.N() * new_normal > 0)
-		{
-			v.N() = new_normal;
-		}
-		else
-		{
-			v.N() = -new_normal;
-		}
-		v.recompute_m_render();
-	}
+    //CMesh* samples = mesh;
+    //GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+
+    vector<Point3f> normal_sum;
+    vector<float> normal_weight_sum;
+
+    normal_sum.assign(samples->vert.size(), Point3f(0.,0.,0.));
+    normal_weight_sum.assign(samples->vert.size(), 0);
+
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      for (int j = 0; j < v.neighbors.size(); j++)
+      {
+        CVertex& t = samples->vert[v.neighbors[j]];
+
+        Point3f diff = v.P() - t.P();
+        double dist2  = diff.SquaredNorm();
+
+        double rep; 
+
+        Point3f vm(v.N());
+        Point3f tm(t.N());
+        Point3f d = vm-tm;
+        double psi = exp(-pow(1-vm*tm, 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
+        double theta = exp(dist2*iradius16);
+        rep = psi * theta;
+        rep = max(rep, 1e-10);
+
+        normal_weight_sum[i] += rep;
+        normal_sum[i] += tm * rep;         
+      }
+
+      if (normal_weight_sum[i] > 1e-6)
+      {
+        v.N() = normal_sum[i] / normal_weight_sum[i];
+      }
+    }
+  }
+  else
+  {
+    for(int i = 0; i < samples->vn; i++)
+    {
+      mesh_temp[i].P() = samples->vert[i].P();
+    }
+
+    int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+    vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
+
+    for(int i = 0; i < samples->vn; i++)
+    {
+      Point3f& new_normal = mesh_temp[i].N();
+      CVertex& v = samples->vert[i];
+      if (v.N() * new_normal > 0)
+      {
+        v.N() = new_normal;
+      }
+      else
+      {
+        v.N() = -new_normal;
+      }
+      v.recompute_m_render();
+    }
+  }
+
 }
 
 void WLOP::stepForward()
@@ -640,4 +708,14 @@ void WLOP::stepForward()
     v.P() += v.N() * pace_size;
   }
   //recomputePCA_Normal();
+}
+
+void WLOP::computeInitialSampleNeighbor()
+{
+  
+  Timer time;
+  time.start("Sample Sample Neighbor Tree");
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius")/2, samples->bbox);
+  time.end();
+
 }

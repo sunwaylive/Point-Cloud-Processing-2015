@@ -41,7 +41,7 @@ class WlopParaDlg : public QFrame
     void needAverageMovement(bool _val);
 
     void useEllipticalOriginalNeighbor(bool _val);
-    void useKNNSampleNeighbor(bool _val);
+    void useAdaptiveSampleNeighbor(bool _val);
 
 		//
 		void applyWlop();

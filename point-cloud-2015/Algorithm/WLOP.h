@@ -28,6 +28,7 @@ public:
   int getIterateNum(){ return nTimeIterated; }
 	double getErrorX(){return error_x;}
 
+  void computeInitialSampleNeighbor();
 
 protected:
 	WLOP(){}
