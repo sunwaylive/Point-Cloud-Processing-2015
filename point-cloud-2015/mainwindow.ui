@@ -159,6 +159,7 @@
       <string>Pick Point</string>
      </property>
      <addaction name="actionErase_Pick"/>
+     <addaction name="actionShow_Picked_Neighbor"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -678,6 +679,11 @@
    </property>
    <property name="visible">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionShow_Picked_Neighbor">
+   <property name="text">
+    <string>Show Picked Neighbor</string>
    </property>
   </action>
  </widget>

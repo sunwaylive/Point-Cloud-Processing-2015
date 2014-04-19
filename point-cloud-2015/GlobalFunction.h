@@ -15,6 +15,7 @@
 #include<algorithm>
 #include <math.h>
 #include "ANN/ANN.h"
+#include <vcg/space/fitting3.h>
 
 #define EIGEN_DEFAULT_TO_ROW_MAJOR
 #define EIGEN_EXCEPTIONS
@@ -37,6 +38,8 @@ namespace GlobalFun
 	void computeEigen(CMesh* _samples);
 	void computeEigenIgnoreBranchedPoints(CMesh* _samples);
 	void computeEigenWithTheta(CMesh* _samples, double radius);
+  
+  void computeUndirectedNormal(CMesh* _samples);
 
 	void computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &querypts, int numKnn, bool need_self_included, QString purpose);
 	void computeBallNeighbors(CMesh* mesh0, CMesh* mesh1, double radius, vcg::Box3f& box);

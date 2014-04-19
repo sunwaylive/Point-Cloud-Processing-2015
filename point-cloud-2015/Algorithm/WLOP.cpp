@@ -239,6 +239,8 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+  
+  double close_threshold = radius2 / 16;
 
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
 	for(int i = 0; i < samples->vert.size(); i++)
@@ -288,6 +290,14 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			average[i] += t.P() * w;  
 			average_weight_sum[i] += w;  
 
+
+      if (use_adaptive_mu && !is_sample_close_to_original[v.m_index])
+      {
+        if (dist2 < close_threshold)
+        {
+          is_sample_close_to_original[v.m_index] = true;
+        }
+      }
 		}
 	}
 }
@@ -437,6 +447,12 @@ void WLOP::computeDensity(bool isOriginal, double radius)
 
 double WLOP::iterate()
 {
+  use_adaptive_mu = para->getBool("Use Adaptive Mu");
+  if (use_adaptive_mu)
+  {
+    is_sample_close_to_original.assign(samples->vert.size(), false);
+  }
+
 	Timer time;
 
 	initVertexes();
@@ -512,6 +528,9 @@ double WLOP::iterate()
 
 	double mu = para->getDouble("Repulsion Mu");
   double mu3 = para->getDouble("Sample Average Mu3");
+
+  double current_mu = para->getDouble("Repulsion Mu");
+
 	Point3f c;
 
   vector<Point3f> new_sample_positions;
@@ -536,9 +555,21 @@ double WLOP::iterate()
         temp_p = average[i] / average_weight_sum[i];
       }
 
-      if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+      if (use_adaptive_mu)
       {
-        temp_p += repulsion[i] * (mu / repulsion_weight_sum[i]);
+        if (is_sample_close_to_original[i])
+        {
+          current_mu = mu;
+        }
+        else
+        {
+          current_mu = mu3;
+        }
+      }
+
+      if (repulsion_weight_sum[i] > 1e-20 && current_mu > 0)
+      {
+        temp_p += repulsion[i] * (current_mu / repulsion_weight_sum[i]);
       }
 
       Point3f move_vector = temp_p - v.P();
@@ -623,8 +654,11 @@ double WLOP::iterate()
 
 void WLOP::recomputePCA_Normal()
 {
-  if (para->getBool("Use Adaptive Sample Neighbor"))
+  CMesh temp_mesh;
+  //if (para->getBool("Use Adaptive Sample Neighbor"))
+  if (false)
   {
+
     double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
     double radius = para->getDouble("CGrid Radius"); 
 
@@ -670,6 +704,60 @@ void WLOP::recomputePCA_Normal()
         v.N() = normal_sum[i] / normal_weight_sum[i];
       }
     }
+
+
+
+
+    //for(int i = 0; i < samples->vn; i++)
+    //{
+    //  mesh_temp[i].P() = samples->vert[i].P();
+    //}
+
+    //int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+    //vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormalsWithExistingNeighbor(mesh_temp.begin(), mesh_temp.end());
+
+    //for(int i = 0; i < samples->vn; i++)
+    //{
+    //  Point3f& new_normal = mesh_temp[i].N();
+    //  CVertex& v = samples->vert[i];
+    //  if (v.N() * new_normal > 0)
+    //  {
+    //    v.N() = new_normal;
+    //  }
+    //  else
+    //  {
+    //    v.N() = -new_normal;
+    //  }
+    //  v.recompute_m_render();
+    //}
+
+
+
+
+    //for(int i = 0; i < samples->vn; i++)
+    //{ 
+    //  temp_mesh.vert.push_back(samples->vert[i]);
+    //}
+    //temp_mesh.vn = samples->vert.size();
+
+    //GlobalFun::computeUndirectedNormal(&temp_mesh);
+ 
+    //for(int i = 0; i < samples->vn; i++)
+    //{
+    //  Point3f& new_normal = temp_mesh.vert[i].N();
+    //  //Point3f& new_normal = temp_mesh.vert[i].eigen_vector1;
+
+    //  CVertex& v = samples->vert[i];
+    //  if (v.N() * new_normal > 0)
+    //  {
+    //    v.N() = new_normal;
+    //  }
+    //  else
+    //  {
+    //    v.N() = -new_normal;
+    //  }
+    //  v.recompute_m_render();
+    //}
   }
   else
   {

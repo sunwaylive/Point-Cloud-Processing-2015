@@ -274,7 +274,14 @@ void GLArea::paintGL()
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
 		glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
+
+    if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
+    {
+      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+    }
 	}
+
+
 
 	if (isDragging && para->getBool("Multiply Pick Point"))
 	{

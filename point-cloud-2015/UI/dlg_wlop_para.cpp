@@ -78,6 +78,10 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
+  if(!connect(ui->Use_Adaptive_Mu,SIGNAL(clicked(bool)),this,SLOT(useAdaptiveMu(bool))))
+  {
+    cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+  }
 
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
@@ -125,6 +129,9 @@ bool WlopParaDlg::initWidgets()
 
   state = m_paras->wLop.getBool("Use Adaptive Sample Neighbor") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Use_KNN_Sample_Neighbor->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Use Adaptive Mu") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+  ui->Use_Adaptive_Mu->setCheckState(state);
 
 	update();
 	repaint();
@@ -221,6 +228,12 @@ void WlopParaDlg::useAdaptiveSampleNeighbor(bool _val)
     m_paras->wLop.setValue("Run Compute Initial Sample Neighbor", BoolValue(false));
   }
 }
+
+void WlopParaDlg::useAdaptiveMu(bool _val)
+{
+  m_paras->wLop.setValue("Use Adaptive Mu", BoolValue(_val));
+}
+
 
 // apply
 void WlopParaDlg::applyWlop()

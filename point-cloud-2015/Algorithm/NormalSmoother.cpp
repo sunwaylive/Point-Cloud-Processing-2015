@@ -111,7 +111,12 @@ void NormalSmoother::runNormalSmooth()
 	double iradius16 = -4 / radius2;
 
 	CMesh* samples = mesh;
-	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+
+  if (!global_paraMgr.wLop.getBool("Use Adaptive Sample Neighbor"))
+  {
+    GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+  }
+	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 
 	normal_sum.assign(samples->vert.size(), Point3f(0.,0.,0.));
 	normal_weight_sum.assign(samples->vert.size(), 0);

@@ -75,4 +75,7 @@ private:
 	vector<double>  average_weight_sum;
 
 	vector<CVertex> mesh_temp;
+
+  bool use_adaptive_mu;
+  vector<bool> is_sample_close_to_original;
 };

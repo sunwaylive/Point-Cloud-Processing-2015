@@ -49,7 +49,8 @@ void MainWindow::initWidgets()
 	ui.actionNo_Snap_Radius->setChecked(paras->glarea.getBool("No Snap Radius"));
   ui.actionShow_Skeleton->setChecked(paras->glarea.getBool("Show Skeleton"));
   ui.actionShow_colorful_branches->setChecked(paras->drawer.getBool("Use Differ Branch Color"));
-	
+  ui.actionShow_Picked_Neighbor->setChecked(paras->drawer.getBool("Draw Picked Point Neighbor"));
+
 }
 
 void MainWindow::initConnect()
@@ -99,6 +100,7 @@ void MainWindow::initConnect()
 	connect(ui.actionNo_Snap_Radius,SIGNAL(toggled(bool)),this,SLOT(setNoSnapshotWithRadius(bool)));
   connect(ui.actionShow_Skeleton,SIGNAL(toggled(bool)),this,SLOT(showSkeleton(bool)));
   connect(ui.actionShow_colorful_branches,SIGNAL(toggled(bool)),this,SLOT(showColorfulBranches(bool)));
+  connect(ui.actionShow_Picked_Neighbor,SIGNAL(toggled(bool)),this,SLOT(showPickPointNeighbor(bool)));
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
@@ -491,6 +493,11 @@ void MainWindow::setSnapshotEachIteration(bool _val)
 void MainWindow::setNoSnapshotWithRadius(bool _val)
 {
 	paras->glarea.setValue("No Snap Radius", BoolValue(_val));
+}
+
+void MainWindow::showPickPointNeighbor(bool _val)
+{
+  paras->drawer.setValue("Draw Picked Point Neighbor", BoolValue(_val));
 }
 
 void MainWindow::showColorfulBranches(bool _val)

@@ -471,6 +471,26 @@ void GlobalFun::computeEigenIgnoreBranchedPoints(CMesh* _samples)
 	}
 }
 
+void GlobalFun::computeUndirectedNormal(CMesh* _samples)
+{
+  for (int i = 0; i < _samples->vert.size(); i++)
+  {
+    CVertex& v = _samples->vert[i];
+
+    std::vector<Point3f> ptVec;
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = _samples->vert[v.neighbors[j]];
+      ptVec.push_back(t.P());
+    }
+
+    Plane3f plane;
+    vcg::FitPlaneToPointSet(ptVec, plane);
+    v.N()=plane.Direction();
+  }
+}
+
 void GlobalFun::computeEigen(CMesh* _samples)
 {
 	vector<vector<int> > neighborMap;

@@ -327,6 +327,52 @@ void GLDrawer::drawNormal(const CVertex& v)
 	glEnable(GL_LIGHTING);
 }
 
+void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
+{
+  double width = para->getDouble("Sample Draw Width") * 1.2;
+  GLColor dnn_color = para->getColor("Pick Point DNN Color");
+  glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
+
+  for(int ii = 0; ii < pickList.size(); ii++) 
+  {
+    int i = pickList[ii];
+
+    if(i < 0 )
+      continue;
+
+    CVertex &v = samples->vert[i];
+    Point3f &p = v.P();  
+
+    cout << "Neighbor number: " << v.neighbors.size() << endl;
+
+
+    vector<int>::iterator vi = v.neighbors.begin();
+    int nsize = 6;
+    int j = 0;
+    for(; vi != v.neighbors.end()/* && j < nsize*/; ++vi, ++j)
+    {
+      if( (*vi) > samples->vert.size() || (*vi) < 0)
+        break;
+
+      CVertex& v2 = samples->vert[*vi];
+      Point3f p2 = v2.P();
+
+      glPushMatrix();      
+      glTranslatef(p2[0], p2[1], p2[2]);
+      glutSolidSphere(width, 10, 10);
+      glPopMatrix();
+    }
+
+    //Point3d & p3 = v.nb_center / v.neighbors.size();
+//     Point3d & p3 = samples->vert[v.fatherIndex].P();
+//     glPushMatrix();      
+//     glTranslatef(p3[0], p3[1], p3[2]);
+//     glutSolidCube(width*1.5);
+//     glPopMatrix();
+    //cout << "density: " << v.density << endl;
+  } 
+
+}
 
 void GLDrawer::drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_as_dot)
 {

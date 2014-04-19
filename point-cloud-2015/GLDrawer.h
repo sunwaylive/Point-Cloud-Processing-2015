@@ -58,6 +58,7 @@ public:
 
 	void cleanPickPoint();
 	void drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_as_dot);
+  void drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList);
 	void setRGBNormals(vector<Point3f>& normals){RGB_normals = normals; }
 
   void drawDualSampleRelations(CMesh* samples, CMesh* dual_samples);

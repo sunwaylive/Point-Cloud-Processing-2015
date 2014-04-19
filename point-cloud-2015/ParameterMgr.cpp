@@ -124,8 +124,11 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Use Color From Normal", false));
   drawer.addParam(new RichBool("Use Differ Branch Color", false));
 
+  drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
+
+
 	drawer.addParam(new RichDouble("Original Draw Width", 0.0015));
-	drawer.addParam(new RichDouble("Sample Draw Width", 0.005));
+	drawer.addParam(new RichDouble("Sample Draw Width", 0.02));
 	drawer.addParam(new RichDouble("Sample Dot Size", 6));
 	drawer.addParam(new RichDouble("Original Dot Size", 1));
 	drawer.addParam(new RichDouble("Normal Line Width", 2));
@@ -159,7 +162,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Average Power", 1.0));
 	wLop.addParam(new RichBool("Need Compute Density", true));
 	wLop.addParam(new RichBool("Need Compute PCA", true));
-	wLop.addParam(new RichDouble("Repulsion Mu", 0.3));
+	wLop.addParam(new RichDouble("Repulsion Mu", 0.80));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 
   wLop.addParam(new RichDouble("Sample Average Mu3", 0.1));
@@ -174,6 +177,7 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
+  wLop.addParam(new RichBool("Use Adaptive Mu", false));
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
 

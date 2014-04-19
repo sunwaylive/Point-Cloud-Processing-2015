@@ -84,6 +84,9 @@ private slots:
 	void setNoSnapshotWithRadius(bool _val);
   void showColorfulBranches(bool _val);
 
+  void showPickPointNeighbor(bool _val);
+
+
 	void setSmapleType(QAction * action);
 	void setOriginalType(QAction * action);
 
