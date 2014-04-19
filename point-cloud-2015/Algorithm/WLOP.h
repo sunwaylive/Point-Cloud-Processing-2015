@@ -50,6 +50,8 @@ private:
 
   void stepForward();
 
+  void updateAdaptiveNeighbor();
+
 
 private:
 	RichParameterSet* para;

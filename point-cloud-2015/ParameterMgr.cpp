@@ -128,7 +128,7 @@ void ParameterMgr::initDrawerParameter()
 
 
 	drawer.addParam(new RichDouble("Original Draw Width", 0.0015));
-	drawer.addParam(new RichDouble("Sample Draw Width", 0.02));
+	drawer.addParam(new RichDouble("Sample Draw Width", 0.025));
 	drawer.addParam(new RichDouble("Sample Dot Size", 6));
 	drawer.addParam(new RichDouble("Original Dot Size", 1));
 	drawer.addParam(new RichDouble("Normal Line Width", 2));
@@ -308,7 +308,7 @@ void ParameterMgr::initUpsamplingParameter()
 	upsampling.addParam(new RichDouble("Edge Parameter", 0.0));
 	upsampling.addParam(new RichDouble("Z Parameter", 0.1));
 
-  upsampling.addParam(new RichBool("Use Constant Threshold", false) );
+  upsampling.addParam(new RichBool("Use Constant Threshold", true) );
   upsampling.addParam(new RichBool("Run Predict Constant Threshold", false) );
 
 

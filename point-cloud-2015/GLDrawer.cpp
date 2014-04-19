@@ -330,7 +330,9 @@ void GLDrawer::drawNormal(const CVertex& v)
 void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
   double width = para->getDouble("Sample Draw Width") * 1.2;
-  GLColor dnn_color = para->getColor("Pick Point DNN Color");
+  //GLColor dnn_color = para->getColor("Pick Point DNN Color");
+  GLColor dnn_color = cGreen;
+
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
   for(int ii = 0; ii < pickList.size(); ii++) 

@@ -444,14 +444,44 @@ void WLOP::computeDensity(bool isOriginal, double radius)
 
 }
 
+void WLOP::updateAdaptiveNeighbor()
+{
+  double radius = para->getDouble("CGrid Radius"); 
+  double radius2 = radius * radius;
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    vector<int> new_neighbors;
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+
+      float dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+      //Point3f diff = t.P() - v.P();
+      //diff.normalized();
+
+      if (dist2 < radius2 && (t.N() * v.N()) > 0)
+      {
+        new_neighbors.push_back(v.neighbors[j]);
+      }
+    }
+
+    v.neighbors.clear();
+    for (int j = 0; j < new_neighbors.size(); j++)
+    {
+      v.neighbors.push_back(new_neighbors[j]);
+    }
+  }
+}
 
 double WLOP::iterate()
 {
   use_adaptive_mu = para->getBool("Use Adaptive Mu");
-  if (use_adaptive_mu)
-  {
-    is_sample_close_to_original.assign(samples->vert.size(), false);
-  }
+  is_sample_close_to_original.assign(samples->vert.size(), false);
+  
+  
 
 	Timer time;
 
@@ -468,6 +498,10 @@ double WLOP::iterate()
     GlobalFun::computeBallNeighbors(samples, NULL, 
       para->getDouble("CGrid Radius"), samples->bbox);
     time.end();
+  }
+  else
+  {
+    updateAdaptiveNeighbor();
   }
 
 	
@@ -539,6 +573,21 @@ double WLOP::iterate()
   double radius = para->getDouble("CGrid Radius");
   double radius2 = radius * radius;
   double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+
+  if (use_adaptive_mu)
+  {
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      if (is_sample_close_to_original[i])
+      {
+        samples->vert[i].is_fixed_sample = true;
+      }
+      else
+      {
+        samples->vert[i].is_fixed_sample = false;
+      }
+    }
+  }
 
   if (para->getBool("Need Averaging Movement"))
   {
@@ -655,8 +704,8 @@ double WLOP::iterate()
 void WLOP::recomputePCA_Normal()
 {
   CMesh temp_mesh;
-  //if (para->getBool("Use Adaptive Sample Neighbor"))
-  if (false)
+  if (para->getBool("Use Adaptive Sample Neighbor"))
+  //if (false)
   {
 
     double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
@@ -803,7 +852,7 @@ void WLOP::computeInitialSampleNeighbor()
   
   Timer time;
   time.start("Sample Sample Neighbor Tree");
-  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius")/2, samples->bbox);
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
   time.end();
 
 }

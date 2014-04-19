@@ -232,6 +232,16 @@ void WlopParaDlg::useAdaptiveSampleNeighbor(bool _val)
 void WlopParaDlg::useAdaptiveMu(bool _val)
 {
   m_paras->wLop.setValue("Use Adaptive Mu", BoolValue(_val));
+
+  if (!_val)
+  {
+    CMesh* samples = area->dataMgr.getCurrentSamples();
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      samples->vert[i].is_fixed_sample = false;
+    }
+  }
 }
 
 

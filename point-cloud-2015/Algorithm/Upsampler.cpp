@@ -366,9 +366,11 @@ double Upsampler::getPredictThresholdFirstTime()
 
 void Upsampler::runGetConstantPredictThreshold()
 {
-  GlobalFun::computeBallNeighbors(samples, NULL, 
-    para->getDouble("CGrid Radius"), samples->bbox);
-
+  if (!global_paraMgr.wLop.getBool("Use Adaptive Sample Neighbor"))
+  {
+    GlobalFun::computeBallNeighbors(samples, NULL, 
+      para->getDouble("CGrid Radius"), samples->bbox);
+  }
 
   float sumDist = 0.0;
   int testNumber = 0;
