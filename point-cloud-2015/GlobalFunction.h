@@ -39,7 +39,7 @@ namespace GlobalFun
 	void computeEigenIgnoreBranchedPoints(CMesh* _samples);
 	void computeEigenWithTheta(CMesh* _samples, double radius);
   
-  void computeUndirectedNormal(CMesh* _samples);
+  void computeUndirectedNormal(CMesh* _samples, float radius);
 
 	void computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &querypts, int numKnn, bool need_self_included, QString purpose);
 	void computeBallNeighbors(CMesh* mesh0, CMesh* mesh1, double radius, vcg::Box3f& box);

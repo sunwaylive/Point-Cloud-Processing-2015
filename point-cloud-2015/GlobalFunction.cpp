@@ -471,23 +471,34 @@ void GlobalFun::computeEigenIgnoreBranchedPoints(CMesh* _samples)
 	}
 }
 
-void GlobalFun::computeUndirectedNormal(CMesh* _samples)
+void GlobalFun::computeUndirectedNormal(CMesh* _samples, float radius)
 {
+  float radius2 = radius * radius;
+  radius2 /= 4.0;
+
   for (int i = 0; i < _samples->vert.size(); i++)
   {
     CVertex& v = _samples->vert[i];
 
     std::vector<Point3f> ptVec;
+    ptVec.push_back(v.P());
 
     for (int j = 0; j < v.neighbors.size(); j++)
     {
       CVertex& t = _samples->vert[v.neighbors[j]];
-      ptVec.push_back(t.P());
+
+      float dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+
+      if (dist2 < radius2)
+      {
+        ptVec.push_back(t.P());
+      }
     }
 
     Plane3f plane;
     vcg::FitPlaneToPointSet(ptVec, plane);
     v.N()=plane.Direction();
+    v.N().normalized();
   }
 }
 

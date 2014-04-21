@@ -704,55 +704,56 @@ double WLOP::iterate()
 void WLOP::recomputePCA_Normal()
 {
   CMesh temp_mesh;
-  if (para->getBool("Use Adaptive Sample Neighbor"))
-  //if (false)
+  //if (para->getBool("Use Adaptive Sample Neighbor"))
+  if (false)
   {
 
-    double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
-    double radius = para->getDouble("CGrid Radius"); 
+    //double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+    //double radius = para->getDouble("CGrid Radius"); 
 
-    double radius2 = radius * radius;
-    double iradius16 = -4 / radius2;
+    //double radius2 = radius * radius;
+    //double iradius16 = -4 / radius2;
 
-    //CMesh* samples = mesh;
-    //GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+    ////CMesh* samples = mesh;
+    ////GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 
-    vector<Point3f> normal_sum;
-    vector<float> normal_weight_sum;
+    //vector<Point3f> normal_sum;
+    //vector<float> normal_weight_sum;
 
-    normal_sum.assign(samples->vert.size(), Point3f(0.,0.,0.));
-    normal_weight_sum.assign(samples->vert.size(), 0);
+    //normal_sum.assign(samples->vert.size(), Point3f(0.,0.,0.));
+    //normal_weight_sum.assign(samples->vert.size(), 0);
 
-    for(int i = 0; i < samples->vert.size(); i++)
-    {
-      CVertex& v = samples->vert[i];
+    //for(int i = 0; i < samples->vert.size(); i++)
+    //{
+    //  CVertex& v = samples->vert[i];
 
-      for (int j = 0; j < v.neighbors.size(); j++)
-      {
-        CVertex& t = samples->vert[v.neighbors[j]];
+    //  for (int j = 0; j < v.neighbors.size(); j++)
+    //  {
+    //    CVertex& t = samples->vert[v.neighbors[j]];
 
-        Point3f diff = v.P() - t.P();
-        double dist2  = diff.SquaredNorm();
+    //    Point3f diff = v.P() - t.P();
+    //    double dist2  = diff.SquaredNorm();
 
-        double rep; 
+    //    double rep; 
 
-        Point3f vm(v.N());
-        Point3f tm(t.N());
-        Point3f d = vm-tm;
-        double psi = exp(-pow(1-vm*tm, 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
-        double theta = exp(dist2*iradius16);
-        rep = psi * theta;
-        rep = max(rep, 1e-10);
+    //    Point3f vm(v.N());
+    //    Point3f tm(t.N());
+    //    Point3f d = vm-tm;
+    //    double psi = exp(-pow(1-vm*tm, 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
+    //    double theta = exp(dist2*iradius16);
+    //    rep = psi * theta;
+    //    rep = max(rep, 1e-10);
 
-        normal_weight_sum[i] += rep;
-        normal_sum[i] += tm * rep;         
-      }
+    //    normal_weight_sum[i] += rep;
+    //    normal_sum[i] += tm * rep;         
+    //  }
 
-      if (normal_weight_sum[i] > 1e-6)
-      {
-        v.N() = normal_sum[i] / normal_weight_sum[i];
-      }
-    }
+    //  if (normal_weight_sum[i] > 1e-6)
+    //  {
+    //    v.N() = normal_sum[i] / normal_weight_sum[i];
+    //  }
+    //}
+
 
 
 
@@ -783,30 +784,30 @@ void WLOP::recomputePCA_Normal()
 
 
 
-    //for(int i = 0; i < samples->vn; i++)
-    //{ 
-    //  temp_mesh.vert.push_back(samples->vert[i]);
-    //}
-    //temp_mesh.vn = samples->vert.size();
+    for(int i = 0; i < samples->vn; i++)
+    { 
+      temp_mesh.vert.push_back(samples->vert[i]);
+    }
+    temp_mesh.vn = samples->vert.size();
 
-    //GlobalFun::computeUndirectedNormal(&temp_mesh);
+    GlobalFun::computeUndirectedNormal(&temp_mesh, para->getDouble("CGrid Radius"));
  
-    //for(int i = 0; i < samples->vn; i++)
-    //{
-    //  Point3f& new_normal = temp_mesh.vert[i].N();
-    //  //Point3f& new_normal = temp_mesh.vert[i].eigen_vector1;
+    for(int i = 0; i < samples->vn; i++)
+    {
+      Point3f& new_normal = temp_mesh.vert[i].N();
+      //Point3f& new_normal = temp_mesh.vert[i].eigen_vector1;
 
-    //  CVertex& v = samples->vert[i];
-    //  if (v.N() * new_normal > 0)
-    //  {
-    //    v.N() = new_normal;
-    //  }
-    //  else
-    //  {
-    //    v.N() = -new_normal;
-    //  }
-    //  v.recompute_m_render();
-    //}
+      CVertex& v = samples->vert[i];
+      if (v.N() * new_normal > 0)
+      {
+        v.N() = new_normal;
+      }
+      else
+      {
+        v.N() = -new_normal;
+      }
+      v.recompute_m_render();
+    }
   }
   else
   {
