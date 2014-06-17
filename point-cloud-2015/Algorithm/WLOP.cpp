@@ -481,8 +481,6 @@ double WLOP::iterate()
   use_adaptive_mu = para->getBool("Use Adaptive Mu");
   is_sample_close_to_original.assign(samples->vert.size(), false);
   
-  
-
 	Timer time;
 
 	initVertexes();

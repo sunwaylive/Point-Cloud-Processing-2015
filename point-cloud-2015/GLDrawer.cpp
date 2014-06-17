@@ -154,10 +154,10 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		Color4b c = v.C();
 		return GLColor(c.X()/255., c.Y()/255., c.Z()/255., 1.);
 	}
-	else if (v.is_fixed_sample)
-	{
-		return feature_color;
-	}
+// 	else if (v.is_fixed_sample)
+// 	{
+// 		return feature_color;
+// 	}
 	return sample_color;
 	
 }
@@ -345,8 +345,7 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
     CVertex &v = samples->vert[i];
     Point3f &p = v.P();  
 
-    cout << "Neighbor number: " << v.neighbors.size() << endl;
-
+    //cout << "Neighbor number: " << v.neighbors.size() << endl;
 
     vector<int>::iterator vi = v.neighbors.begin();
     int nsize = 6;
