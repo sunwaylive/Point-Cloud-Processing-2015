@@ -1548,6 +1548,15 @@ void GLArea::mouseReleaseEvent(QMouseEvent *e)
 			fatherPickList.clear();
 			RGBPickList.assign(3, -1);
 			RGB_counter = 0;
+
+      if (pickList.empty())
+      {
+        para->setValue("Picked Index", DoubleValue(-1));
+      }
+      else
+      {
+        para->setValue("Picked Index", DoubleValue(pickList[0]));
+      }
 		}
 	}
 

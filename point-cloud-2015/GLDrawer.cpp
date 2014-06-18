@@ -113,6 +113,10 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
+  if (v.is_new)
+  {
+    return cGray;
+  }
 
   if (v.is_dual_sample)
   {
@@ -669,13 +673,24 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
   //  return;
   //}
 
-  for (int i = 0; i < dual_samples->vert.size(); i++)
-  {
-    CVertex& v = dual_samples->vert[i];
 
-    //CVertex& dual_v = dual_samples->vert[i];
-    CVertex& dual_v = samples->vert[v.dual_index];
+
+  //for (int i = 0; i < dual_samples->vert.size(); i++)
+  //{
+  //  CVertex& v = dual_samples->vert[i];
+  //  //CVertex& dual_v = dual_samples->vert[i];
+  //  CVertex& dual_v = samples->vert[v.dual_index];
+
+  //  glDrawLine(v.P(), dual_v.P(), cGreen, 2);
+  //}
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+    //CVertex& dual_v = samples->vert[v.dual_index];
 
     glDrawLine(v.P(), dual_v.P(), cGreen, 2);
   }
+
 }

@@ -58,6 +58,7 @@
     <addaction name="actionClear_Data"/>
     <addaction name="actionImport_Image"/>
     <addaction name="actionSave_View"/>
+    <addaction name="actionSwitch_Sample_DualSample"/>
    </widget>
    <widget class="QMenu" name="menuAlgorithom">
     <property name="title">
@@ -684,6 +685,11 @@
   <action name="actionShow_Picked_Neighbor">
    <property name="text">
     <string>Show Picked Neighbor</string>
+   </property>
+  </action>
+  <action name="actionSwitch_Sample_DualSample">
+   <property name="text">
+    <string>Switch Sample DualSample</string>
    </property>
   </action>
  </widget>

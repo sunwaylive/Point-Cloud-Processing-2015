@@ -45,6 +45,8 @@ class UpsamplingParaDlg : public QFrame
 		void getSpeed(double _val);
 		void applyPlayVideo();
 
+    void runPointsExtrapolation();
+
 	private:
 		Ui::Upsampling_para * ui;
 		ParameterMgr * m_paras;

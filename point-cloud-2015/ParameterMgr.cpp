@@ -89,6 +89,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Radius Use Pick", true));
 	glarea.addParam(new RichBool("Show Red Radius Line", true));
 	glarea.addParam(new RichBool("Multiply Pick Point", true) );
+  glarea.addParam(new RichDouble("Picked Index", 0));
 
 	glarea.addParam(new RichBool("GLarea Busying", false) );
   glarea.addParam(new RichBool("Algorithom Stop", false) );
@@ -324,5 +325,8 @@ void ParameterMgr::initUpsamplingParameter()
 	upsampling.addParam(new RichDouble("Upsample Radius", grid_r * 0.5) );
 	upsampling.addParam(new RichBool("Use Proj New Term", false));
 	upsampling.addParam(new RichBool("Run Projection", false));
+
+  upsampling.addParam(new RichBool("Run Points Extrapolation", false));
+
 
 }

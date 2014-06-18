@@ -36,6 +36,7 @@ void UpsamplingParaDlg::initConnects()
   connect(ui->threshold,SIGNAL(valueChanged(double)),this,SLOT(setThreshold(double)));
 	connect(ui->apply_add_point,SIGNAL(clicked()),this,SLOT(runAddPts()));
 	connect(ui->pushButton_Projection,SIGNAL(clicked()),this,SLOT(runProjection()));
+  connect(ui->Points_extrapolation,SIGNAL(clicked()),this,SLOT(runPointsExtrapolation()));
 
 	connect(ui->edge_paramete,SIGNAL(valueChanged(double)),this,SLOT(setEdgeParameter(double)));
 
@@ -105,6 +106,16 @@ void UpsamplingParaDlg::runProjection()
 	m_paras->upsampling.setValue("Run Projection", BoolValue(false));
 	area->dataMgr.recomputeQuad();
 	area->updateGL();
+}
+
+
+void UpsamplingParaDlg::runPointsExtrapolation()
+{
+  m_paras->upsampling.setValue("Run Points Extrapolation", BoolValue(true));
+  area->runUpsampling();
+  m_paras->upsampling.setValue("Run Points Extrapolation", BoolValue(false));
+  area->dataMgr.recomputeQuad();
+  area->updateGL();
 }
 
 
@@ -276,3 +287,4 @@ void UpsamplingParaDlg::applyPlayVideo()
 	area->updateGL();
 
 }
+

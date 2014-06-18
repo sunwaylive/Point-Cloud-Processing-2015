@@ -268,28 +268,53 @@ void WlopParaDlg::applyWlop()
 
 }
 
+//void WlopParaDlg::applyDualConnection()
+//{
+//  CMesh* samples = area->dataMgr.getCurrentSamples();
+//  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+//
+//  GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+//  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+//
+//  cout << "finished ANN " << endl;
+//
+//  for (int i = 0; i < dual_samples->vert.size(); i++)
+//  {
+//    int dual_index = dual_samples->vert[i].neighbors[0];
+//    if (dual_index < 0 && dual_index >= samples->vert.size())
+//    {
+//      dual_index = 0;
+//    }
+//    dual_samples->vert[i].dual_index = dual_index;
+//  }
+//
+//  return;
+//}
+
+
 void WlopParaDlg::applyDualConnection()
 {
   CMesh* samples = area->dataMgr.getCurrentSamples();
   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
 
-  GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
-  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+  //GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
 
   cout << "finished ANN " << endl;
 
-  for (int i = 0; i < dual_samples->vert.size(); i++)
+  for (int i = 0; i < samples->vert.size(); i++)
   {
-    int dual_index = dual_samples->vert[i].neighbors[0];
-    if (dual_index < 0 && dual_index >= samples->vert.size())
+    int dual_index = samples->vert[i].neighbors[0];
+    if (dual_index < 0 && dual_index >= dual_samples->vert.size())
     {
       dual_index = 0;
     }
-    dual_samples->vert[i].dual_index = dual_index;
+    samples->vert[i].dual_index = dual_index;
   }
 
   return;
 }
+
 
  void WlopParaDlg::applyDualWlop()
  {

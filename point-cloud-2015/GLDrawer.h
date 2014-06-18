@@ -39,6 +39,7 @@ static GLColor cBlack(0, 0, 0);
 static GLColor cYellow(0.2, 1, 0.2);
 static GLColor cOrange(0.6, 0.4, 0);
 static GLColor cSnow(0.5, 0.5, 0.5);
+static GLColor cGray(0.8, 0.8, 0.8);
 static GLColor cPink(0.8, 0.1, 0.5);
 
 

@@ -60,6 +60,8 @@ private slots:
 
 	void removePickPoints();
 
+  void switchSampleDualSample();
+
 	
 
 private slots:

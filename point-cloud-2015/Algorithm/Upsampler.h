@@ -51,6 +51,8 @@ private:
 
   void removeOneNeighbor(vector<int>& neighbors, int remove_idx);
 
+  void pointsExtrapoaltion();
+
 
 	
 protected:

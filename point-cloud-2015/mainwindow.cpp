@@ -115,7 +115,8 @@ void MainWindow::initConnect()
 	connect(ui.actionFeature_Color,SIGNAL(triggered()),this,SLOT(featureColor()));
 
 	connect(ui.actionErase_Pick,SIGNAL(triggered()),this,SLOT(removePickPoints()));
-	
+  connect(ui.actionSwitch_Sample_DualSample,SIGNAL(triggered()),this,SLOT(switchSampleDualSample()));
+
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this->area, SLOT(update()));
 	timer->start(100);
@@ -768,4 +769,11 @@ void MainWindow::removePickPoints()
 	area->removePickPoint();
 	area->updateUI();
 	area->updateGL();
+}
+
+void MainWindow::switchSampleDualSample()
+{
+  area->cleanPickPoints();
+  area->dataMgr.switchSampleDualSample();
+  area->updateUI();
 }

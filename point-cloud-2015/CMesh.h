@@ -64,6 +64,7 @@ public:
   double skel_radius; // remember radius for branches
 
   bool is_dual_sample;
+  bool is_new;
 	
 public:
 	operator Point3f &()
@@ -92,6 +93,7 @@ public:
 		is_skel_virtual(false),
     is_fixed_original(false),
     is_dual_sample(false),
+    is_new(false),
 		eigen_vector0(Point3f(1, 0, 0)),
 		eigen_vector1(Point3f(0, 1, 0)),
     skel_radius(-1.0)

@@ -44,7 +44,6 @@ class WlopParaDlg : public QFrame
     void useAdaptiveSampleNeighbor(bool _val);
     void useAdaptiveMu(bool _val);
 
-
 		//
 		void applyWlop();
     void applyDualWlop();

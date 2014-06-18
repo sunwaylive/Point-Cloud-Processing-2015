@@ -68,13 +68,23 @@ void Upsampler::run()
 		radius = para->getDouble("CGrid Radius");
 	}
 
-  if ("Use Constant Threshold")
+  if (para->getBool("Run Points Extrapolation"))
+  {
+    cout << "Extrapolation! " << endl;
+    recomputeAllNeighbors();
+    pointsExtrapoaltion();
+    return;
+  }
+
+  if (para->getBool("Use Constant Threshold"))
   {
     radius = para->getDouble("CGrid Radius");
     clearAllThresholdFlag();
     runConstantUpsampling();
     return;
   }
+
+
 
 	doUpsampling();	
 }
@@ -498,6 +508,106 @@ void Upsampler::runConstantUpsampling()
   computeEigenVerctorForRendering();
 }
 
+
+void Upsampler::pointsExtrapoaltion()
+{
+  int sample_number = samples->vert.size();
+  for (int i = 0; i < sample_number; i++)
+  {
+    CVertex& v = samples->vert[i];
+    v.is_new = false;
+    v.m_index = i;
+  }
+
+  CVertex new_v;
+  new_v.is_new = true;
+
+
+  if (global_paraMgr.glarea.getDouble("Picked Index") > 0.1)
+  {
+    int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+    cout  << "pick index: " << pick_index <<endl;
+
+    if (pick_index >= sample_number)
+    {
+      return;
+    }
+
+    CVertex& v = samples->vert[pick_index];
+
+    Point3f movement(0., 0., 0.);
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      Point3f diff = v.P() - t.P();
+      movement += diff;
+    }
+    movement  = movement / v.neighbors.size();
+
+    new_v.P() = v.P() + movement;
+    new_v.N() = v.N();
+
+    new_v.m_index = sample_number;
+    samples->vert.push_back(new_v);
+    samples->vn = samples->vert.size();
+  }
+  else
+  {
+
+
+    vector<CVertex> extrapolation_points(sample_number, new_v);
+    vector<double> extrapolation_dist(sample_number, 0.);
+
+    for (int i = 0; i < sample_number; i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      Point3f movement(0., 0., 0.);
+      for (int j = 0; j < v.neighbors.size(); j++)
+      {
+        CVertex& t = samples->vert[v.neighbors[j]];
+        Point3f diff = v.P() - t.P();
+        movement += diff;
+      }
+
+      CVertex& ext_v = extrapolation_points[i];
+      ext_v.P() = v.P() + movement;
+      ext_v.N() = v.N();
+    }
+
+    GlobalFun::computeAnnNeigbhors(samples->vert, extrapolation_points, 2, false, "WlopParaDlg::applyDualConnection()");
+
+    for (int i = 0; i < sample_number; i++)
+    {
+      CVertex& ext_v = extrapolation_points[i];
+      CVertex& ext_nearest_v = samples->vert[ext_v.neighbors[0]];
+      double dist = GlobalFun::computeEulerDist(ext_v.P(),ext_nearest_v.P());
+      extrapolation_dist[i] = dist;
+    }
+
+    int max_index = 0;
+    double max_dist = 0.0;
+    for (int i = 0; i < sample_number; i++)
+    {
+      if (extrapolation_dist[i] > max_dist)
+      {
+        max_dist = extrapolation_dist[i];
+        max_dist = i;
+      }
+    }
+
+    new_v = extrapolation_points[max_index];
+
+    new_v.m_index = sample_number;
+    samples->vert.push_back(new_v);
+    samples->vn = samples->vert.size();
+  }
+
+
+
+}
+
+
 void Upsampler::insertPointsByThreshold()
 {
   int abandonCounter = 0;
@@ -915,6 +1025,5 @@ void Upsampler::updateVT_proj_normal(CVertex& v, CVertex& t, double weight, doub
 	sum_Gw[v.m_index] += grad_w;
 	sum_Gf[v.m_index] += grad_w * diff_proj_vt;
 	sum_N[v.m_index] += t.N() * weight;
-
-
 }
+
