@@ -95,6 +95,8 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->anisotropic_lop_apply,SIGNAL(clicked()),this,SLOT(applyAnisotropicLop()));
   connect(ui->step_forward,SIGNAL(clicked()),this,SLOT(applyStepForward()));
+  connect(ui->dual_connection,SIGNAL(clicked()),this,SLOT(applyDualConnection()));
+
 
 }
 
@@ -266,10 +268,33 @@ void WlopParaDlg::applyWlop()
 
 }
 
+void WlopParaDlg::applyDualConnection()
+{
+  CMesh* samples = area->dataMgr.getCurrentSamples();
+  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+  GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
+
+  cout << "finished ANN " << endl;
+
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    int dual_index = dual_samples->vert[i].neighbors[0];
+    if (dual_index < 0 && dual_index >= samples->vert.size())
+    {
+      dual_index = 0;
+    }
+    dual_samples->vert[i].dual_index = dual_index;
+  }
+
+  return;
+}
+
  void WlopParaDlg::applyDualWlop()
  {
    double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
-   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius*0.2));
+   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
 
    m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
    area->runWlop();

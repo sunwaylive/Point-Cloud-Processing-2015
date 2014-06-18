@@ -162,7 +162,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Average Power", 1.0));
 	wLop.addParam(new RichBool("Need Compute Density", true));
 	wLop.addParam(new RichBool("Need Compute PCA", false));
-	wLop.addParam(new RichDouble("Repulsion Mu", 0.80));
+	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 
   wLop.addParam(new RichDouble("Sample Average Mu3", 0.1));

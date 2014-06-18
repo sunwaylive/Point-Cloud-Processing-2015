@@ -46,6 +46,7 @@ public:
 
 	bool bIsOriginal;
 	int m_index;
+  int dual_index;
 
 	bool is_fixed_sample; //feature points (blue color) 
 	bool is_skel_ignore;
@@ -82,6 +83,7 @@ public:
 
 	CVertex():
 		m_index(0),
+    dual_index(0),
 		bIsOriginal(false),
 		is_fixed_sample(false),
 		eigen_confidence(0),

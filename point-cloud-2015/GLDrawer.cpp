@@ -663,16 +663,18 @@ void GLDrawer::generateRandomColorList(int num)
 
 void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 {
-  if (samples->vn != dual_samples->vn)
-  {
-    //cout << "No dual sampels!!!" << endl;
-    return;
-  }
+  //if (samples->vn != dual_samples->vn)
+  //{
+  //  //cout << "No dual sampels!!!" << endl;
+  //  return;
+  //}
 
-  for (int i = 0; i < samples->vert.size(); i++)
+  for (int i = 0; i < dual_samples->vert.size(); i++)
   {
-    CVertex& v = samples->vert[i];
-    CVertex& dual_v = dual_samples->vert[i];
+    CVertex& v = dual_samples->vert[i];
+
+    //CVertex& dual_v = dual_samples->vert[i];
+    CVertex& dual_v = samples->vert[v.dual_index];
 
     glDrawLine(v.P(), dual_v.P(), cGreen, 2);
   }

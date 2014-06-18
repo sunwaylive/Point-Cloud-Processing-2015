@@ -50,6 +50,7 @@ class WlopParaDlg : public QFrame
     void applyDualWlop();
 		void applyAnisotropicLop();
     void applyStepForward();
+    void applyDualConnection();
 
 	private:
 		Ui::para_wlop * ui;

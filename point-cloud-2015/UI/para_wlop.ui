@@ -184,8 +184,8 @@
   <widget class="QPushButton" name="anisotropic_lop_apply">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>520</y>
+     <x>40</x>
+     <y>540</y>
      <width>161</width>
      <height>31</height>
     </rect>
@@ -244,6 +244,19 @@
    </property>
    <property name="text">
     <string>Projection</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="dual_connection">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>490</y>
+     <width>209</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Dual Connection</string>
    </property>
   </widget>
  </widget>
