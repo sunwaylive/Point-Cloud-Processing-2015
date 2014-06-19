@@ -166,6 +166,9 @@
     <ClInclude Include="CMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm\pointcloud_normal.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm\NormalSmoother.cpp">

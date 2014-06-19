@@ -104,24 +104,32 @@ void NormalParaDlg::applyPCANormal()
 	}
 	else
 	{
-		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-		CMesh* samples = area->dataMgr.getCurrentSamples();
-		vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(samples->vert.begin(), samples->vert.end(), knn, -1);
+    int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+    CMesh* samples;
+    if (global_paraMgr.glarea.getBool("Show Original")
+      && !area->dataMgr.isOriginalEmpty())
+    {
+      samples = area->dataMgr.getCurrentOriginal();
+    }
+    else
+    {
+      samples = area->dataMgr.getCurrentSamples();
+    }
+    //vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(samples->vert.begin(), samples->vert.end(), knn, -1);
+    vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+    pca_para.fittingAdjNum = knn;
+
+    vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
 	}
 	area->dataMgr.recomputeQuad();
 	area->updateGL();
 
 }
 
-
-
 NormalParaDlg::~NormalParaDlg()
 {
 	delete ui;
 	ui = NULL;
-
-	// 
 	area = NULL;
 	m_paras = NULL;
-
 }

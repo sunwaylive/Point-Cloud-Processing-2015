@@ -32,7 +32,7 @@ public:
     VertexPointer src;
     VertexPointer trg;
     float w;
-    bool operator< (const WArc &a) const {return w<a.w;}
+    bool operator< (const WArc &a) const { return w < a.w; }
   };
 
   static void ComputeUndirectedNormal(MeshType &m, int nn, float maxDist, KdTree<float> &tree,vcg::CallBackPos * cb=0)

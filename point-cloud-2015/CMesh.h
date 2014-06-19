@@ -38,7 +38,7 @@ class CUsedTypes: public vcg::UsedTypes< vcg::Use<CVertex>::AsVertexType,
 	vcg::Use<CFace>::AsFaceType>{};
 
 
-class CVertex : public vcg::Vertex<CUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b> 
+class CVertex : public vcg::Vertex<CUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b, vcg::vertex::BitFlags> 
 {
 public:
 	vector<int> neighbors;

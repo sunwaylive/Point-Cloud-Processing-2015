@@ -170,6 +170,7 @@
     <ClInclude Include="Algorithm\NormalSmoother.h" />
     <ClInclude Include="Algorithm\normal_extrapolation.h" />
     <ClInclude Include="Algorithm\PointCloudAlgorithm.h" />
+    <ClInclude Include="Algorithm\pointcloud_normal.h" />
     <ClInclude Include="Algorithm\Skeleton.h" />
     <ClInclude Include="Algorithm\Skeletonization.h" />
     <ClInclude Include="Algorithm\Upsampler.h" />
