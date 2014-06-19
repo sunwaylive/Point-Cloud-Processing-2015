@@ -547,9 +547,14 @@ void Upsampler::pointsExtrapoaltion()
     new_v.P() = v.P() + movement;
     new_v.N() = v.N();
 
+    
+
     new_v.m_index = sample_number;
     samples->vert.push_back(new_v);
     samples->vn = samples->vert.size();
+
+    recomputeAllNeighbors();
+    projectOneCVertex(samples->vert[samples->vert.size()-1]);
   }
   else
   {
@@ -777,6 +782,48 @@ void Upsampler::computeNewVertexNormAvgMethod(CVertex & v, int firstV, int secV)
 	Point3f avg_normal = sum_theta1_multiply_normal / sum_theta1;
 
 	v.N() = avg_normal.Normalize();
+}
+
+
+void Upsampler::projectOneCVertex(CVertex& v)
+{
+  double radius2 = radius * radius;
+  double radius16 =   -4 / (radius2);
+
+  int neighbor_number = v.neighbors.size();
+  //vector<double> sum_weight(neighbor_number, 0.0);
+  //vector<double> sum_proj_dist(neighbor_number, 0.0);
+  //vector<Point3f> sum_normal(neighbor_number, Point3f(0, 0, 0));
+
+  double sum_weight = 0.0;
+  double sum_proj_dist = 0.0;
+  Point3f sum_normal(Point3f(0, 0, 0));
+
+  if (v.neighbors.empty())
+  {
+    return;
+  }
+
+  for (int i = 0; i < neighbor_number; i++)
+  {
+    CVertex& t = samples->vert[v.neighbors[i]];
+    
+    double theta_1 = exp( (t.P() - v.P()).SquaredNorm() * radius16);
+    double psi = exp(-pow(1- v.N() * t.N(), 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
+
+    double diff_proj_vt = (v.P() - t.P()) * t.N();
+    double weight = psi * theta_1;
+
+    sum_proj_dist +=  weight * diff_proj_vt;
+    sum_weight += weight;
+    sum_normal +=  t.N() * weight;
+  }
+
+  double proj_dist = sum_proj_dist / sum_weight;
+  v.N() = sum_normal / sum_weight;
+  v.P() -= v.N() * proj_dist;
+
+     //pv.P() = pv.P() + pv.N() * (d / wd);
 }
 
 //our new sigma

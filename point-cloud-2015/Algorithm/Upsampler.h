@@ -52,6 +52,7 @@ private:
   void removeOneNeighbor(vector<int>& neighbors, int remove_idx);
 
   void pointsExtrapoaltion();
+  void projectOneCVertex(CVertex& v);
 
 
 	
