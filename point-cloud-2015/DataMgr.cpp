@@ -421,6 +421,7 @@ Box3f DataMgr::normalizeAllMesh()
 	samples.bbox = box;
 
 	normalizeROSA_Mesh(samples);
+  normalizeROSA_Mesh(dual_samples);
 	normalizeROSA_Mesh(original);
 
 	recomputeBox();

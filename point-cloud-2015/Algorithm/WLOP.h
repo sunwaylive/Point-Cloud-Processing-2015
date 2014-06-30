@@ -42,7 +42,6 @@ private:
   void computeAverageAddSampleTerm(CMesh* samples, CMesh* original);
 
   void computeSampleAverageTerm(CMesh* samples);
-
 	void computeRepulsionTerm(CMesh* samples);
 
 	void computeDensity(bool isOriginal, double radius);

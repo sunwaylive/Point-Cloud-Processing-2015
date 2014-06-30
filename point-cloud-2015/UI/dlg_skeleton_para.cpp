@@ -558,7 +558,7 @@ void SkeletonParaDlg::applyAutoRun()
   }
   else
   {
-     m_paras->glarea.setValue("Algorithom Stop", BoolValue(false));
+    m_paras->glarea.setValue("Algorithom Stop", BoolValue(false));
     global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("Skeletonization"));
     calculation_thread.setArea(area);
     calculation_thread.start();

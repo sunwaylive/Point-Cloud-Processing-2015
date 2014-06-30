@@ -283,6 +283,8 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
 
+  bool use_elliptical_neighbor = global_paraMgr.wLop.getBool("Use Elliptical Original Neighbor");
+
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
 	for(int i = 0; i < samples->vert.size(); i++)
 	{
@@ -300,6 +302,8 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			Point3f diff = v.P() - t.P();
 			double dist2  = diff.SquaredNorm();
+      double proj_dist = radius - diff * v.N();// wsh 
+      double proj_dist2 = proj_dist * proj_dist;
 
 			double w = 1;
 			if (average_power < 2)
@@ -312,6 +316,16 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 			{
 				w = exp(dist2 * iradius16);
 			}
+
+      if (use_elliptical_neighbor)
+      {
+        w *= exp(proj_dist2 * iradius16);
+
+        if (i < 2)
+        {
+          cout << exp(proj_dist2 * iradius16) << endl;
+        }
+      }
 
 			if (need_density)
 			{
@@ -433,6 +447,7 @@ void Skeletonization::computeDensity(bool isOriginal, double radius)
 double Skeletonization::wlopIterate()
 {
 	Timer time;
+
 
 	initVertexes();
 
