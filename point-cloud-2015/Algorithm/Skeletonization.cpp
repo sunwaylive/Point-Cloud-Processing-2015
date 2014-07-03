@@ -282,6 +282,7 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+  double iradius16_ellipse = -16/radius2;
 
   bool use_elliptical_neighbor = global_paraMgr.wLop.getBool("Use Elliptical Original Neighbor");
 
@@ -302,7 +303,7 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			Point3f diff = v.P() - t.P();
 			double dist2  = diff.SquaredNorm();
-      double proj_dist = radius - diff * v.N();// wsh 
+      double proj_dist = radius - std::abs(diff * v.N());// wsh 
       double proj_dist2 = proj_dist * proj_dist;
 
 			double w = 1;
@@ -319,12 +320,7 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 
       if (use_elliptical_neighbor)
       {
-        w *= exp(proj_dist2 * iradius16);
-
-        if (i < 2)
-        {
-          cout << exp(proj_dist2 * iradius16) << endl;
-        }
+        w *= exp(proj_dist2 * iradius16_ellipse);
       }
 
 			if (need_density)
@@ -351,6 +347,9 @@ void Skeletonization::computeRepulsionTerm(CMesh* samples)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+  //double iradius16_ellipse = -16/radius2;
+
+  bool use_elliptical_neighbor = global_paraMgr.wLop.getBool("Use Elliptical Original Neighbor");
 
 	for(int i = 0; i < samples->vert.size(); i++)
 	{
@@ -366,13 +365,21 @@ void Skeletonization::computeRepulsionTerm(CMesh* samples)
 		{
 			CVertex& t = samples->vert[v.neighbors[j]];
 			Point3f diff = v.P() - t.P();
+      double dist2  = diff.SquaredNorm();
+      double proj_dist = diff * v.N();// wsh 
+      double proj_dist2 = proj_dist * proj_dist;
 
-			double dist2  = diff.SquaredNorm();
+			//double dist2  = diff.SquaredNorm();
 			double len = sqrt(dist2);
 			if(len <= 0.001 * radius) len = radius*0.001;
 
 			double w = exp(dist2*iradius16);
 			double rep = w * pow(1.0 / len, repulsion_power);
+
+//       if (use_elliptical_neighbor)
+//       {
+//         w *= exp(proj_dist2 * iradius16_ellipse);
+//       }
 
 			repulsion[i] += diff * rep;  
 			repulsion_weight_sum[i] += rep;

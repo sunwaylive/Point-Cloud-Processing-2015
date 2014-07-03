@@ -319,6 +319,7 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
     }
 
 		CVertex& v = original.vert[index];
+    v.dual_index = i;
 		samples.vert.push_back(v);
 		samples.bbox.Add(v.P());
 	}
@@ -334,6 +335,7 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
   {
     CVertex v = samples.vert[i];
     v.is_dual_sample = true;
+    v.dual_index = i;
     dual_samples.vert.push_back(v);
   }
   dual_samples.bbox = samples.bbox;
@@ -458,6 +460,7 @@ void DataMgr::clearData()
 {
 	clearCMesh(original);
 	clearCMesh(samples);
+  clearCMesh(dual_samples);
 	skeleton.clear();
 }
 
@@ -619,6 +622,15 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
     strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
   }
   strStream << endl;
+
+  strStream << "dual_corresponding_index " << samples.vert.size() << endl;
+  for(int i = 0; i < dual_samples.vert.size(); i++)
+  {
+    CVertex& v = dual_samples.vert[i];
+    strStream << dual_samples.vert[i].dual_index << endl;
+  }
+  strStream << endl;
+
 
 	outfile.write( strStream.str().c_str(), strStream.str().size() ); 
 	outfile.close();
@@ -930,6 +942,21 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
       dual_samples.bbox.Add(v.P());
     }
     dual_samples.vn = dual_samples.vert.size();
+  }
+
+  if (!sem.eof())
+  {
+    sem >> str;
+    if (str == "dual_corresponding_index")
+    {
+      sem >> num;
+      for (int i = 0; i < num; i++)
+      {
+        int index;
+        sem >> index;
+        dual_samples.vert[i].dual_index = index;
+      }
+    }
   }
 
 	skeleton.generateBranchSampleMap();

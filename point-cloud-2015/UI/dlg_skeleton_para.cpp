@@ -507,6 +507,8 @@ void SkeletonParaDlg::applyAutoWlopOneStep()
 
   m_paras->skeleton.setValue("The Skeletonlization Process Should Stop", BoolValue(false));
 
+  m_paras->glarea.setValue("Algorithom Stop", BoolValue(false));
+  global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("Skeletonization"));
 
   //global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("Skeletonization"));
   //calculation_thread.setArea(area);

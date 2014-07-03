@@ -409,6 +409,7 @@ void MainWindow::downSample()
     return;
   }
 
+  
 	area->dataMgr.downSamplesByNum();
   area->dataMgr.skeleton.clear();
 	area->initSetting();
