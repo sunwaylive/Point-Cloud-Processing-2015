@@ -345,7 +345,7 @@ void GLArea::initAfterOpenFile()
 
 void GLArea::initSetting()
 {
-  dataMgr.recomputeQuad();
+  //dataMgr.recomputeQuad();
   initView();
 	wlop.setFirstIterate();
 	skeletonization.setFirstIterate();

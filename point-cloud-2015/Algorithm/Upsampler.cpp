@@ -823,7 +823,7 @@ void Upsampler::projectOneCVertex(CVertex& v)
   v.N() = sum_normal / sum_weight;
   v.P() -= v.N() * proj_dist;
 
-     //pv.P() = pv.P() + pv.N() * (d / wd);
+  //pv.P() = pv.P() + pv.N() * (d / wd);
 }
 
 //our new sigma

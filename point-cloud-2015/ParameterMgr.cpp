@@ -215,7 +215,7 @@ void ParameterMgr::initSkeletonParameter()
 
 	//init
 	skeleton.addParam(new RichDouble("Max Iterate Time", 55));
-	skeleton.addParam(new RichDouble("Stop And Grow Error", 0.0005));
+	skeleton.addParam(new RichDouble("Stop And Grow Error", 0.0001));
 	skeleton.addParam(new RichDouble("Initial Radius", -1.));
 	skeleton.addParam(new RichDouble("Radius Update Speed", 0.5));
 

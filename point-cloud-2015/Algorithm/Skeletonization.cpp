@@ -207,8 +207,10 @@ void Skeletonization::setInput(DataMgr* pData)
 	if(!pData->isSamplesEmpty() && !pData->isOriginalEmpty())
 	{
 		CMesh* _samples = pData->getCurrentSamples();
-		CMesh* _original = pData->getCurrentOriginal();
-		Skeleton* _skeleton = pData->getCurrentSkeleton();
+		//CMesh* _original = pData->getCurrentOriginal();
+    CMesh* _original = pData->getCurrentDualSamples();
+    
+    Skeleton* _skeleton = pData->getCurrentSkeleton();
 
 		if(_samples == NULL || _original == NULL)
 		{
@@ -297,6 +299,11 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 			continue;
 		}
 
+    if (i < 2)
+    {
+      cout << "original neighbor size:  " << v.original_neighbors.size() << endl;
+    }
+
 		for (int j = 0; j < v.original_neighbors.size(); j++)
 		{
 			CVertex& t = original->vert[v.original_neighbors[j]];
@@ -347,6 +354,8 @@ void Skeletonization::computeRepulsionTerm(CMesh* samples)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+  //double iradius16 = -16/radius2;
+
   //double iradius16_ellipse = -16/radius2;
 
   bool use_elliptical_neighbor = global_paraMgr.wLop.getBool("Use Elliptical Original Neighbor");
@@ -371,10 +380,10 @@ void Skeletonization::computeRepulsionTerm(CMesh* samples)
 
 			//double dist2  = diff.SquaredNorm();
 			double len = sqrt(dist2);
-			if(len <= 0.001 * radius) len = radius*0.001;
+			if(len <= 0.000000001 * radius) len = radius * 0.000000001;
 
 			double w = exp(dist2*iradius16);
-			double rep = w * pow(1.0 / len, repulsion_power);
+			double rep = w * pow(1.0/len, repulsion_power);
 
 //       if (use_elliptical_neighbor)
 //       {
@@ -402,6 +411,7 @@ void Skeletonization::computeDensity(bool isOriginal, double radius)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+  //double iradius16 = -16 / radius2;
 
 	for(int i = 0; i < mesh->vert.size(); i++)
 	{
@@ -445,6 +455,7 @@ void Skeletonization::computeDensity(bool isOriginal, double radius)
 		else
 		{
 			samples_density[i] = sqrt(samples_density[i]);
+      //samples_density[i] = samples_density[i];
 		}
 	}
 
@@ -455,12 +466,10 @@ double Skeletonization::wlopIterate()
 {
 	Timer time;
 
-
 	initVertexes();
 
 	time.start("Samples Initial");
-	GlobalFun::computeBallNeighbors(samples, NULL, 
-		para->getDouble("CGrid Radius"), samples->bbox);
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 	time.end();
 

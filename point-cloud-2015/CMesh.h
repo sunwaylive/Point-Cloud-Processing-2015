@@ -87,7 +87,7 @@ public:
     dual_index(0),
 		bIsOriginal(false),
 		is_fixed_sample(false),
-		eigen_confidence(0),
+		eigen_confidence(0.),
 		is_skel_branch(false),
 		is_skel_ignore(false),
 		is_skel_virtual(false),
