@@ -34,6 +34,11 @@ void WLOP::setInput(DataMgr* pData)
 		CMesh* _samples = pData->getCurrentSamples();
 		CMesh* _original = pData->getCurrentOriginal();
 
+    if (para->getBool("Run Skel WLOP"))
+    {
+      _original = pData->getCurrentDualSamples();
+    }
+
 		if(_samples == NULL || _original == NULL)
 		{
 			cout << "ERROR: WLOP::setInput == NULL!!" << endl;
@@ -129,6 +134,24 @@ void WLOP::run()
   if (para->getBool("Run Compute Initial Sample Neighbor"))
   {
     computeInitialSampleNeighbor();
+    return;
+  }
+
+  if (para->getBool("Run Skel WLOP"))
+  {
+    runSkelWlop();
+    return;
+  }
+
+  if (para->getBool("Run Dual Drag WLOP"))
+  {
+    runDragWlop();
+    return;
+  }
+
+  if (para->getBool("Run Regularize Samples"))
+  {
+    runRegularizeSamples();
     return;
   }
 
@@ -854,4 +877,117 @@ void WLOP::computeInitialSampleNeighbor()
   GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
   time.end();
 
+}
+
+
+void WLOP::runSkelWlop()
+{
+  cout << "runSkelWlop" << endl;
+
+  Timer time;
+
+  initVertexes();
+
+  time.start("Samples Initial");
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+  GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+  time.end();
+
+  if (nTimeIterated == 0) 
+  {
+    time.start("Original Initial");
+    GlobalFun::computeBallNeighbors(original, NULL, 
+      para->getDouble("CGrid Radius"), original->bbox);
+
+    original_density.assign(original->vn, 0);
+    if (para->getBool("Need Compute Density"))
+    {
+      computeDensity(true, para->getDouble("CGrid Radius"));
+    }
+    time.end();
+  }
+
+  time.start("Sample Original neighbor");
+  GlobalFun::computeBallNeighbors(samples, original, 
+    para->getDouble("CGrid Radius"), box);
+  time.end();
+
+  time.start("computeAverageTerm");
+  computeAverageTerm(samples, original);
+  time.end();
+
+  time.start("computeRepulsionTerm");
+  computeRepulsionTerm(samples);
+  time.end();
+
+  double min_sigma = GlobalFun::getDoubleMAXIMUM();
+  double max_sigma = -1;
+  for (int i = 0; i < samples->vn; i++)
+  {
+    CVertex& v = samples->vert[i];
+    if (v.eigen_confidence < min_sigma)
+    {
+      min_sigma = v.eigen_confidence;
+    }
+    if (v.eigen_confidence > max_sigma)
+    {
+      max_sigma = v.eigen_confidence;
+    }
+  }
+
+  double mu_max = para->getDouble("Repulsion Mu");
+  double mu_min = para->getDouble("Repulsion Mu2");
+  double mu_length = abs(mu_max - mu_min);
+  double sigma_length = abs(max_sigma - min_sigma);
+  Point3f c;
+  int moving_num = 0;
+  double max_error = 0;
+
+  for(int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    if (v.is_fixed_sample || v.is_skel_ignore)
+    {
+      continue;
+    }
+    c = v.P();
+
+    double mu = (mu_length / sigma_length) * (v.eigen_confidence - min_sigma) + mu_min;
+
+    if (average_weight_sum[i] > 1e-20)
+    {
+      v.P() = average[i] / average_weight_sum[i];
+
+    }
+    if (repulsion_weight_sum[i] > 1e-20 && mu >= 0)
+    {
+      v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
+    }
+
+    if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
+    {
+      moving_num++;
+      Point3f diff = v.P() - c; 
+      double move_error = sqrt(diff.SquaredNorm());
+
+      error_x += move_error; 
+    }
+  }
+  error_x = error_x / moving_num;
+
+  para->setValue("Current Movement Error", DoubleValue(error_x));
+  cout << "****finished compute Skeletonization error:	" << error_x << endl;
+  return ;
+}
+
+
+void WLOP::runDragWlop()
+{
+  cout << "runDragWlop" << endl;
+}
+
+
+void WLOP::runRegularizeSamples()
+{
+  cout << "runRegularizeSamples" << endl;
 }

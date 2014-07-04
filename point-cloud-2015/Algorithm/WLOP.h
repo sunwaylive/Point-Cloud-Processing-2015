@@ -30,6 +30,10 @@ public:
 
   void computeInitialSampleNeighbor();
 
+  void runSkelWlop();
+  void runDragWlop();
+  void runRegularizeSamples();
+
 protected:
 	WLOP(){}
 

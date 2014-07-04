@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>293</width>
-    <height>581</height>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -257,6 +257,45 @@
    </property>
    <property name="text">
     <string>Dual Connection</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="skel_wlop">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>580</y>
+     <width>209</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Skel WLOP</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="dual_drag_wlop">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>620</y>
+     <width>209</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Dual Drag WLOP</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="regularize_samples">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>660</y>
+     <width>209</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Regularize Samples</string>
    </property>
   </widget>
  </widget>

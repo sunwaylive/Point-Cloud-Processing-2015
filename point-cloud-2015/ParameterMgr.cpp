@@ -160,7 +160,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("CGrid Radius", grid_r));
 	wLop.addParam(new RichDouble("H Gaussian Para", 4));
 	wLop.addParam(new RichDouble("Repulsion Power", 1.0));
-	wLop.addParam(new RichDouble("Average Power", 1.0));
+	wLop.addParam(new RichDouble("Average Power", 2.0));
 	wLop.addParam(new RichBool("Need Compute Density", true));
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
@@ -172,6 +172,11 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
   wLop.addParam(new RichBool("Run Step Forward", false));
+
+  wLop.addParam(new RichBool("Run Skel WLOP", false));
+  wLop.addParam(new RichBool("Run Dual Drag WLOP", false));
+  wLop.addParam(new RichBool("Run Regularize Samples", false));
+
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));

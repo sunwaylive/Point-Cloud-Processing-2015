@@ -51,6 +51,10 @@ class WlopParaDlg : public QFrame
     void applyStepForward();
     void applyDualConnection();
 
+    void applySkelWlop();
+    void applyDragWlop();
+    void applyRegularizeSamples();
+
 	private:
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;

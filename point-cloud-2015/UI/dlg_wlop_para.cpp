@@ -97,6 +97,9 @@ void WlopParaDlg::initConnects()
   connect(ui->step_forward,SIGNAL(clicked()),this,SLOT(applyStepForward()));
   connect(ui->dual_connection,SIGNAL(clicked()),this,SLOT(applyDualConnection()));
 
+  connect(ui->skel_wlop,SIGNAL(clicked()),this,SLOT(applySkelWlop()));
+  connect(ui->dual_drag_wlop,SIGNAL(clicked()),this,SLOT(applyDragWlop()));
+  connect(ui->regularize_samples,SIGNAL(clicked()),this,SLOT(applyRegularizeSamples()));
 
 }
 
@@ -384,6 +387,26 @@ void WlopParaDlg::applyStepForward()
   
 }
 
+void WlopParaDlg::applySkelWlop()
+{
+  m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
+}
+
+void WlopParaDlg::applyDragWlop()
+{
+  m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(false));
+}
+
+void WlopParaDlg::applyRegularizeSamples()
+{
+  m_paras->wLop.setValue("Run Regularize Samples", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Regularize Samples", BoolValue(false));
+}
 
 WlopParaDlg::~WlopParaDlg()
 {
