@@ -10,6 +10,7 @@
 using namespace std;
 using namespace vcg;
 
+
 // better code is going to be in CGAL 
 class WLOP : public PointCloudAlgorithm
 {

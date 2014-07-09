@@ -279,11 +279,19 @@ void GLArea::paintGL()
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
 		glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
+    glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
 
     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
     {
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
     }
+
+    if (!pickList.empty())
+    {
+      glDrawer.drawPickedDisk(dataMgr.getCurrentDualSamples(), &picked_disk);
+    }
+
 	}
 
 
@@ -1561,6 +1569,19 @@ void GLArea::mouseReleaseEvent(QMouseEvent *e)
       else
       {
         para->setValue("Picked Index", DoubleValue(pickList[0]));
+      }
+
+
+      if (!pickList.empty())
+      {
+        CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+        CVertex picked = dual_samples->vert[pickList[0]];
+        picked_disk = LocalDisk(picked.P(), picked.N());
+        for (int i = 0; i < picked.neighbors.size(); i++)
+        {
+          picked_disk.add_point(dual_samples->vert[picked.neighbors[i]]);
+        }
+        picked_disk.printSlots();
       }
 		}
 	}

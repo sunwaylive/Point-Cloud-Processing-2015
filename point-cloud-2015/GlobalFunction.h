@@ -101,6 +101,95 @@ private:
 };
 
 
+class LocalDisk
+{
+public:
+  LocalDisk(){}
+  LocalDisk(Point3f c, Point3f n)
+  {
+    center = c;
+    normal = n;
+    Point3f temp(0, 0, 1.11111111111);
+    zero_axis = (normal ^ temp).Normalize();
+    disk_slots.assign(36, false);
+  }
+
+  LocalDisk(const LocalDisk& d)
+  {
+    center = d.center;
+    normal = d.normal;
+    zero_axis = d.zero_axis;
+    disk_slots = d.disk_slots;
+    projected_points = d.projected_points;
+  }
+
+  LocalDisk& LocalDisk::operator = (const LocalDisk& d)
+  {
+    if (&d != this)
+    {
+      center = d.center;
+      normal = d.normal;
+      zero_axis = d.zero_axis;
+      disk_slots = d.disk_slots;
+      projected_points = d.projected_points;
+    }
+    return *this;
+  }
+
+
+  void add_point(Point3f new_p)
+  {
+    Point3f temp1 = (new_p - center).Normalize();
+    Point3f temp2 = temp1 ^ normal;
+    Point3f temp3 = normal ^ temp2;
+
+    if (temp1 * temp3 < 0)
+    {
+      temp3 *= -1;
+    }
+
+    double proj_dist = (new_p - center) * temp3;
+    Point3f new_projected_point = center + temp3 * proj_dist;
+    projected_points.push_back(new_projected_point);
+
+    //update slots
+    double angle = GlobalFun::computeRealAngleOfTwoVertor(temp3, zero_axis);
+    Point3f temp_test = (temp3.Normalize() ^ zero_axis).Normalize();
+    if (temp_test * normal < 0)
+    {
+      angle = 360. - angle;
+    }
+
+    int new_slot_id = angle / 10.0;
+    if (new_slot_id >= 36)
+    {
+      new_slot_id = 35;
+    }
+    disk_slots[new_slot_id] = true;
+  }
+  void printSlots()
+  {
+    for (int i = 0; i < disk_slots.size(); i++)
+    {
+      if (disk_slots[i])
+      {
+        cout << "1  ";
+      }
+      else
+      {
+        cout << "0  ";
+      }
+    }
+    cout << endl;
+  }
+
+public:
+  Point3f center;
+  Point3f normal;
+  Point3f zero_axis;
+  vector<bool> disk_slots;
+  vector<Point3f> projected_points;
+};
 
 
 /* Useful code template

@@ -316,10 +316,10 @@ void GLDrawer::drawNormal(const CVertex& v)
 
 	Point3f p = v.P(); 
 	Point3f m = v.cN();
-//   if (v.eigen_confidence > 0)
-//   {
-//     m = v.eigen_vector0;
-//   }
+  if (v.eigen_confidence > 0)
+  {
+    m = v.eigen_vector0;
+  }
 
 	glBegin(GL_LINES);	
 	glVertex3d(p[0], p[1], p[2]);
@@ -334,6 +334,28 @@ void GLDrawer::drawNormal(const CVertex& v)
 
 	glEnable(GL_LIGHTING);
 }
+
+void GLDrawer::drawPickedDisk(CMesh* dual_samples, LocalDisk* disk)
+{
+  double width = para->getDouble("Sample Draw Width") * 1.2;
+  //GLColor dnn_color = para->getColor("Pick Point DNN Color");
+  GLColor dnn_color = cGreen;
+
+  glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
+
+  vector<Point3f> projected_points = disk->projected_points;
+  for (int i = 0; i < projected_points.size(); i++)
+  {
+    Point3f p = projected_points[i];
+
+    glPushMatrix();      
+    glTranslatef(p[0], p[1], p[2]);
+    glutSolidSphere(width, 10, 10);
+    glPopMatrix();
+  }
+
+}
+
 
 void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {

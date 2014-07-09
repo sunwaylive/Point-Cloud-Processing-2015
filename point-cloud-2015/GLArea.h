@@ -113,6 +113,8 @@ private: // For pick points function
 	int RGB_counter;
 	void addRBGPick(int pick_index);
 
+  LocalDisk picked_disk;
+
 private: // For snapshot
 	int tileCol, tileRow, totalCols, totalRows;
 	QImage snapBuffer;
@@ -159,6 +161,8 @@ private:
 
 private:
 	QMutex paintMutex;
+
+
 
 public:
 	DataMgr dataMgr;
