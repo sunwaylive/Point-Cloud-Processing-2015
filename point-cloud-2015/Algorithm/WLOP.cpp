@@ -48,6 +48,7 @@ void WLOP::setInput(DataMgr* pData)
 		error_x = 0.0;
 		samples = _samples;
 		original = _original;
+    dual_samples = pData->getCurrentDualSamples();
 
     if (para->getBool("Run Dual WLOP"))
     {
@@ -264,9 +265,9 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   
   double close_threshold = radius2 / 16;
-
+  
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
-	for(int i = 0; i < samples->vert.size(); i++)
+  for(int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
 
@@ -314,13 +315,13 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			average_weight_sum[i] += w;  
 
 
-      if (use_adaptive_mu && !is_sample_close_to_original[v.m_index])
-      {
-        if (dist2 < close_threshold)
-        {
-          is_sample_close_to_original[v.m_index] = true;
-        }
-      }
+      //if (use_adaptive_mu && !is_sample_close_to_original[v.m_index])
+      //{
+      //  if (dist2 < close_threshold)
+      //  {
+      //    is_sample_close_to_original[v.m_index] = true;
+      //  }
+      //}
 		}
 	}
 }
@@ -983,11 +984,64 @@ void WLOP::runSkelWlop()
 
 void WLOP::runDragWlop()
 {
-  cout << "runDragWlop" << endl;
+
 }
 
 
 void WLOP::runRegularizeSamples()
 {
   cout << "runRegularizeSamples" << endl;
+
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+  GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+//   int branch_KNN = para->getDouble("Branch Search KNN");
+//   GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, branch_KNN, false, "void Skeletonization::searchNewBranches()");
+
+  vector<Point3f> new_sample_set;
+  new_sample_set.assign(samples->vert.size(), Point3f(0, 0, 0));
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    Point3f direction = v.eigen_vector0.Normalize();
+
+    Point3f front_nearest_p = v.P();
+    Point3f back_nearest_p = v.P();
+    double front_nearest_dist = 1000000.;
+    double back_nearest_dist = -1000000.;
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      int neighbor_idx = v.neighbors[j];
+      CVertex& t = samples->vert[neighbor_idx];
+
+      Point3f diff = t.P() - v.P();
+      double proj_dist = diff * direction;
+
+      if (proj_dist > 0)
+      {
+        if (proj_dist < front_nearest_dist)
+        {
+          front_nearest_p = t.P();
+          front_nearest_dist = proj_dist;
+        }
+      }
+      else
+      {
+        if (proj_dist > back_nearest_dist)
+        {
+          back_nearest_p = t.P();
+          back_nearest_dist = proj_dist;
+        }
+      }
+    }
+
+    if (front_nearest_dist > 100000 || back_nearest_dist < -100000)
+    {
+      cout << "end pointssss" << endl;
+      continue;
+    }
+
+    v.P() = (front_nearest_p + back_nearest_p) / 2.0;
+  }
 }

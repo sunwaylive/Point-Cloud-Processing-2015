@@ -62,6 +62,7 @@ private:
 private:
 	CMesh* samples;
 	CMesh* original;
+  CMesh* dual_samples;
 
 	Box3f box;
 	int nTimeIterated;

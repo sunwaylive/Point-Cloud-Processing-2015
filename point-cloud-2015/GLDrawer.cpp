@@ -316,10 +316,10 @@ void GLDrawer::drawNormal(const CVertex& v)
 
 	Point3f p = v.P(); 
 	Point3f m = v.cN();
-  if (v.eigen_confidence > 0)
-  {
-    m = v.eigen_vector0;
-  }
+//   if (v.eigen_confidence > 0)
+//   {
+//     m = v.eigen_vector0;
+//   }
 
 	glBegin(GL_LINES);	
 	glVertex3d(p[0], p[1], p[2]);

@@ -249,6 +249,11 @@ void GLArea::paintGL()
 			if(!dataMgr.isOriginalEmpty())
 				glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
+
+    if (para->getBool("Show Skeleton"))
+    {
+      glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
+    }
 	}
 
  	if(para->getBool("Show Original"))
