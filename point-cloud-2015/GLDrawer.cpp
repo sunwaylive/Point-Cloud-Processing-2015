@@ -316,10 +316,10 @@ void GLDrawer::drawNormal(const CVertex& v)
 
 	Point3f p = v.P(); 
 	Point3f m = v.cN();
-  if (v.eigen_confidence > 0)
-  {
-    m = v.eigen_vector0;
-  }
+//   if (v.eigen_confidence > 0)
+//   {
+//     m = v.eigen_vector0;
+//   }
 
 	glBegin(GL_LINES);	
 	glVertex3d(p[0], p[1], p[2]);
@@ -335,7 +335,7 @@ void GLDrawer::drawNormal(const CVertex& v)
 	glEnable(GL_LIGHTING);
 }
 
-void GLDrawer::drawPickedDisk(CMesh* dual_samples, LocalDisk* disk)
+void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 {
   double width = para->getDouble("Sample Draw Width") * 1.2;
   //GLColor dnn_color = para->getColor("Pick Point DNN Color");
@@ -700,14 +700,13 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
   //}
 
 
-
   for (int i = 0; i < dual_samples->vert.size(); i++)
   {
     CVertex& v = dual_samples->vert[i];
     //CVertex& dual_v = dual_samples->vert[i];
     CVertex& dual_v = samples->vert[i];
 
-    glDrawLine(v.P(), dual_v.P(), cGreen, 1.5);
+    glDrawLine(v.P(), dual_v.P(), cBrown, 1);
   }
 
   //for (int i = 0; i < samples->vert.size(); i++)

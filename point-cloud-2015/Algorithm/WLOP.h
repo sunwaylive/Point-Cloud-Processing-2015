@@ -22,18 +22,20 @@ public:
 	void run();
 	void setInput(DataMgr* pData);
 	RichParameterSet* getParameterSet(){ return para; }
-	void setParameterSet(RichParameterSet* _para){para = _para;}
+	void setParameterSet(RichParameterSet* _para){ para = _para; }
 	void clear();
 
 	void setFirstIterate();
   int getIterateNum(){ return nTimeIterated; }
-	double getErrorX(){return error_x;}
+	double getErrorX(){ return error_x; }
 
   void computeInitialSampleNeighbor();
 
   void runSkelWlop();
   void runDragWlop();
   void runRegularizeSamples();
+
+  void computeDiskNeighborhood();
 
 protected:
 	WLOP(){}

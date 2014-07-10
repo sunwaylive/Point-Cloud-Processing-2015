@@ -113,7 +113,7 @@ private: // For pick points function
 	int RGB_counter;
 	void addRBGPick(int pick_index);
 
-  LocalDisk picked_disk;
+  NeighborDisk picked_disk;
 
 private: // For snapshot
 	int tileCol, tileRow, totalCols, totalRows;

@@ -284,13 +284,13 @@ void GLArea::paintGL()
     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
     {
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
     }
 
-    if (!pickList.empty())
-    {
-      glDrawer.drawPickedDisk(dataMgr.getCurrentDualSamples(), &picked_disk);
-    }
+//     if (!pickList.empty())
+//     {
+//       glDrawer.drawPickedDisk(dataMgr.getCurrentDualSamples(), &picked_disk);
+//     }
 
 	}
 
@@ -1576,12 +1576,13 @@ void GLArea::mouseReleaseEvent(QMouseEvent *e)
       {
         CMesh* dual_samples = dataMgr.getCurrentDualSamples();
         CVertex picked = dual_samples->vert[pickList[0]];
-        picked_disk = LocalDisk(picked.P(), picked.N());
+        picked_disk = NeighborDisk(picked.P(), picked.N());
         for (int i = 0; i < picked.neighbors.size(); i++)
         {
           picked_disk.add_point(dual_samples->vert[picked.neighbors[i]]);
         }
         picked_disk.printSlots();
+        cout << picked_disk.getOccupyPercentage() << endl << endl;
       }
 		}
 	}

@@ -146,7 +146,8 @@ void WLOP::run()
 
   if (para->getBool("Run Dual Drag WLOP"))
   {
-    runDragWlop();
+    computeDiskNeighborhood();
+    //runDragWlop();
     return;
   }
 
@@ -1043,5 +1044,63 @@ void WLOP::runRegularizeSamples()
     }
 
     v.P() = (front_nearest_p + back_nearest_p) / 2.0;
+  }
+}
+
+
+void WLOP::computeDiskNeighborhood()
+{
+  GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 1.5, samples->bbox);
+
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    CVertex& dual_v = dual_samples->vert[i];
+    CVertex& v = samples->vert[i];
+
+    v.N() = dual_v.N();
+  }
+
+  vector<NeighborDisk> neighbor_disks;
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    CVertex& dual_v = dual_samples->vert[i];
+    NeighborDisk disk(dual_v.P(), dual_v.N());
+    for (int j = 0; j < dual_v.neighbors.size(); j++)
+    {
+      disk.add_point(dual_samples->vert[dual_v.neighbors[j]]);
+    }
+    neighbor_disks.push_back(disk);
+  }
+
+  double angle = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+  //double angle_threshold = angle * 3.1415926 / 180.;
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    double occupy_percentage = neighbor_disks[i].getOccupyPercentage();
+    if (occupy_percentage > 0.66)
+      continue;
+
+    CVertex& dual_v = dual_samples->vert[i];
+    CVertex& v = samples->vert[i];
+
+    vector<int> new_neighbors;
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      double normal_diff = GlobalFun::computeRealAngleOfTwoVertor(t.N(), v.N()); 
+      
+      //new_neighbors.push_back(v.neighbors[j]);
+
+      if (normal_diff < angle)
+      {
+        new_neighbors.push_back(v.neighbors[j]);
+      }
+    }
+
+    for (int j = 0; j < new_neighbors.size(); j++)
+    {
+      dual_v.neighbors.push_back(new_neighbors[j]);
+    }
   }
 }

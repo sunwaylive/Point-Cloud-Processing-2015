@@ -60,7 +60,7 @@ public:
 	void cleanPickPoint();
 	void drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_as_dot);
   void drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList);
-  void drawPickedDisk(CMesh* dual_samples, LocalDisk* disk);
+  void drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk);
 
 	void setRGBNormals(vector<Point3f>& normals){RGB_normals = normals; }
 

@@ -101,29 +101,31 @@ private:
 };
 
 
-class LocalDisk
+class NeighborDisk
 {
 public:
-  LocalDisk(){}
-  LocalDisk(Point3f c, Point3f n)
+  NeighborDisk(){}
+  NeighborDisk(Point3f c, Point3f n)
   {
     center = c;
     normal = n;
     Point3f temp(0, 0, 1.11111111111);
     zero_axis = (normal ^ temp).Normalize();
-    disk_slots.assign(36, false);
+    slot_num = 24;
+    disk_slots.assign(slot_num, false);
   }
 
-  LocalDisk(const LocalDisk& d)
+  NeighborDisk(const NeighborDisk& d)
   {
     center = d.center;
     normal = d.normal;
     zero_axis = d.zero_axis;
     disk_slots = d.disk_slots;
     projected_points = d.projected_points;
+    slot_num = d.slot_num;
   }
 
-  LocalDisk& LocalDisk::operator = (const LocalDisk& d)
+  NeighborDisk& NeighborDisk::operator = (const NeighborDisk& d)
   {
     if (&d != this)
     {
@@ -132,6 +134,7 @@ public:
       zero_axis = d.zero_axis;
       disk_slots = d.disk_slots;
       projected_points = d.projected_points;
+      slot_num = d.slot_num;
     }
     return *this;
   }
@@ -161,12 +164,26 @@ public:
     }
 
     int new_slot_id = angle / 10.0;
-    if (new_slot_id >= 36)
+    if (new_slot_id >= slot_num)
     {
-      new_slot_id = 35;
+      new_slot_id = slot_num-1;
     }
     disk_slots[new_slot_id] = true;
   }
+
+  double getOccupyPercentage()
+  {
+    int occ_number = 0;
+    for (int i = 0; i < disk_slots.size(); i++)
+    {
+      if (disk_slots[i])
+      {
+        occ_number++;
+      }
+    }
+    return double(occ_number) / disk_slots.size();
+  }
+
   void printSlots()
   {
     for (int i = 0; i < disk_slots.size(); i++)
@@ -189,6 +206,7 @@ public:
   Point3f zero_axis;
   vector<bool> disk_slots;
   vector<Point3f> projected_points;
+  int slot_num;
 };
 
 
