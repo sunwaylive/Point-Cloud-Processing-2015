@@ -356,6 +356,42 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 
 }
 
+void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
+{
+  double width = para->getDouble("Sample Draw Width") * 0.6;
+  GLColor dnn_color = cGray;
+
+  glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
+
+  for(int ii = 0; ii < pickList.size(); ii++) 
+  {
+    int i = pickList[ii];
+
+    if(i < 0 )
+      continue;
+
+    CVertex &v = samples->vert[i];
+    Point3f &p = v.P();  
+
+    vector<int>::iterator vi = v.original_neighbors.begin();
+    int nsize = 6;
+    int j = 0;
+    for(; vi != v.original_neighbors.end()/* && j < nsize*/; ++vi, ++j)
+    {
+      if( (*vi) > original->vert.size() || (*vi) < 0)
+        break;
+
+      CVertex& v2 = original->vert[*vi];
+      Point3f p2 = v2.P();
+
+      glPushMatrix();      
+      glTranslatef(p2[0], p2[1], p2[2]);
+      glutSolidSphere(width, 10, 10);
+      glPopMatrix();
+    }
+  } 
+}
+
 
 void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
@@ -393,6 +429,7 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
       glutSolidSphere(width, 10, 10);
       glPopMatrix();
     }
+
 
     //Point3d & p3 = v.nb_center / v.neighbors.size();
 //     Point3d & p3 = samples->vert[v.fatherIndex].P();

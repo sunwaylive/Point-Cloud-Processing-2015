@@ -285,6 +285,8 @@ void GLArea::paintGL()
     {
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+      glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+
     }
 
 //     if (!pickList.empty())

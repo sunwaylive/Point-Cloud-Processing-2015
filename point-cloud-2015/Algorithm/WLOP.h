@@ -35,7 +35,7 @@ public:
   void runDragWlop();
   void runRegularizeSamples();
 
-  void computeDiskNeighborhood();
+  void computeJointNeighborhood();
 
 protected:
 	WLOP(){}

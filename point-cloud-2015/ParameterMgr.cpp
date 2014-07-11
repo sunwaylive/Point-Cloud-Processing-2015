@@ -88,7 +88,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show All Radius", false));
 	glarea.addParam(new RichBool("Show Radius Use Pick", true));
 	glarea.addParam(new RichBool("Show Red Radius Line", true));
-	glarea.addParam(new RichBool("Multiply Pick Point", true) );
+	glarea.addParam(new RichBool("Multiply Pick Point", false) );
   glarea.addParam(new RichDouble("Picked Index", 0));
 
 	glarea.addParam(new RichBool("GLarea Busying", false) );

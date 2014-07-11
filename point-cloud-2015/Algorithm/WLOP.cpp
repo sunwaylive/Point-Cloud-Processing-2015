@@ -146,7 +146,7 @@ void WLOP::run()
 
   if (para->getBool("Run Dual Drag WLOP"))
   {
-    computeDiskNeighborhood();
+    computeJointNeighborhood();
     //runDragWlop();
     return;
   }
@@ -1048,10 +1048,16 @@ void WLOP::runRegularizeSamples()
 }
 
 
-void WLOP::computeDiskNeighborhood()
+void WLOP::computeJointNeighborhood()
 {
   GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
   GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 1.5, samples->bbox);
+  
+  Timer time;
+  time.start("Sample Original Neighbor Tree!!!");
+  GlobalFun::computeBallNeighbors(dual_samples, original, 
+    para->getDouble("CGrid Radius"), box);
+  time.end();
 
   for (int i = 0; i < dual_samples->vert.size(); i++)
   {
@@ -1075,6 +1081,10 @@ void WLOP::computeDiskNeighborhood()
 
   double angle = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
   //double angle_threshold = angle * 3.1415926 / 180.;
+  vector< vector<int> > new_neighbors_vec;
+  vector< set<int> > new_original_neighbors_vec;
+  vector<int> update_dual_sample_indexes;
+
   for (int i = 0; i < dual_samples->vert.size(); i++)
   {
     double occupy_percentage = neighbor_disks[i].getOccupyPercentage();
@@ -1085,6 +1095,9 @@ void WLOP::computeDiskNeighborhood()
     CVertex& v = samples->vert[i];
 
     vector<int> new_neighbors;
+    set<int> new_original_neighbors;
+    //vector<int> new_original_neighbors;
+
     for (int j = 0; j < v.neighbors.size(); j++)
     {
       CVertex& t = samples->vert[v.neighbors[j]];
@@ -1095,12 +1108,49 @@ void WLOP::computeDiskNeighborhood()
       if (normal_diff < angle)
       {
         new_neighbors.push_back(v.neighbors[j]);
+
+        CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+        for (int k = 0; k < dual_t.original_neighbors.size(); k++)
+        {
+          new_original_neighbors.insert(dual_t.original_neighbors[k]);
+          //new_original_neighbors.push_back(dual_t.original_neighbors[k]);
+        }
       }
     }
 
+    new_neighbors_vec.push_back(new_neighbors);
+    new_original_neighbors_vec.push_back(new_original_neighbors);
+    update_dual_sample_indexes.push_back(i);
+  }
+
+  for (int i = 0; i < update_dual_sample_indexes.size(); i++)
+  {
+    CVertex& dual_v = dual_samples->vert[update_dual_sample_indexes[i]];
+
+    vector<int>& new_neighbors = new_neighbors_vec[i];
+    set<int>& new_original_neighbors = new_original_neighbors_vec[i];
+
+    set<int> new_neighbors_set;
+    for (int j = 0; j < dual_v.neighbors.size(); j++)
+    {
+      new_neighbors_set.insert(dual_v.neighbors[j]);
+    }
     for (int j = 0; j < new_neighbors.size(); j++)
     {
-      dual_v.neighbors.push_back(new_neighbors[j]);
+      new_neighbors_set.insert(new_neighbors[j]);
+    }
+
+    set<int>::iterator iter;
+
+    dual_v.neighbors.clear();
+    for (iter = new_neighbors_set.begin(); iter != new_neighbors_set.end(); ++iter)
+    {
+      dual_v.neighbors.push_back(*iter);
+    }
+
+    for (iter = new_original_neighbors.begin(); iter != new_original_neighbors.end(); ++iter)
+    {
+      dual_v.original_neighbors.push_back(*iter);
     }
   }
 }
