@@ -106,7 +106,11 @@ void NormalParaDlg::applyPCANormal()
 	{
     int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
     CMesh* samples;
-    if (global_paraMgr.glarea.getBool("Show Original")
+    if (global_paraMgr.glarea.getBool("Show Skeleton"))
+    {
+      samples = area->dataMgr.getCurrentDualSamples();
+    }
+    else if(global_paraMgr.glarea.getBool("Show Original")
       && !area->dataMgr.isOriginalEmpty())
     {
       samples = area->dataMgr.getCurrentOriginal();

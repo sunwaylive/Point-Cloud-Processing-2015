@@ -42,7 +42,7 @@ protected:
 
 private:
 	void input(CMesh* _samples, CMesh* _original);
-	void initVertexes();
+	void initVertexes(bool clear_neighbor);
 
 	double iterate();
 	void computeAverageTerm(CMesh* samples, CMesh* original);
@@ -87,4 +87,10 @@ private:
 
   bool use_adaptive_mu;
   vector<bool> is_sample_close_to_original;
+
+  vector<int> pioneer_points_id;
+  vector<Point3f> pioneer_points_position;
+  vector< vector<Point3f>> pioneer_points_origininal;
+
+
 };

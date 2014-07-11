@@ -240,7 +240,12 @@ void GLArea::paintGL()
 
 	if (para->getBool("Show Normal")) 
 	{
-		if(para->getBool("Show Samples"))
+    if (para->getBool("Show Skeleton"))
+    {
+      glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
+    }
+
+      if(para->getBool("Show Samples"))
 		{
 			glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentSamples());
 		}
@@ -250,10 +255,7 @@ void GLArea::paintGL()
 				glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
 
-    if (para->getBool("Show Skeleton"))
-    {
-      glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
-    }
+
 	}
 
  	if(para->getBool("Show Original"))
@@ -280,6 +282,10 @@ void GLArea::paintGL()
 	{
 		glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
     glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
+
+    //glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, false);
+    //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
+
 
     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
     {

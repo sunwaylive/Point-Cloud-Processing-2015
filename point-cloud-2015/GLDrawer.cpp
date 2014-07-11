@@ -460,7 +460,7 @@ void GLDrawer::drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_a
 
 		if(bShow_as_dot)
 		{
-			glPointSize(sample_dot_size * 1.2);
+			glPointSize(sample_dot_size * 3);
 			glBegin(GL_POINTS);
 
 			GLColor color = pick_color;
@@ -472,7 +472,7 @@ void GLDrawer::drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_a
 		}
 		else
 		{
-			glDrawSphere(p, pick_color, sample_draw_width * 1.2, 40);
+			glDrawSphere(p, pick_color, sample_draw_width * 2, 40);
 		}
 	}    
 }

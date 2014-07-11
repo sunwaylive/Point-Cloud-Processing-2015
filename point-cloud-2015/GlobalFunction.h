@@ -111,7 +111,7 @@ public:
     normal = n;
     Point3f temp(0, 0, 1.11111111111);
     zero_axis = (normal ^ temp).Normalize();
-    slot_num = 24;
+    slot_num = 12;
     disk_slots.assign(slot_num, false);
   }
 
@@ -139,8 +139,7 @@ public:
     return *this;
   }
 
-
-  void add_point(Point3f new_p)
+  Point3f projectPointToDisk(Point3f new_p)
   {
     Point3f temp1 = (new_p - center).Normalize();
     Point3f temp2 = temp1 ^ normal;
@@ -153,7 +152,22 @@ public:
 
     double proj_dist = (new_p - center) * temp3;
     Point3f new_projected_point = center + temp3 * proj_dist;
-    projected_points.push_back(new_projected_point);
+    return new_projected_point;
+  }
+
+  int getSlotIDbyPoint(Point3f new_p)
+  {
+    Point3f temp1 = (new_p - center).Normalize();
+    Point3f temp2 = temp1 ^ normal;
+    Point3f temp3 = normal ^ temp2;
+
+    if (temp1 * temp3 < 0)
+    {
+      temp3 *= -1;
+    }
+
+    double proj_dist = (new_p - center) * temp3;
+    Point3f new_projected_point = center + temp3 * proj_dist;
 
     //update slots
     double angle = GlobalFun::computeRealAngleOfTwoVertor(temp3, zero_axis);
@@ -168,7 +182,71 @@ public:
     {
       new_slot_id = slot_num-1;
     }
+    return new_slot_id;
+  }
+
+  void add_point(Point3f new_p)
+  {
+    Point3f temp1 = (new_p - center).Normalize();
+    Point3f temp2 = temp1 ^ normal;
+    Point3f temp3 = normal ^ temp2;
+
+    if (temp1 * temp3 < 0)
+    {
+      temp3 *= -1;
+    }
+
+    double proj_dist = (new_p - center) * temp3;
+    Point3f new_projected_point = center + temp3 * proj_dist;
+
+    //update slots
+    double angle = GlobalFun::computeRealAngleOfTwoVertor(temp3, zero_axis);
+    Point3f temp_test = (temp3.Normalize() ^ zero_axis).Normalize();
+    if (temp_test * normal < 0)
+    {
+      angle = 360. - angle;
+    }
+
+    int new_slot_id = angle / 10.0;
+    if (new_slot_id >= slot_num)
+    {
+      new_slot_id = slot_num-1;
+    }
+    projected_points.push_back(new_projected_point);
     disk_slots[new_slot_id] = true;
+  }
+
+  bool isSlotOccupied(Point3f new_p)
+  {
+    int new_slot_id = getSlotIDbyPoint(new_p);
+    return disk_slots[new_slot_id];
+  }
+
+  bool isNewPointGood(Point3f new_p)
+  {
+    Point3f new_projected_point = projectPointToDisk(new_p);
+    Point3f new_direction = (new_projected_point - center).normalized();
+    double min_angle = 180;
+    for (int i = 0; i < projected_points.size(); i++)
+    {
+      Point3f proj_p = projected_points[i];
+      Point3f direction = (proj_p - center).normalized();
+      double angle = GlobalFun::computeRealAngleOfTwoVertor(new_direction, direction);
+      if (angle < min_angle)
+      {
+        min_angle = angle;
+      }
+    }
+
+    if (min_angle > (360. / slot_num))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+
   }
 
   double getOccupyPercentage()
@@ -199,6 +277,8 @@ public:
     }
     cout << endl;
   }
+
+
 
 public:
   Point3f center;

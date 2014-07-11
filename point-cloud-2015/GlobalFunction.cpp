@@ -784,9 +784,9 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 
 	if (angle < 0 || angle > 180)
 	{
-		cout << "compute angle wrong!!" << endl;
+		//cout << "compute angle wrong!!" << endl;
 		//system("Pause");
-		return -1;
+		return 180;
 	}
 
 

@@ -64,7 +64,7 @@ void WLOP::setInput(DataMgr* pData)
 }
 
 
-void WLOP::initVertexes()
+void WLOP::initVertexes(bool clear_neighbor)
 {
   bool use_current_neighbor = para->getBool("Use Adaptive Sample Neighbor");
 	
@@ -76,11 +76,12 @@ void WLOP::initVertexes()
 	for(vi = samples->vert.begin(); vi != vi_end; ++vi) 
 	{
 		vi->m_index = i++;
-    if (!use_current_neighbor)
+    if (!use_current_neighbor && clear_neighbor)
     {
       vi->neighbors.clear();
+      vi->original_neighbors.clear();
     }
-		vi->original_neighbors.clear();
+		
 
 		if (vi->is_skel_ignore)
 		{
@@ -146,8 +147,16 @@ void WLOP::run()
 
   if (para->getBool("Run Dual Drag WLOP"))
   {
+    pioneer_points_id.clear();
+    pioneer_points_position.clear();
+    pioneer_points_origininal.clear();
+
     computeJointNeighborhood();
-    //runDragWlop();
+    samples = dual_samples;
+    if (para->getBool("Need Sample Average"))
+    {
+      runDragWlop();
+    }
     return;
   }
 
@@ -266,7 +275,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   
   double close_threshold = radius2 / 16;
+
+  bool L2 = para->getBool("Need Sample Average");
   
+  cout << "dual" << endl;
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
   for(int i = 0; i < samples->vert.size(); i++)
 	{
@@ -311,6 +323,11 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			{
 				w *= original_density[t.m_index];
 			}
+
+      if (L2)
+      {
+        w = 1.0;
+      }
 
 			average[i] += t.P() * w;  
 			average_weight_sum[i] += w;  
@@ -508,7 +525,7 @@ double WLOP::iterate()
   
 	Timer time;
 
-	initVertexes();
+	initVertexes(true);
 
 	time.start("Sample Original Neighbor Tree!!!");
 	GlobalFun::computeBallNeighbors(samples, original, 
@@ -888,7 +905,7 @@ void WLOP::runSkelWlop()
 
   Timer time;
 
-  initVertexes();
+  initVertexes(true);
 
   time.start("Samples Initial");
   GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
@@ -985,7 +1002,250 @@ void WLOP::runSkelWlop()
 
 void WLOP::runDragWlop()
 {
+  use_adaptive_mu = para->getBool("Use Adaptive Mu");
 
+  Timer time;
+
+  initVertexes(false);
+
+//   time.start("Sample Original Neighbor Tree!!!");
+//   GlobalFun::computeBallNeighbors(samples, original, 
+//     para->getDouble("CGrid Radius"), box);
+//   time.end();
+
+//   if (!para->getBool("Use Adaptive Sample Neighbor"))
+//   {
+//     time.start("Sample Sample Neighbor Tree");
+//     GlobalFun::computeBallNeighbors(samples, NULL, 
+//       para->getDouble("CGrid Radius"), samples->bbox);
+//     time.end();
+//   }
+//   else
+//   {
+//     updateAdaptiveNeighbor();
+//   }
+
+
+//   if (nTimeIterated == 0) 
+//   {
+//     if (para->getBool("Need Compute Density"))
+//     {
+// //       double local_density_para = 0.95;
+// //       time.start("Original Original Neighbor Tree");
+// //       GlobalFun::computeBallNeighbors(original, NULL, 
+// //         para->getDouble("CGrid Radius") * local_density_para, original->bbox);
+// //       time.end();
+// 
+//       time.start("Compute Original Density");
+//       original_density.assign(original->vn, 0);
+// 
+//       computeDensity(true, para->getDouble("CGrid Radius"));
+//       time.end();
+//     }
+// 
+//   }
+
+  if (para->getBool("Need Compute Density"))
+  {
+    time.start("Compute Density For Sample");
+    computeDensity(false, para->getDouble("CGrid Radius"));
+    time.end();
+  }
+
+//   time.start("Sample Original Neighbor Tree!!!");
+//   GlobalFun::computeBallNeighbors(samples, original, 
+//     para->getDouble("CGrid Radius"), box);
+//   time.end();
+
+  time.start("Compute Average Term");
+//   if (para->getBool("Original Combine Sample"))
+//   {
+//     computeAverageAddSampleTerm(samples, original);
+//   }
+//   else
+//   {
+    computeAverageTerm(samples, original);
+  //}
+  time.end();
+
+  time.start("Compute Repulsion Term");
+  computeRepulsionTerm(samples);
+  time.end();
+
+//   bool need_sample_average_term = false;
+//   if (para->getBool("Need Sample Average"))
+//   {
+//     time.start("Compute Repulsion Term");
+//     computeSampleAverageTerm(samples);
+//     time.end();
+//     need_sample_average_term = true;
+//   }
+
+  double mu = para->getDouble("Repulsion Mu");
+  double mu3 = para->getDouble("Sample Average Mu3");
+
+  double current_mu = para->getDouble("Repulsion Mu");
+
+  Point3f c;
+
+  vector<Point3f> new_sample_positions;
+  vector<float> move_proj_vec;
+
+  double radius = para->getDouble("CGrid Radius");
+  double radius2 = radius * radius;
+  double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+
+  if (use_adaptive_mu)
+  {
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      if (is_sample_close_to_original[i])
+      {
+        samples->vert[i].is_fixed_sample = true;
+      }
+      else
+      {
+        samples->vert[i].is_fixed_sample = false;
+      }
+    }
+  }
+
+  if (para->getBool("Need Averaging Movement"))
+  {
+    new_sample_positions.assign(samples->vert.size(), Point3f(0.,0.,0.));
+    move_proj_vec.assign(samples->vert.size(), 0.);
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      Point3f temp_p = v.P();
+
+      if (average_weight_sum[i] > 1e-20)
+      {
+        temp_p = average[i] / average_weight_sum[i];
+      }
+
+      if (use_adaptive_mu)
+      {
+        if (is_sample_close_to_original[i])
+        {
+          current_mu = mu;
+        }
+        else
+        {
+          current_mu = mu3;
+        }
+      }
+
+      if (repulsion_weight_sum[i] > 1e-20 && current_mu > 0)
+      {
+        temp_p += repulsion[i] * (current_mu / repulsion_weight_sum[i]);
+      }
+
+      Point3f move_vector = temp_p - v.P();
+      float move_proj = move_vector * v.N();
+      move_proj_vec[i] = move_proj;
+    }
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      float sum_move_proj = 0.0;
+      float sum_w = 0.0;
+
+      for (int j = 0; j < v.neighbors.size(); j++)
+      {
+        int neighbor_idx = v.neighbors[j];
+        CVertex& t = samples->vert[neighbor_idx];
+        float neighbor_move_proj = move_proj_vec[neighbor_idx];
+
+        float dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+        float w = exp(dist2 * iradius16);
+
+        sum_move_proj += w * neighbor_move_proj;
+        sum_w += w;
+      }
+
+      float avg_move_proj = sum_move_proj / sum_w;
+
+      if (sum_w > 0.0)
+      {
+        v.P() += v.N() * avg_move_proj;
+      }
+
+    }
+  }
+  else
+  {
+    for(int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      c = v.P();
+
+      if (average_weight_sum[i] > 1e-20)
+      {
+        v.P() = average[i] / average_weight_sum[i];
+      }
+
+      if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+      {
+        v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
+      }
+
+//       if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
+//       {
+//         v.P() +=  samples_average[i] * (mu3 / samples_average_weight_sum[i]);
+//       }
+
+      if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20 )
+      {
+        Point3f diff = v.P() - c; 
+        double move_error = sqrt(diff.SquaredNorm());
+        error_x += move_error; 
+      }
+    }
+    error_x = error_x / samples->vn;
+  }
+
+
+  para->setValue("Current Movement Error", DoubleValue(error_x));
+  cout << "****finished compute WLOP error:	" << error_x << endl;
+
+
+
+
+
+  if (para->getBool("Need Compute PCA"))
+  {
+    for (int i = 0; i < pioneer_points_id.size(); i++)
+    {
+      CVertex& dual_v = dual_samples->vert[pioneer_points_id[i]];
+      Point3f dual_v_last = pioneer_points_position[i];
+      Point3f movement = dual_v.P() - dual_v_last;
+
+      if (sqrt(movement.SquaredNorm()) < error_x * 1.5)
+      {
+        continue;
+      }
+
+      for (int j = 0; j < pioneer_points_origininal[i].size(); j++)
+      {
+        CVertex new_v;
+        new_v.bIsOriginal = true;
+        new_v.P() = pioneer_points_origininal[i][j] + movement;
+        new_v.m_index = original->vert.size();
+        original->vert.push_back(new_v);
+      }
+
+    }
+    original->vn = original->vert.size();
+
+
+    //time.start("Recompute PCA");
+    //recomputePCA_Normal();
+    //time.end();
+  }
 }
 
 
@@ -1051,8 +1311,11 @@ void WLOP::runRegularizeSamples()
 void WLOP::computeJointNeighborhood()
 {
   GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 1.5, samples->bbox);
+  //GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 3, samples->bbox);
   
+  int sigma_KNN = 800;
+  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, sigma_KNN, false, "void Skeletonization::eigenThresholdClassification()");
+
   Timer time;
   time.start("Sample Original Neighbor Tree!!!");
   GlobalFun::computeBallNeighbors(dual_samples, original, 
@@ -1088,7 +1351,7 @@ void WLOP::computeJointNeighborhood()
   for (int i = 0; i < dual_samples->vert.size(); i++)
   {
     double occupy_percentage = neighbor_disks[i].getOccupyPercentage();
-    if (occupy_percentage > 0.66)
+    if (occupy_percentage > 0.85)
       continue;
 
     CVertex& dual_v = dual_samples->vert[i];
@@ -1104,18 +1367,31 @@ void WLOP::computeJointNeighborhood()
       double normal_diff = GlobalFun::computeRealAngleOfTwoVertor(t.N(), v.N()); 
       
       //new_neighbors.push_back(v.neighbors[j]);
-
-      if (normal_diff < angle)
+      if (normal_diff > angle)
       {
-        new_neighbors.push_back(v.neighbors[j]);
-
-        CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
-        for (int k = 0; k < dual_t.original_neighbors.size(); k++)
-        {
-          new_original_neighbors.insert(dual_t.original_neighbors[k]);
-          //new_original_neighbors.push_back(dual_t.original_neighbors[k]);
-        }
+        continue;
       }
+
+      CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+      //bool is_slot_occupied = neighbor_disks[i].isSlotOccupied(dual_t.P());
+      //if (is_slot_occupied)
+      //{
+      //  continue;
+      //}
+      bool is_new_point_good = neighbor_disks[i].isNewPointGood(dual_t.P());
+      if (!is_new_point_good)
+      {
+        continue;
+      }
+      neighbor_disks[i].add_point(dual_t.P());
+
+      new_neighbors.push_back(v.neighbors[j]);
+      for (int k = 0; k < dual_t.original_neighbors.size(); k++)
+      {
+        new_original_neighbors.insert(dual_t.original_neighbors[k]);
+        //new_original_neighbors.push_back(dual_t.original_neighbors[k]);
+      }   
+ 
     }
 
     new_neighbors_vec.push_back(new_neighbors);
@@ -1125,10 +1401,34 @@ void WLOP::computeJointNeighborhood()
 
   for (int i = 0; i < update_dual_sample_indexes.size(); i++)
   {
+    pioneer_points_id.push_back(update_dual_sample_indexes[i]);
+    CVertex& dual_v = dual_samples->vert[update_dual_sample_indexes[i]];
+
+    pioneer_points_position.push_back(dual_v.P());
+    vector<Point3f> pioneer_original;
+    for (int j = 0; j < dual_v.original_neighbors.size(); j++)
+    {
+      pioneer_original.push_back(original->vert[dual_v.original_neighbors[j]]);
+    }
+    pioneer_points_origininal.push_back(pioneer_original);
+  }
+
+  for (int i = 0; i < update_dual_sample_indexes.size(); i++)
+  {
     CVertex& dual_v = dual_samples->vert[update_dual_sample_indexes[i]];
 
     vector<int>& new_neighbors = new_neighbors_vec[i];
-    set<int>& new_original_neighbors = new_original_neighbors_vec[i];
+    
+    if (i < 15)
+    {
+      cout << "before:  " << dual_v.original_neighbors.size() << "  "<<  dual_v.neighbors.size() << endl;
+    }
+    set<int>& new_original_neighbors_set = new_original_neighbors_vec[i];
+    for (int j = 0; j < dual_v.original_neighbors.size(); j++)
+    {
+      new_original_neighbors_set.insert(dual_v.original_neighbors[j]);
+    }
+
 
     set<int> new_neighbors_set;
     for (int j = 0; j < dual_v.neighbors.size(); j++)
@@ -1148,9 +1448,14 @@ void WLOP::computeJointNeighborhood()
       dual_v.neighbors.push_back(*iter);
     }
 
-    for (iter = new_original_neighbors.begin(); iter != new_original_neighbors.end(); ++iter)
+    dual_v.original_neighbors.clear();
+    for (iter = new_original_neighbors_set.begin(); iter != new_original_neighbors_set.end(); ++iter)
     {
       dual_v.original_neighbors.push_back(*iter);
+    }
+    if (i < 15)
+    {
+      cout << "after:  " << dual_v.original_neighbors.size() << "  "<<  dual_v.neighbors.size() << endl << endl;
     }
   }
 }

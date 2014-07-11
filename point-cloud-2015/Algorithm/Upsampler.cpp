@@ -28,7 +28,9 @@ void Upsampler::setInput(DataMgr* pData)
 {
 	if(!pData->isSamplesEmpty())
 	{
-		input(pData->getCurrentSamples());
+		//input(pData->getCurrentSamples());
+    input(pData->getCurrentDualSamples());
+
 	}
 	else
 	{
