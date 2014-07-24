@@ -62,6 +62,8 @@ private slots:
 
   void switchSampleDualSample();
 
+
+
 	
 
 private slots:
@@ -87,6 +89,11 @@ private slots:
   void showColorfulBranches(bool _val);
 
   void showPickPointNeighbor(bool _val);
+
+  void showDualPoints(bool _val);
+  void showConnection(bool _val);
+  void pickDualPoints(bool _val);
+
 
 
 	void setSmapleType(QAction * action);

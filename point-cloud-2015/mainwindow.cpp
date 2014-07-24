@@ -39,6 +39,10 @@ void MainWindow::initWidgets()
 	ui.actionShow_Sample_Circle->setChecked(paras->glarea.getBool("Show Samples Circle"));
 	ui.actionShow_Sample_Sphere->setChecked(paras->glarea.getBool("Show Samples Sphere"));
 	
+  ui.actionShow_Dual->setChecked(global_paraMgr.glarea.getBool("Show Dual Samples"));
+  ui.actionShow_Connection->setChecked(global_paraMgr.glarea.getBool("Show Dual Connection"));
+  ui.actionPick_Dual->setChecked(global_paraMgr.glarea.getBool("Pick Dual Point"));
+
 	ui.actionShow_Original_Quad->setChecked(paras->glarea.getBool("Show Original Quad"));
 	ui.actionShow_Original_Dot->setChecked(paras->glarea.getBool("Show Original Dot"));
 	ui.actionShow_Original_Circle->setChecked(paras->glarea.getBool("Show Original Circle"));
@@ -101,6 +105,11 @@ void MainWindow::initConnect()
   connect(ui.actionShow_Skeleton,SIGNAL(toggled(bool)),this,SLOT(showSkeleton(bool)));
   connect(ui.actionShow_colorful_branches,SIGNAL(toggled(bool)),this,SLOT(showColorfulBranches(bool)));
   connect(ui.actionShow_Picked_Neighbor,SIGNAL(toggled(bool)),this,SLOT(showPickPointNeighbor(bool)));
+
+  connect(ui.actionShow_Dual,SIGNAL(toggled(bool)),this,SLOT(showDualPoints(bool)));
+  connect(ui.actionShow_Connection,SIGNAL(toggled(bool)),this,SLOT(showConnection(bool)));
+  connect(ui.actionPick_Dual,SIGNAL(toggled(bool)),this,SLOT(pickDualPoints(bool)));
+
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
@@ -542,6 +551,24 @@ void MainWindow::showSamples(bool _val)
 {
 	global_paraMgr.glarea.setValue("Show Samples", BoolValue(_val));
 	area->updateGL();
+}
+
+void MainWindow::showDualPoints(bool _val)
+{
+  global_paraMgr.glarea.setValue("Show Dual Samples", BoolValue(_val));
+  area->updateGL();
+}
+
+void MainWindow::showConnection(bool _val)
+{
+  global_paraMgr.glarea.setValue("Show Dual Connection", BoolValue(_val));
+  area->updateGL();
+}
+
+void MainWindow::pickDualPoints(bool _val)
+{
+  global_paraMgr.glarea.setValue("Pick Dual Point", BoolValue(_val));
+  area->updateGL();
 }
 
  void MainWindow::showSkeleton(bool _val)

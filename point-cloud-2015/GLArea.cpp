@@ -211,6 +211,11 @@ void GLArea::paintGL()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  if (para->getBool("Pick Dual Point") && para->getBool("Doing Pick"))
+  {
+    glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+  }
+
 	if(para->getBool("Show Samples"))  
 	{
 		if(para->getBool("Show Samples Quad"))
@@ -223,7 +228,22 @@ void GLArea::paintGL()
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
 	}
 
-  //if(para->getBool("Show Dual Samples"))
+  if(para->getBool("Show Dual Samples"))
+  {
+    if(para->getBool("Show Samples Quad"))
+      glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
+    if(para->getBool("Show Samples Dot"))
+      glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+    if(para->getBool("Show Samples Circle"))
+      glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
+    if (para->getBool("Show Samples Sphere"))
+      glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
+  }
+
+  if(para->getBool("Show Dual Connection"))
+      glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
+
+
   if(para->getBool("Show Skeleton"))
   {
     if(para->getBool("Show Samples Quad"))
@@ -234,8 +254,7 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
     if (para->getBool("Show Samples Sphere"))
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
-    glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), 
-                                     dataMgr.getCurrentDualSamples());
+
   }
 
 	if (para->getBool("Show Normal")) 
@@ -280,8 +299,16 @@ void GLArea::paintGL()
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
-		glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
-    glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
+    if (para->getBool("Pick Dual Point"))
+    {
+      glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
+    }
+    else
+    {
+      glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
+      glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
+    }
+
 
     //glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, false);
     //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
@@ -673,7 +700,7 @@ void GLArea::changeColor(QString paraName)
 	} 
 }
 
-int GLArea::pickPoint(int x, int y, vector<int> &result, int width, int height,bool only_one)
+int GLArea::pickPoint(int x, int y, vector<int> &result, int width, int height, bool only_one)
 {
 	if(dataMgr.isSamplesEmpty())
 		return -1;

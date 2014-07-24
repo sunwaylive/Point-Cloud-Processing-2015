@@ -161,6 +161,7 @@
      </property>
      <addaction name="actionErase_Pick"/>
      <addaction name="actionShow_Picked_Neighbor"/>
+     <addaction name="actionPick_Dual"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -181,6 +182,8 @@
     <addaction name="menuSnap_Shot"/>
     <addaction name="menuShow_Neighbor_Size"/>
     <addaction name="menuPick_Point"/>
+    <addaction name="actionShow_Dual"/>
+    <addaction name="actionShow_Connection"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -232,6 +235,9 @@
    <addaction name="actionShow_Original"/>
    <addaction name="actionShow_Samples"/>
    <addaction name="actionShow_Skeleton"/>
+   <addaction name="actionShow_Dual"/>
+   <addaction name="actionShow_Connection"/>
+   <addaction name="actionPick_Dual"/>
    <addaction name="separator"/>
    <addaction name="actionShow_Neighborhood_Ball"/>
    <addaction name="actionShow_Normals"/>
@@ -690,6 +696,30 @@
   <action name="actionSwitch_Sample_DualSample">
    <property name="text">
     <string>Switch Sample DualSample</string>
+   </property>
+  </action>
+  <action name="actionShow_Dual">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Dual</string>
+   </property>
+  </action>
+  <action name="actionShow_Connection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Connection</string>
+   </property>
+  </action>
+  <action name="actionPick_Dual">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Pick Dual</string>
    </property>
   </action>
  </widget>
