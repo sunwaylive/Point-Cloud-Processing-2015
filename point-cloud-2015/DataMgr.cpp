@@ -471,6 +471,11 @@ void DataMgr::recomputeQuad()
 		samples.vert[i].recompute_m_render();
 	}
 
+  for (int i = 0; i < samples.vert.size(); i++)
+  {
+    dual_samples.vert[i].recompute_m_render();
+  }
+
   for (int i = 0; i < original.vert.size(); i++)
   {
     original.vert[i].recompute_m_render();
@@ -643,6 +648,8 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 {
 	clearCMesh(samples);
 	clearCMesh(original);
+  clearCMesh(dual_samples);
+
 	skeleton.clear();
 
 	ifstream infile;
@@ -980,7 +987,10 @@ void DataMgr::replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual)
 void DataMgr::switchSampleDualSample()
 {
   CMesh temp_mesh;
-  replaceMeshDual(dual_samples, temp_mesh, false);
-  replaceMeshDual(samples, dual_samples, true);
+   replaceMeshDual(dual_samples, temp_mesh, false);
+   replaceMeshDual(samples, dual_samples, true);
+   replaceMeshDual(temp_mesh, samples, false);
+  replaceMeshDual(original, temp_mesh, false);
+  replaceMeshDual(samples, original, true);
   replaceMeshDual(temp_mesh, samples, false);
 }

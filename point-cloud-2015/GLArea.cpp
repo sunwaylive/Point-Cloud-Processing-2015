@@ -211,7 +211,7 @@ void GLArea::paintGL()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  if (para->getBool("Pick Dual Point") && para->getBool("Doing Pick"))
+  if (para->getBool("Pick Dual Point") && global_paraMgr.drawer.getBool("Doing Pick"))
   {
     glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
   }
@@ -221,19 +221,27 @@ void GLArea::paintGL()
 		if(para->getBool("Show Samples Quad"))
 			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentSamples());
 		if(para->getBool("Show Samples Dot"))
+    {
+      lightOnOff(false);
 			glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentSamples());
+    }
 		if(para->getBool("Show Samples Circle"))
 			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentSamples());	
 		if (para->getBool("Show Samples Sphere"))
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
 	}
 
+  lightOnOff(para->getBool("Light On or Off"));
+
   if(para->getBool("Show Dual Samples"))
   {
     if(para->getBool("Show Samples Quad"))
       glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
     if(para->getBool("Show Samples Dot"))
+    {
+      lightOnOff(false);
       glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+    }
     if(para->getBool("Show Samples Circle"))
       glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
     if (para->getBool("Show Samples Sphere"))
@@ -243,19 +251,6 @@ void GLArea::paintGL()
   if(para->getBool("Show Dual Connection"))
       glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
 
-
-  if(para->getBool("Show Skeleton"))
-  {
-    if(para->getBool("Show Samples Quad"))
-      glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
-    if(para->getBool("Show Samples Dot"))
-      glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
-    if(para->getBool("Show Samples Circle"))
-      glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
-    if (para->getBool("Show Samples Sphere"))
-      glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
-
-  }
 
 	if (para->getBool("Show Normal")) 
 	{
@@ -335,7 +330,7 @@ void GLArea::paintGL()
 	{
 		drawPickRect();
 	}
-
+  lightOnOff(para->getBool("Light On or Off"));
   /* The following are semitransparent, careful for the rendering order*/
   glDepthMask(GL_FALSE);
 
@@ -345,6 +340,7 @@ void GLArea::paintGL()
   }
 
   glDepthMask(GL_TRUE);
+  lightOnOff(para->getBool("Light On or Off"));
 
 	glPopMatrix();
 	glPopMatrix();
