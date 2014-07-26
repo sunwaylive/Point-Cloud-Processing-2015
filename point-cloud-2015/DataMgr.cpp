@@ -990,7 +990,8 @@ void DataMgr::switchSampleDualSample()
    replaceMeshDual(dual_samples, temp_mesh, false);
    replaceMeshDual(samples, dual_samples, true);
    replaceMeshDual(temp_mesh, samples, false);
-  replaceMeshDual(original, temp_mesh, false);
-  replaceMeshDual(samples, original, true);
-  replaceMeshDual(temp_mesh, samples, false);
+
+//   replaceMeshDual(original, temp_mesh, false);
+//   replaceMeshDual(samples, original, true);
+//   replaceMeshDual(temp_mesh, samples, false);
 }

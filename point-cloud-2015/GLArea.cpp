@@ -211,10 +211,10 @@ void GLArea::paintGL()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  if (para->getBool("Pick Dual Point") && global_paraMgr.drawer.getBool("Doing Pick"))
-  {
-    glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
-  }
+   if (para->getBool("Pick Dual Point") && global_paraMgr.drawer.getBool("Doing Pick"))
+   {
+     glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+   }
 
 	if(para->getBool("Show Samples"))  
 	{
@@ -231,7 +231,7 @@ void GLArea::paintGL()
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
 	}
 
-  lightOnOff(para->getBool("Light On or Off"));
+  
 
   if(para->getBool("Show Dual Samples"))
   {
@@ -248,8 +248,10 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
   }
 
-  if(para->getBool("Show Dual Connection"))
-      glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
+  lightOnOff(para->getBool("Light On or Off"));
+
+   if(para->getBool("Show Dual Connection"))
+       glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
 
 
 	if (para->getBool("Show Normal")) 
@@ -296,6 +298,7 @@ void GLArea::paintGL()
 	{
     if (para->getBool("Pick Dual Point"))
     {
+      glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
       glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
     }
     else
@@ -311,7 +314,7 @@ void GLArea::paintGL()
 
     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
     {
-      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
       glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
 
@@ -1366,6 +1369,11 @@ void GLArea::wheelEvent(QWheelEvent *e)
       size_temp = global_paraMgr.skeleton.getDouble("Branches Merge Max Dist");
       global_paraMgr.skeleton.setValue("Branches Merge Max Dist", DoubleValue(size_temp * change));
     }
+    else
+    {
+      size_temp = global_paraMgr.drawer.getDouble("Normal Line Width");
+      global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(size_temp * change));
+    }
 	}
 	else if((e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::AltModifier))
 	{
@@ -1634,6 +1642,7 @@ void GLArea::keyReleaseEvent ( QKeyEvent * e )
 void GLArea::removePickPoint()
 {
 	CMesh* samples = dataMgr.getCurrentSamples();
+  CMesh* dual_samples = dataMgr.getCurrentDualSamples();
 
 	CMesh::VertexIterator vi;
 	int j = 0;
@@ -1645,21 +1654,23 @@ void GLArea::removePickPoint()
 
 	if (!para->getBool("Multiply Pick Point"))
 	{
-		for(int i = 0; i < pickList.size(); i++) 
+		for(int i = 0; i < pickList.size(); i+=5) 
 		{
 			if(pickList[i] < 0 || pickList[i] >= samples->vert.size())
 				continue;
 
 			CVertex &v = samples->vert[pickList[i]]; 
 			samples->vert.erase(samples->vert.begin() + v.m_index);
-
+      //dual_samples->vert.erase(dual_samples->vert.begin() + v.m_index);
 		}
 	}
 	else
 	{		
-		for (int i = 0; i < pickList.size(); i++)
+		for (int i = 0; i < pickList.size(); i+= 3)
 		{
 			samples->vert[pickList[i]].is_skel_ignore = true;
+      //dual_samples->vert[pickList[i]].is_skel_ignore = true;
+
 		}
 
 		vector<CVertex> save_sample_vert;

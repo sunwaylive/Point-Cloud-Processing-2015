@@ -359,7 +359,7 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
 {
   double width = para->getDouble("Sample Draw Width") * 0.6;
-  GLColor dnn_color = cGray;
+  GLColor dnn_color = cOrange;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
@@ -397,7 +397,7 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
   double width = para->getDouble("Sample Draw Width") * 1.2;
   //GLColor dnn_color = para->getColor("Pick Point DNN Color");
-  GLColor dnn_color = cGreen;
+  GLColor dnn_color = cBlue;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
@@ -445,8 +445,10 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 void GLDrawer::drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_as_dot)
 {
 	double width = para->getDouble("Sample Draw Width");
-	GLColor pick_color = para->getColor("Pick Point Color");
-	glColor3f(pick_color.r, pick_color.g, pick_color.b);
+	//GLColor pick_color = para->getColor("Pick Point Color");
+  GLColor pick_color = cYellow;
+
+  glColor3f(pick_color.r, pick_color.g, pick_color.b);
 
 	for(int ii = 0; ii < pickList.size(); ii++) 
 	{
@@ -460,7 +462,7 @@ void GLDrawer::drawPickPoint(CMesh* samples, vector<int>& pickList, bool bShow_a
 
 		if(bShow_as_dot)
 		{
-			glPointSize(sample_dot_size * 3);
+			glPointSize(sample_dot_size * 4);
 			glBegin(GL_POINTS);
 
 			GLColor color = pick_color;
@@ -736,6 +738,7 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
   //  return;
   //}
 
+  double width = normal_width;
 
   for (int i = 0; i < dual_samples->vert.size(); i++)
   {
@@ -743,7 +746,7 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
     //CVertex& dual_v = dual_samples->vert[i];
     CVertex& dual_v = samples->vert[i];
 
-    glDrawLine(v.P(), dual_v.P(), cBrown, 1);
+    glDrawLine(v.P(), dual_v.P(), cBrown, width);
   }
 
   //for (int i = 0; i < samples->vert.size(); i++)
