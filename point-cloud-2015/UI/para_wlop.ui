@@ -233,7 +233,7 @@
     <string>Step Forward</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="step_forward_2">
+  <widget class="QPushButton" name="wlop_projection">
    <property name="geometry">
     <rect>
      <x>30</x>

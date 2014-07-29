@@ -179,6 +179,9 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Dual Drag WLOP", false));
   wLop.addParam(new RichBool("Run Regularize Samples", false));
 
+  wLop.addParam(new RichBool("Run Projection", false));
+
+
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));

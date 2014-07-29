@@ -55,6 +55,8 @@ class WlopParaDlg : public QFrame
     void applyDragWlop();
     void applyRegularizeSamples();
 
+    void applyProjection();
+
 	private:
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;

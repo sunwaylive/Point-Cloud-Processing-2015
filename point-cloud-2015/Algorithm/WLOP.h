@@ -58,6 +58,8 @@ private:
 
   void updateAdaptiveNeighbor();
 
+  void runProjection();
+
 
 private:
 	RichParameterSet* para;

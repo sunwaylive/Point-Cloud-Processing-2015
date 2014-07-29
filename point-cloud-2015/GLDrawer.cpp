@@ -358,7 +358,7 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 
 void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
 {
-  double width = para->getDouble("Sample Draw Width") * 0.6;
+  double width = para->getDouble("Sample Draw Width") * 0.4;
   GLColor dnn_color = cOrange;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
