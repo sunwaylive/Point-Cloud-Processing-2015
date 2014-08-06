@@ -256,7 +256,7 @@ void GLArea::paintGL()
 
 	if (para->getBool("Show Normal")) 
 	{
-    if (para->getBool("Show Skeleton"))
+    if (para->getBool("Show Dual Samples"))
     {
       glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
     }

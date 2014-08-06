@@ -1471,101 +1471,153 @@ void WLOP::computeJointNeighborhood()
 
 void WLOP::runProjection()
 {
-  cout << "runRegularizeSamples" << endl;
 
-  double circle_radius = para->getDouble("CGrid Radius");
+  if (global_paraMgr.glarea.getDouble("Picked Index") < 0.1)
+      return;
+
+  vector<CVertex> new_samples;
+
+  int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+
   GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
   GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-  //   int branch_KNN = para->getDouble("Branch Search KNN");
-  //   GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, branch_KNN, false, "void Skeletonization::searchNewBranches()");
+  CVertex pick_v = samples->vert[pick_index];
+  new_samples.push_back(pick_v);
+ 
+  Point3f X_axis = pick_v.N().Normalize();
+  Point3f random_dir = pick_v.eigen_vector0.Normalize();
+  Point3f Y_axis = (X_axis ^ random_dir).Normalize();
+  Point3f Z_axis = (X_axis ^ Y_axis).Normalize();
 
-  vector<Point3f> new_sample_set;
-  vector<CVertex> new_circle_points;
-
-  float PI = 3.1415926;
-
-  new_sample_set.assign(samples->vert.size(), Point3f(0, 0, 0));
-  for (int i = 0; i < samples->vert.size(); i++)
+  for (int j = 0; j < pick_v.neighbors.size(); j++)
   {
-    CVertex& v = samples->vert[i];
-    Point3f direction = v.eigen_vector0.Normalize();
-
-    //Point3f front_nearest_p = v.P();
-    //Point3f back_nearest_p = v.P();
-    //double front_nearest_dist = 1000000.;
-    //double back_nearest_dist = -1000000.;
-
-    //for (int j = 0; j < v.neighbors.size(); j++)
-    //{
-    //  int neighbor_idx = v.neighbors[j];
-    //  CVertex& t = samples->vert[neighbor_idx];
-
-    //  Point3f diff = t.P() - v.P();
-    //  double proj_dist = diff * direction;
-
-    //  if (proj_dist > 0)
-    //  {
-    //    if (proj_dist < front_nearest_dist)
-    //    {
-    //      front_nearest_p = t.P();
-    //      front_nearest_dist = proj_dist;
-    //    }
-    //  }
-    //  else
-    //  {
-    //    if (proj_dist > back_nearest_dist)
-    //    {
-    //      back_nearest_p = t.P();
-    //      back_nearest_dist = proj_dist;
-    //    }
-    //  }
-    //}
-
-    //if (front_nearest_dist > 100000 || back_nearest_dist < -100000)
-    //{
-    //  cout << "end pointssss" << endl;
-    //  continue;
-    //}
-
-    //v.P() = (front_nearest_p + back_nearest_p) / 2.0;
-
-    //Point3f axis_direction = (front_nearest_p - v.P()).Normalize();
-    Point3f axis_direction = v.eigen_vector0.Normalize();
-
-    Point3f random_p(0.1234, 0.1234, 0.1234);
-    Point3f random_direction = (random_p - v.P()).Normalize();
-    Point3f plane_dir0 = (random_direction ^ axis_direction).Normalize();
-    Point3f plane_dir1 = (plane_dir0 ^ axis_direction).Normalize();
-    Point3f axis_X = plane_dir0 * circle_radius;
-    Point3f axis_Y = plane_dir1 * circle_radius;
-
-    float n = 100;
-    for (int j = 0; j < n; j++)
-    {
-      CVertex new_v;
-      //new_v.P() = v.P() + axis_Y * cos(2*PI/n*j) + axis_X * sin(2*PI/n*j); 
-      new_v.P() = v.P() + axis_Y* cos(2*PI/n*j) + axis_X * sin(2*PI/n*j); 
-
-      new_v.N() = (new_v.P() - v.N()).Normalize();
-      new_v.m_index = new_circle_points.size();
-      new_circle_points.push_back(new_v);
-    }
+    CVertex& t = samples->vert[pick_v.neighbors[j]];
+    t.P() = pick_v.P();
+    float X_proj_dist = t.N() * X_axis;
+    float Y_proj_dist = t.N() * Y_axis;
+    Point3f new_normal = t.P() + X_axis * X_proj_dist + Y_axis * Y_proj_dist;
+    t.N() = new_normal.Normalize();
+    new_samples.push_back(t);
   }
 
   //dual_samples->vert.clear();
-  //for (int i = 0; i < new_circle_points.size(); i++)
+  //dual_samples->vn = new_samples.size();
+  //for (int i = 0; i < dual_samples->vn; i++)
   //{
-  //  dual_samples->vert.push_back(new_circle_points[i]);
+  //  CVertex v = new_samples[i];
+  //  v.m_index = i;
+  //  dual_samples->vert.push_back(v);
   //}
-  //dual_samples->vn = dual_samples->vert.size();
 
   samples->vert.clear();
-  for (int i = 0; i < new_circle_points.size(); i++)
+  samples->vn = new_samples.size();
+  for (int i = 0; i < samples->vn; i++)
   {
-    samples->vert.push_back(new_circle_points[i]);
+    CVertex v = new_samples[i];
+    v.m_index = i;
+    samples->vert.push_back(v);
   }
-  samples->vn = samples->vert.size();
 
-  return;
 }
+
+//void WLOP::runProjection()
+//{
+//  cout << "runRegularizeSamples" << endl;
+//
+//  double circle_radius = para->getDouble("CGrid Radius");
+//  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+//  GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+//
+//  //   int branch_KNN = para->getDouble("Branch Search KNN");
+//  //   GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, branch_KNN, false, "void Skeletonization::searchNewBranches()");
+//
+//  vector<Point3f> new_sample_set;
+//  vector<CVertex> new_circle_points;
+//
+//  float PI = 3.1415926;
+//
+//  new_sample_set.assign(samples->vert.size(), Point3f(0, 0, 0));
+//  for (int i = 0; i < samples->vert.size(); i++)
+//  {
+//    CVertex& v = samples->vert[i];
+//    Point3f direction = v.eigen_vector0.Normalize();
+//
+//    //Point3f front_nearest_p = v.P();
+//    //Point3f back_nearest_p = v.P();
+//    //double front_nearest_dist = 1000000.;
+//    //double back_nearest_dist = -1000000.;
+//
+//    //for (int j = 0; j < v.neighbors.size(); j++)
+//    //{
+//    //  int neighbor_idx = v.neighbors[j];
+//    //  CVertex& t = samples->vert[neighbor_idx];
+//
+//    //  Point3f diff = t.P() - v.P();
+//    //  double proj_dist = diff * direction;
+//
+//    //  if (proj_dist > 0)
+//    //  {
+//    //    if (proj_dist < front_nearest_dist)
+//    //    {
+//    //      front_nearest_p = t.P();
+//    //      front_nearest_dist = proj_dist;
+//    //    }
+//    //  }
+//    //  else
+//    //  {
+//    //    if (proj_dist > back_nearest_dist)
+//    //    {
+//    //      back_nearest_p = t.P();
+//    //      back_nearest_dist = proj_dist;
+//    //    }
+//    //  }
+//    //}
+//
+//    //if (front_nearest_dist > 100000 || back_nearest_dist < -100000)
+//    //{
+//    //  cout << "end pointssss" << endl;
+//    //  continue;
+//    //}
+//
+//    //v.P() = (front_nearest_p + back_nearest_p) / 2.0;
+//
+//    //Point3f axis_direction = (front_nearest_p - v.P()).Normalize();
+//    Point3f axis_direction = v.eigen_vector0.Normalize();
+//
+//    Point3f random_p(0.1234, 0.1234, 0.1234);
+//    Point3f random_direction = (random_p - v.P()).Normalize();
+//    Point3f plane_dir0 = (random_direction ^ axis_direction).Normalize();
+//    Point3f plane_dir1 = (plane_dir0 ^ axis_direction).Normalize();
+//    Point3f axis_X = plane_dir0 * circle_radius;
+//    Point3f axis_Y = plane_dir1 * circle_radius;
+//
+//    float n = 100;
+//    for (int j = 0; j < n; j++)
+//    {
+//      CVertex new_v;
+//      //new_v.P() = v.P() + axis_Y * cos(2*PI/n*j) + axis_X * sin(2*PI/n*j); 
+//      new_v.P() = v.P() + axis_Y* cos(2*PI/n*j) + axis_X * sin(2*PI/n*j); 
+//
+//      new_v.N() = (new_v.P() - v.N()).Normalize();
+//      new_v.m_index = new_circle_points.size();
+//      new_circle_points.push_back(new_v);
+//    }
+//  }
+//
+//  //dual_samples->vert.clear();
+//  //for (int i = 0; i < new_circle_points.size(); i++)
+//  //{
+//  //  dual_samples->vert.push_back(new_circle_points[i]);
+//  //}
+//  //dual_samples->vn = dual_samples->vert.size();
+//
+//  samples->vert.clear();
+//  for (int i = 0; i < new_circle_points.size(); i++)
+//  {
+//    samples->vert.push_back(new_circle_points[i]);
+//  }
+//  samples->vn = samples->vert.size();
+//
+//  return;
+//}

@@ -755,6 +755,20 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 	v0.Normalize();
 	v1.Normalize();
 
+  const double epsilon = 1.0e-6;
+  const double nyPI = acos(-1.0);
+
+  double angle_cos = v0 * v1;
+  if (fabs(angle_cos-1.0) < epsilon)
+  {
+    return 0.0;
+  }
+  else if(fabs(angle_cos+1.0) < epsilon)
+  {
+    return nyPI;
+  }
+
+
 
 	if (isTwoPoint3fTheSame(v0, v1))
 	{
@@ -766,7 +780,6 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 		return 180;
 	}
 
-	double angle_cos = v0 * v1;
 	if (angle_cos > 1)
 	{
 		angle_cos = 0.99;
