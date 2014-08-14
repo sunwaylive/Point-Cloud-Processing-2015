@@ -749,6 +749,24 @@ bool GlobalFun::isTwoPoint3fOpposite(Point3f& v0, Point3f& v1)
 	return false;
 }
 
+double GlobalFun::computeDirectionalAngleOfTwoVertor(Point3f v0, Point3f v1, Point3f normal)
+{
+  v0.Normalize();
+  v1.Normalize();
+
+  double absolute_angle = computeRealAngleOfTwoVertor(v0, v1);
+  
+  Point3f dir0_1 = (v0 ^ v1).Normalize();
+
+  if ( (dir0_1 * normal.Normalize()) < 0)
+  {
+    return (-absolute_angle);
+  }
+  else
+  {
+    return absolute_angle;
+  }
+}
 
 double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 {
@@ -767,8 +785,6 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
   {
     return nyPI;
   }
-
-
 
 	if (isTwoPoint3fTheSame(v0, v1))
 	{

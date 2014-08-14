@@ -174,6 +174,12 @@ void WLOP::run()
     return;
   }
 
+  if (para->getBool("Run Regularize Normals"))
+  {
+    runRegularizeNormals();
+    return;
+  }
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -1315,6 +1321,63 @@ void WLOP::runRegularizeSamples()
   }
 }
 
+void WLOP::runRegularizeNormals()
+{
+  cout << "runRegularizeSamples" << endl;
+
+  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+
+  if (samples->vert.size() < 3)
+  {
+    return;
+  }
+  Point3f direction = (samples->vert[0].N() ^ samples->vert[1].N()).Normalize();
+
+  vector<Point3f> new_normals(samples->vert.size());
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    double min_clockwise_angle = 500;
+    double max_anticlockwise_angle = -500;
+    Point3f min_normal = v.N();
+    Point3f max_normal = v.N();
+
+    for (int j = 0; j < samples->vert.size(); j++)
+    {
+      CVertex& t = samples->vert[j];
+
+      double angle = GlobalFun::computeDirectionalAngleOfTwoVertor(v.N(), t.N(), direction);
+      if (angle > 0)
+      {
+        if (angle < min_clockwise_angle)
+        {
+          min_clockwise_angle = angle;
+          min_normal = t.N();
+        }
+      }
+      else
+      {
+        if (angle > max_anticlockwise_angle)
+        {
+          max_anticlockwise_angle = angle;
+          max_normal = t.N();
+        }
+      }
+    }
+
+    Point3f new_normal = (min_normal + max_normal) / 2.0;
+    new_normals[i] = new_normal.Normalize();
+  }
+
+  for (int i = 0 ; i < new_normals.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    v.N() = new_normals[i];
+  }
+
+}
+
 
 void WLOP::computeJointNeighborhood()
 {
@@ -1483,6 +1546,8 @@ void WLOP::runProjection()
   GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
   CVertex pick_v = samples->vert[pick_index];
+  pick_v.N().Normalize();
+
   new_samples.push_back(pick_v);
  
   Point3f X_axis = pick_v.N().Normalize();
@@ -1496,7 +1561,7 @@ void WLOP::runProjection()
     t.P() = pick_v.P();
     float X_proj_dist = t.N() * X_axis;
     float Y_proj_dist = t.N() * Y_axis;
-    Point3f new_normal = t.P() + X_axis * X_proj_dist + Y_axis * Y_proj_dist;
+    Point3f new_normal = ((t.P() + X_axis * X_proj_dist + Y_axis * Y_proj_dist) - t.P()).Normalize();
     t.N() = new_normal.Normalize();
     new_samples.push_back(t);
   }

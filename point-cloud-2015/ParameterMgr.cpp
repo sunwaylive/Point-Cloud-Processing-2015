@@ -73,9 +73,9 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Samples Circle", false) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
-  glarea.addParam(new RichBool("Show Dual Samples", true) );
-  glarea.addParam(new RichBool("Show Dual Connection", true) );
-  glarea.addParam(new RichBool("Pick Dual Point", true) );
+  glarea.addParam(new RichBool("Show Dual Samples", false) );
+  glarea.addParam(new RichBool("Show Dual Connection", false) );
+  glarea.addParam(new RichBool("Pick Dual Point", false) );
 
 
 	glarea.addParam(new RichBool("Show Original", true) );
@@ -178,6 +178,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Skel WLOP", false));
   wLop.addParam(new RichBool("Run Dual Drag WLOP", false));
   wLop.addParam(new RichBool("Run Regularize Samples", false));
+  wLop.addParam(new RichBool("Run Regularize Normals", false));
 
   wLop.addParam(new RichBool("Run Projection", false));
 

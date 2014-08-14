@@ -54,6 +54,8 @@ class WlopParaDlg : public QFrame
     void applySkelWlop();
     void applyDragWlop();
     void applyRegularizeSamples();
+    void applyRegularizeNormals();
+
 
     void applyProjection();
 

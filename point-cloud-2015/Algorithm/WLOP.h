@@ -34,6 +34,8 @@ public:
   void runSkelWlop();
   void runDragWlop();
   void runRegularizeSamples();
+  void runRegularizeNormals();
+
 
   void computeJointNeighborhood();
 

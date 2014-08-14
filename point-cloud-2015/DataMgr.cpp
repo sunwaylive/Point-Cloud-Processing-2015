@@ -966,6 +966,11 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
     }
   }
 
+  for (int i = 0; i < samples.vert.size(); i++)
+  {
+    samples.vert[i].N().Normalize();
+  }
+
 	skeleton.generateBranchSampleMap();
 }
 

@@ -61,6 +61,8 @@ namespace GlobalFun
 	vector<int> GetRandomCards(int Max);
 
 	double computeRealAngleOfTwoVertor(Point3f v0, Point3f v1);
+  double computeDirectionalAngleOfTwoVertor(Point3f v0, Point3f v1, Point3f normal);
+
 	bool isTwoPoint3fTheSame(Point3f& v0, Point3f& v1);
 	bool isTwoPoint3fOpposite(Point3f& v0, Point3f& v1);
 }

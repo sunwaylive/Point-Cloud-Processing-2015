@@ -298,6 +298,19 @@
     <string>Regularize Samples</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="regularize_normals">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>700</y>
+     <width>209</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Regularize Normals</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

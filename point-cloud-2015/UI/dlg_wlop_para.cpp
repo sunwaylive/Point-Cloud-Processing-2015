@@ -100,6 +100,7 @@ void WlopParaDlg::initConnects()
   connect(ui->skel_wlop,SIGNAL(clicked()),this,SLOT(applySkelWlop()));
   connect(ui->dual_drag_wlop,SIGNAL(clicked()),this,SLOT(applyDragWlop()));
   connect(ui->regularize_samples,SIGNAL(clicked()),this,SLOT(applyRegularizeSamples()));
+  connect(ui->regularize_normals,SIGNAL(clicked()),this,SLOT(applyRegularizeNormals()));
 
   connect(ui->wlop_projection,SIGNAL(clicked()),this,SLOT(applyProjection()));
 }
@@ -407,6 +408,13 @@ void WlopParaDlg::applyRegularizeSamples()
   m_paras->wLop.setValue("Run Regularize Samples", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Regularize Samples", BoolValue(false));
+}
+
+void WlopParaDlg::applyRegularizeNormals()
+{
+  m_paras->wLop.setValue("Run Regularize Normals", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Regularize Normals", BoolValue(false));
 }
 
 void WlopParaDlg::applyProjection()
