@@ -760,7 +760,8 @@ double GlobalFun::computeDirectionalAngleOfTwoVertor(Point3f v0, Point3f v1, Poi
 
   if ( (dir0_1 * normal.Normalize()) < 0)
   {
-    return (-absolute_angle);
+    //return (-absolute_angle);
+    return (360-absolute_angle);
   }
   else
   {
@@ -779,33 +780,47 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
   double angle_cos = v0 * v1;
   if (fabs(angle_cos-1.0) < epsilon)
   {
+    cout << "watch out this angle: if (fabs(angle_cos-1.0) < epsilon)" << endl;
+    cout << "return angle 0.0" << endl;
     return 0.0;
   }
   else if(fabs(angle_cos+1.0) < epsilon)
   {
-    return nyPI;
+    cout << "watch out this angle else if(fabs(angle_cos+1.0) < epsilon)" << endl;
+
+    return 180;
   }
 
 	if (isTwoPoint3fTheSame(v0, v1))
 	{
+    cout << "watch out this angle if (isTwoPoint3fTheSame(v0, v1))" << endl;
+
 		return 0;
 	}
 
 	if (isTwoPoint3fOpposite(v0, v1))
 	{
+    cout << "watch out this angle if (isTwoPoint3fOpposite(v0, v1))" << endl;
+
 		return 180;
 	}
 
 	if (angle_cos > 1)
 	{
+    cout << "watch out this angle if (angle_cos > 1)" << endl;
+
 		angle_cos = 0.99;
 	}
 	if (angle_cos < -1)
 	{
+    cout << "watch out this angle if (angle_cos < -1)" << endl;
+
 		angle_cos = -0.99;
 	}
 	if (angle_cos > 0 && angle_cos < 1e-8)
 	{
+    cout << "watch out this angle if (angle_cos > 0 && angle_cos < 1e-8)" << endl;
+
 		return 90;
 	}
 
@@ -813,6 +828,8 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 
 	if (angle < 0 || angle > 180)
 	{
+    cout << "watch out this angle iif (angle < 0 || angle > 180)" << endl;
+
 		//cout << "compute angle wrong!!" << endl;
 		//system("Pause");
 		return 180;
@@ -823,3 +840,73 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 	return angle;
 }
 
+
+void GlobalFun::deleteIgnore(CMesh* mesh)
+{
+  vector<CVertex> temp_vert;
+  for (int i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    if (!v.is_skel_ignore)
+    {
+      temp_vert.push_back(v);
+    }
+  }
+
+  mesh->vert.clear();
+  for (int i = 0; i < temp_vert.size(); i++)
+  {
+    CVertex& v = temp_vert[i];
+    v.m_index = i;
+    mesh->vert.push_back(v);
+    mesh->bbox.Add(v.P());
+  }
+  mesh->vn = mesh->vert.size();
+}
+
+void GlobalFun::removeNormalOverlaps(CMesh* mesh)
+{
+
+  bool has_normal_overlap = true;
+  while (has_normal_overlap)
+  {
+    GlobalFun::computeBallNeighbors(mesh, NULL, 0.2, mesh->bbox);
+
+    for (int i = 0; i < mesh->vert.size(); i++)
+    {
+      CVertex& v = mesh->vert[i];
+      has_normal_overlap = false;
+      for (int j = 0; j < v.neighbors.size(); j++)
+      {
+        CVertex& t = mesh->vert[v.neighbors[j]];
+
+        double angle = computeRealAngleOfTwoVertor(v.N(), t.N());
+        if (angle < 0.001)
+        {
+          cout << "delete angle!!" << endl;
+          if (v.neighbors[j] != 0)
+          {
+            t.is_skel_ignore = true;
+            has_normal_overlap = true;
+            break;
+          }
+          else
+          {
+            cout << "the first point overlap!!" << endl;
+          }
+        }
+      }
+
+      if (has_normal_overlap)
+      {
+        break;
+      }
+    }
+
+    if (has_normal_overlap)
+    {
+      deleteIgnore(mesh);
+    }
+  }
+
+}

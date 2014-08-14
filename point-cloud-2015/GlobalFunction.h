@@ -65,6 +65,9 @@ namespace GlobalFun
 
 	bool isTwoPoint3fTheSame(Point3f& v0, Point3f& v1);
 	bool isTwoPoint3fOpposite(Point3f& v0, Point3f& v1);
+
+  void deleteIgnore(CMesh* mesh);
+  void removeNormalOverlaps(CMesh* mesh);
 }
 
 class Timer
