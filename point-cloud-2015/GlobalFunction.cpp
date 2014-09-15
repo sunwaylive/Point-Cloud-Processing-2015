@@ -840,6 +840,14 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 	return angle;
 }
 
+Point3f GlobalFun::getTangentVector(Point3f& diff_vecotr, Point3f& normal)
+{
+  double proj_dist = diff_vecotr * normal.Normalize();
+  Point3f proj_vector = normal * proj_dist;
+  Point3f tangent_vector = diff_vecotr - proj_vector;
+
+  return tangent_vector;
+}
 
 void GlobalFun::deleteIgnore(CMesh* mesh)
 {

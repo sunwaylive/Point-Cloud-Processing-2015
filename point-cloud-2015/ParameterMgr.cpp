@@ -190,6 +190,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
+  wLop.addParam(new RichBool("Use Tangent Vector", false));
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
 

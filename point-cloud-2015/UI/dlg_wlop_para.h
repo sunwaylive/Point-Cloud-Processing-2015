@@ -43,6 +43,7 @@ class WlopParaDlg : public QFrame
     void useEllipticalOriginalNeighbor(bool _val);
     void useAdaptiveSampleNeighbor(bool _val);
     void useAdaptiveMu(bool _val);
+    void useTangentVector(bool _val);
 
 		//
 		void applyWlop();

@@ -28,8 +28,8 @@ void Upsampler::setInput(DataMgr* pData)
 {
 	if(!pData->isSamplesEmpty())
 	{
-		//input(pData->getCurrentSamples());
-    input(pData->getCurrentDualSamples());
+		input(pData->getCurrentSamples());
+    //input(pData->getCurrentDualSamples());
 
 	}
 	else
@@ -1003,7 +1003,8 @@ void Upsampler::self_optimize_normals(CGrid::iterator start, CGrid::iterator end
 	double delta = 2.0;
 	double sigma = global_paraMgr.upsampling.getDouble("Feature Sigma");
 
-	for(CGrid::iterator dest = start; dest != end; dest++) {
+	for(CGrid::iterator dest = start; dest != end; dest++) 
+  {
 		CVertex &v = *(*dest);
 		Point3f &p = v.P();
 		for(CGrid::iterator origin = dest+1; origin != end; origin++)

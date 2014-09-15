@@ -101,6 +101,10 @@ private:
   void subdivisionCurveOnce(Curve& c);
   void subdivisionCurve(Curve& c, double stop_segment_length);
 
+
+  //new improvement 2014-09-15
+  void runRegularizeSamples();
+
 protected:
 	Skeletonization(){}
 

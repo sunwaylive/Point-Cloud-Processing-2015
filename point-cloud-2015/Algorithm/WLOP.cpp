@@ -289,6 +289,8 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   
   double close_threshold = radius2 / 16;
+  bool use_tangent = para->getBool("Use Tangent Vector");
+
 
   bool L2 = para->getBool("Need Sample Average");
   
@@ -343,7 +345,20 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
         w = 1.0;
       }
 
-			average[i] += t.P() * w;  
+      if (use_tangent)
+      {
+//         if (i < 10)
+//         {
+//           cout << "tangent" << endl;
+//         }
+        Point3f proj_point = v.P() + v.N() * proj_dist;
+        average[i] += proj_point * w;  
+
+      }
+      else
+      {
+        average[i] += t.P() * w;  
+      }
 			average_weight_sum[i] += w;  
 
 
@@ -367,6 +382,7 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
+  bool use_tangent = para->getBool("Use Tangent Vector");
 
 	cout << endl<< endl<< "Sample Neighbor Size:" << samples->vert[0].neighbors.size() << endl<< endl;
 	for(int i = 0; i < samples->vert.size(); i++)
@@ -376,6 +392,11 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 		{
 			CVertex& t = samples->vert[v.neighbors[j]];
 			Point3f diff = v.P() - t.P();
+
+      if (use_tangent)
+      {
+        diff = GlobalFun::getTangentVector(diff, v.N());
+      }
 
 			double dist2  = diff.SquaredNorm();
 			double len = sqrt(dist2);
@@ -536,7 +557,8 @@ double WLOP::iterate()
 {
   use_adaptive_mu = para->getBool("Use Adaptive Mu");
   is_sample_close_to_original.assign(samples->vert.size(), false);
-  
+  bool use_tangent = para->getBool("Use Tangent Vector");
+
 	Timer time;
 
 	initVertexes(true);
@@ -575,7 +597,6 @@ double WLOP::iterate()
 			computeDensity(true, para->getDouble("CGrid Radius") * local_density_para);
 			time.end();
 		}
-		
 	}
 
 	if (para->getBool("Need Compute Density"))

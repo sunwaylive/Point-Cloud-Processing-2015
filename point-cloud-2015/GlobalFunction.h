@@ -68,6 +68,8 @@ namespace GlobalFun
 
   void deleteIgnore(CMesh* mesh);
   void removeNormalOverlaps(CMesh* mesh);
+
+  Point3f getTangentVector(Point3f& diff_vecotr, Point3f& normal);
 }
 
 class Timer
