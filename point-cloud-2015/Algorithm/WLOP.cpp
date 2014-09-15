@@ -53,6 +53,7 @@ void WLOP::setInput(DataMgr* pData)
     if (para->getBool("Run Dual WLOP"))
     {
       samples = pData->getCurrentDualSamples();
+      original = pData->getCurrentSamples();
     }
 		samples_density.assign(samples->vn, 1);
 	}
@@ -1440,85 +1441,101 @@ void WLOP::runRegularizeSamples()
 //}
 
 
+//void WLOP::runRegularizeNormals()
+//{
+//  cout << "runRegularizeSamples" << endl;
+//
+//  GlobalFun::removeNormalOverlaps(samples);
+//
+//  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+//
+//  if (samples->vert.size() < 3)
+//  {
+//    return;
+//  }
+//  Point3f direction = (samples->vert[0].N() ^ samples->vert[1].N()).Normalize();
+//
+//  vector<Point3f> new_normals(samples->vert.size());
+//  for (int i = 0; i < samples->vert.size(); i++)
+//  {
+//    CVertex& v = samples->vert[i];
+//
+//    double min_clockwise_angle = 500;
+//    double max_clockwise_angle = -500;
+//
+//    Point3f min_clockwise_normal = v.N();
+//    Point3f max_clockwise_normal = v.N();
+//
+//    for (int j = 0; j < samples->vert.size(); j++)
+//    {
+//      CVertex& t = samples->vert[j];
+//
+//      double angle = GlobalFun::computeDirectionalAngleOfTwoVertor(v.N(), t.N(), direction);
+//
+//      if (angle < min_clockwise_angle)
+//      {
+//        min_clockwise_angle = angle;
+//        min_clockwise_normal = t.N();
+//      }
+//      if (angle > max_clockwise_angle)
+//      {
+//        max_clockwise_angle = angle;
+//        max_clockwise_normal = t.N();
+//      }
+//
+////       if ((angle < 0.000001 && angle > -0.000001) /*|| angle > 179.99999 || angle < -179.99999*/)
+////       {
+////         //t.N() *= -1;
+////         //cout << "skip!!" << endl;
+////         //break;;
+////       }
+////       if (angle > 0)
+////       {
+////         if (angle < min_clockwise_angle)
+////         {
+////           min_clockwise_angle = angle;
+////           min_clockwise_normal = t.N();
+////         }
+////         if (angle > max_clockwise_angle)
+////         {
+////           max_clockwise_angle = angle;
+////           max_clockwise_normal = t.N();
+////         }
+////       }
+//    }
+//
+//    Point3f new_normal = (min_clockwise_normal + max_clockwise_normal) / 2.0;
+//    if (max_clockwise_angle < 180)
+//    {
+//      cout << "small circle" << endl;
+//      new_normal *= -1;
+//    }
+//    new_normals[i] = new_normal.Normalize();
+//  }
+//
+//  for (int i = 0 ; i < new_normals.size(); i++)
+//  {
+//    CVertex& v = samples->vert[i];
+//    v.N() = new_normals[i];
+//  }
+//
+//}
+
+
+
 void WLOP::runRegularizeNormals()
 {
-  cout << "runRegularizeSamples" << endl;
-
-  GlobalFun::removeNormalOverlaps(samples);
-
-  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-
-  if (samples->vert.size() < 3)
-  {
-    return;
-  }
-  Point3f direction = (samples->vert[0].N() ^ samples->vert[1].N()).Normalize();
-
-  vector<Point3f> new_normals(samples->vert.size());
-  for (int i = 0; i < samples->vert.size(); i++)
+  for(int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[i];
 
-    double min_clockwise_angle = 500;
-    double max_clockwise_angle = -500;
-
-    Point3f min_clockwise_normal = v.N();
-    Point3f max_clockwise_normal = v.N();
-
-    for (int j = 0; j < samples->vert.size(); j++)
-    {
-      CVertex& t = samples->vert[j];
-
-      double angle = GlobalFun::computeDirectionalAngleOfTwoVertor(v.N(), t.N(), direction);
-
-      if (angle < min_clockwise_angle)
-      {
-        min_clockwise_angle = angle;
-        min_clockwise_normal = t.N();
-      }
-      if (angle > max_clockwise_angle)
-      {
-        max_clockwise_angle = angle;
-        max_clockwise_normal = t.N();
-      }
-
-//       if ((angle < 0.000001 && angle > -0.000001) /*|| angle > 179.99999 || angle < -179.99999*/)
-//       {
-//         //t.N() *= -1;
-//         //cout << "skip!!" << endl;
-//         //break;;
-//       }
-//       if (angle > 0)
-//       {
-//         if (angle < min_clockwise_angle)
-//         {
-//           min_clockwise_angle = angle;
-//           min_clockwise_normal = t.N();
-//         }
-//         if (angle > max_clockwise_angle)
-//         {
-//           max_clockwise_angle = angle;
-//           max_clockwise_normal = t.N();
-//         }
-//       }
-    }
-
-    Point3f new_normal = (min_clockwise_normal + max_clockwise_normal) / 2.0;
-    if (max_clockwise_angle < 180)
-    {
-      cout << "small circle" << endl;
-      new_normal *= -1;
-    }
-    new_normals[i] = new_normal.Normalize();
+    Point3f dir = (dual_v.P() - v.P()).Normalize();
+    v.N() = -dir;
   }
-
-  for (int i = 0 ; i < new_normals.size(); i++)
-  {
-    CVertex& v = samples->vert[i];
-    v.N() = new_normals[i];
-  }
-
 }
+
+
 
 
 void WLOP::computeJointNeighborhood()

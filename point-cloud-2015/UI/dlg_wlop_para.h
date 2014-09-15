@@ -57,8 +57,8 @@ class WlopParaDlg : public QFrame
     void applyRegularizeSamples();
     void applyRegularizeNormals();
 
-
     void applyProjection();
+    void applyNormalReform();
 
 	private:
 		Ui::para_wlop * ui;

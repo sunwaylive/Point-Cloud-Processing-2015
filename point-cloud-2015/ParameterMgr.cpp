@@ -193,6 +193,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Use Tangent Vector", false));
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
+  wLop.addParam(new RichBool("Run Normal Reform", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
 }

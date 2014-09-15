@@ -191,7 +191,7 @@
   <widget class="QPushButton" name="anisotropic_lop_apply">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>190</x>
      <y>440</y>
      <width>101</width>
      <height>31</height>
@@ -295,9 +295,9 @@
   <widget class="QPushButton" name="regularize_samples">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>0</x>
      <y>480</y>
-     <width>121</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -308,14 +308,27 @@
   <widget class="QPushButton" name="regularize_normals">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>520</y>
+     <x>160</x>
+     <y>480</y>
      <width>131</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Regularize Normals</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="normal_reform">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>530</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Normal reform</string>
    </property>
   </widget>
  </widget>

@@ -442,3 +442,10 @@ WlopParaDlg::~WlopParaDlg()
 	delete ui;
 	ui = NULL;
 }
+
+void WlopParaDlg::applyNormalReform()
+{
+  m_paras->wLop.setValue("Run Normal Reform", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Normal Reform", BoolValue(false));
+}
