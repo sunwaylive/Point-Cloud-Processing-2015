@@ -556,7 +556,7 @@ void GLDrawer::glDrawSphere(Point3f& p, GLColor color, double radius, int slide)
 	glColor3f(color.r, color.g, color.b);
 	glPushMatrix();      
 	glTranslatef(p[0], p[1], p[2]);
-	//glutSolidSphere(radius, slide, slide);
+	glutSolidSphere(radius, slide, slide);
 	glPopMatrix();
 }
 

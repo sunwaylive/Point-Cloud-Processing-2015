@@ -1525,13 +1525,19 @@ void WLOP::runRegularizeSamples()
 
 void WLOP::runRegularizeNormals()
 {
+  GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+
   for(int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
-    CVertex& dual_v = dual_samples->vert[i];
 
-    Point3f dir = (dual_v.P() - v.P()).Normalize();
-    v.N() = -dir;
+	int neighbor_idx = v.neighbors[0];
+
+    CVertex& dual_v = dual_samples->vert[neighbor_idx];
+
+	Point3f dir = (v.P() - dual_v.P()).Normalize();
+    v.N() = ((dir+v.N())/2.0).Normalize();
   }
 }
 

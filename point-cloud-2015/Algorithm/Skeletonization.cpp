@@ -42,14 +42,17 @@ void Skeletonization::runAutoWlopOneStep()
 
     cout << "@@@@@@@@@ regulaize samples @@@@@@@@@@@@" << endl;
 
-    if(nTimeIterated < 2)
-    {
-      for(int i = 0; i < 5; i++)
-      {
-          runRegularizeSamples();
-       }
-    }
-
+//     if(nTimeIterated <= 5)
+//     {
+//       for(int i = 0; i < 7; i++)
+//       {
+//           runRegularizeSamples();
+//        }
+//     }
+    //for (int i = 0; i < 7; i++)
+    //{
+    //  runRegularizeSamples();
+    //}
 
 
 		runStep1_DetectFeaturePoints();
@@ -482,7 +485,7 @@ double Skeletonization::wlopIterate()
 
 	time.start("Samples Initial");
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+  GlobalFun::computeEigenIgnoreBranchedPoints(samples);
 	time.end();
 
 	if (nTimeIterated == 0) 
