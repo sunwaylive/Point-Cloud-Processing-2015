@@ -112,12 +112,30 @@ void Skeletonization::finalProcess()
     }
   }
 
+   cout << "recover sample points" << endl;
+// 
+//   for (int i = 0; i < samples->vert.size(); i++)
+//   {
+//     CVertex& v = samples->vert[i];
+//     v.is_skel_ignore = false;
+//   }
+
   if (para->getBool("Need Segment Right Away"))
   {
     Timer time;
     time.start("Run refefinement");
     runAllSegment();
     time.end();
+  }
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    if (v.is_skel_ignore)
+    {
+      v.P() = v.N();
+      v.is_skel_ignore = false;
+    }
   }
 
 }

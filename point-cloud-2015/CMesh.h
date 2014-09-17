@@ -108,6 +108,7 @@ public:
 		neighbors.clear();
 		original_neighbors.clear();
 		is_skel_ignore = true;
+    N() = P();
 		P() = Point3f(88888888888.8, 88888888888.8, 88888888888.8);
 	}
 

@@ -53,7 +53,7 @@ void WLOP::setInput(DataMgr* pData)
     if (para->getBool("Run Dual WLOP"))
     {
       samples = pData->getCurrentDualSamples();
-      original = pData->getCurrentSamples();
+      //original = pData->getCurrentSamples();
     }
 		samples_density.assign(samples->vn, 1);
 	}
@@ -730,6 +730,38 @@ double WLOP::iterate()
       }
 
     }
+
+
+    if (use_tangent)
+    {
+      for (int i = 0; i < samples->vert.size(); i++)
+      {
+        CVertex& v = samples->vert[i];
+        c = v.P();
+
+        if (average_weight_sum[i] > 1e-20)
+        {
+          v.P() = average[i] / average_weight_sum[i];
+        }
+
+        if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+        {
+          v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+        }
+
+        if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
+        {
+          v.P() += samples_average[i] * (mu3 / samples_average_weight_sum[i]);
+        }
+
+        if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20)
+        {
+          Point3f diff = v.P() - c;
+          double move_error = sqrt(diff.SquaredNorm());
+          error_x += move_error;
+        }
+      }
+    }
   }
   else
   {
@@ -1289,11 +1321,15 @@ void WLOP::runRegularizeSamples()
 {
   cout << "runRegularizeSamples" << endl;
 
-  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-  GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+  //GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+  //GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-//   int branch_KNN = para->getDouble("Branch Search KNN");
-//   GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, branch_KNN, false, "void Skeletonization::searchNewBranches()");
+  int branch_KNN = global_paraMgr.skeleton.getDouble("Sigma KNN");
+   //int branch_KNN = 20;
+   GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, branch_KNN, false, "void Skeletonization::searchNewBranches()");
+  
+  double feature_sigma = global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold");
+  cout << "feature sigma:" << feature_sigma << endl;
 
   vector<Point3f> new_sample_set;
   new_sample_set.assign(samples->vert.size(), Point3f(0, 0, 0));
@@ -1301,6 +1337,11 @@ void WLOP::runRegularizeSamples()
   {
     CVertex& v = samples->vert[i];
     Point3f direction = v.eigen_vector0.Normalize();
+
+    if (v.eigen_confidence < feature_sigma)
+    {
+      continue;;
+    }
 
     Point3f front_nearest_p = v.P();
     Point3f back_nearest_p = v.P();
@@ -1532,12 +1573,19 @@ void WLOP::runRegularizeNormals()
   {
     CVertex& v = samples->vert[i];
 
-	int neighbor_idx = v.neighbors[0];
+    int neighbor_idx = v.neighbors[0];
 
     CVertex& dual_v = dual_samples->vert[neighbor_idx];
 
-	Point3f dir = (v.P() - dual_v.P()).Normalize();
-    v.N() = ((dir+v.N())/2.0).Normalize();
+    Point3f dir = (v.P() - dual_v.P()).Normalize();
+    if (dir*v.N() < 0)
+    {
+      v.N() = ((dir + -v.N()) / 2.0).Normalize();
+    }
+    else
+    {
+      v.N() = ((dir + v.N()) / 2.0).Normalize();
+    }
   }
 }
 

@@ -74,8 +74,6 @@ public:
 	//}
 
 
-
-
 	//static void ComputeAPcaNormalsByGrid(CMeshO& cmeshO)
 	//{
 	//	CMesh cmesh;
