@@ -996,6 +996,21 @@ void DataMgr::switchSampleDualSample()
    replaceMeshDual(samples, dual_samples, true);
    replaceMeshDual(temp_mesh, samples, false);
 
+   for (int i = 0; i < samples.vert.size(); i++)
+   {
+     CVertex& v = samples.vert[i];
+     v.is_dual_sample = false;
+     v.is_fixed_sample = false;
+   }
+
+   for (int i = 0; i < dual_samples.vert.size(); i++)
+   {
+     CVertex& v = dual_samples.vert[i];
+     v.is_dual_sample = true;
+     v.is_fixed_sample = false;
+
+   }
+
 //   replaceMeshDual(original, temp_mesh, false);
 //   replaceMeshDual(samples, original, true);
 //   replaceMeshDual(temp_mesh, samples, false);

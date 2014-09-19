@@ -312,13 +312,14 @@ void GLArea::paintGL()
     //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
 
 
-    if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
-    {
-      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
-      glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+//     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
+//     {
+//       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+//       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+//       glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+// 
+//     }
 
-    }
 
 //     if (!pickList.empty())
 //     {
@@ -1611,18 +1612,18 @@ void GLArea::mouseReleaseEvent(QMouseEvent *e)
       }
 
 
-      if (!pickList.empty())
-      {
-        CMesh* dual_samples = dataMgr.getCurrentDualSamples();
-        CVertex picked = dual_samples->vert[pickList[0]];
-        picked_disk = NeighborDisk(picked.P(), picked.N());
-        for (int i = 0; i < picked.neighbors.size(); i++)
-        {
-          picked_disk.add_point(dual_samples->vert[picked.neighbors[i]]);
-        }
-        picked_disk.printSlots();
-        cout << picked_disk.getOccupyPercentage() << endl << endl;
-      }
+      //if (!pickList.empty())
+      //{
+      //  CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+      //  CVertex picked = dual_samples->vert[pickList[0]];
+      //  picked_disk = NeighborDisk(picked.P(), picked.N());
+      //  for (int i = 0; i < picked.neighbors.size(); i++)
+      //  {
+      //    picked_disk.add_point(dual_samples->vert[picked.neighbors[i]]);
+      //  }
+      //  picked_disk.printSlots();
+      //  cout << picked_disk.getOccupyPercentage() << endl << endl;
+      //}
 		}
 	}
 
@@ -1636,6 +1637,35 @@ void GLArea::keyReleaseEvent ( QKeyEvent * e )
 	if(e->key()==Qt::Key_Control) trackball.MouseUp(0,0, QT2VCG(Qt::NoButton, Qt::ControlModifier ) );
 	if(e->key()==Qt::Key_Shift) trackball.MouseUp(0,0, QT2VCG(Qt::NoButton, Qt::ShiftModifier ) );
 	if(e->key()==Qt::Key_Alt) trackball.MouseUp(0,0, QT2VCG(Qt::NoButton, Qt::AltModifier ) );
+}
+
+
+void GLArea::reorientPick()
+{
+//   CMesh* samples = dataMgr.getCurrentSamples();
+// 
+//   for (int i = 0; i < pickList.size(); i++)
+//   {
+//     samples->vert[pickList[i]].N() *= -1;
+//   }
+
+
+  CMesh* samples = dataMgr.getCurrentSamples();
+
+  for (int i = 0; i < pickList.size(); i++)
+  {
+    samples->vert[pickList[i]].is_fixed_sample = true;
+  }
+}
+
+void GLArea::cleanPick()
+{
+  CMesh* samples = dataMgr.getCurrentSamples();
+
+  for (int i = 0; i < pickList.size(); i++)
+  {
+    samples->vert[pickList[i]].is_fixed_sample = false;
+  }
 }
 
 

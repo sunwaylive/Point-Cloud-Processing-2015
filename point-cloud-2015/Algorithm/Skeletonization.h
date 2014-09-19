@@ -27,6 +27,8 @@ private:
 
   /* step 1 - 3 is for skeletonlization before increase radius */
 	void runStep1_DetectFeaturePoints();
+  void runStep1_DetectFeaturePoints_for_test();
+
 	void runStep2_SearchNewBranches();
 	void runStep3_UpdateRadius();
 

@@ -12,7 +12,8 @@ void Skeletonization::run()
 
 	if (para->getBool("Step1 Detect Skeleton Feature"))
 	{
-		runStep1_DetectFeaturePoints();
+		//runStep1_DetectFeaturePoints();
+    runStep1_DetectFeaturePoints_for_test();
 	}
 
 	if (para->getBool("Step2 Run Search New Branchs"))
@@ -185,6 +186,14 @@ void Skeletonization::runStep1_DetectFeaturePoints()
 
 	eigenThresholdIdentification();
 }
+
+void Skeletonization::runStep1_DetectFeaturePoints_for_test()
+{
+  cout << "runStep1_DetectFeaturePoints" << endl;
+
+  eigenThresholdIdentification();
+}
+
 
 void Skeletonization::runStep2_SearchNewBranches()
 {

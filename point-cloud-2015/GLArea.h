@@ -74,6 +74,9 @@ public:
 	void readRGBNormal(QString fileName);
 	
 	void removePickPoint();
+  
+  void reorientPick();
+  void cleanPick();
 
 signals:
 	void needUpdateStatus();

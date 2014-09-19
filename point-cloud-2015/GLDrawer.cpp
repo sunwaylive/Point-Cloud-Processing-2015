@@ -118,7 +118,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
     return cGray;
   }
 
-  if (v.is_dual_sample)
+  if (v.is_dual_sample || v.is_fixed_sample)
   {
     return feature_color;
   }

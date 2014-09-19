@@ -162,6 +162,8 @@
      <addaction name="actionErase_Pick"/>
      <addaction name="actionShow_Picked_Neighbor"/>
      <addaction name="actionPick_Dual"/>
+     <addaction name="actionReorient_Pick"/>
+     <addaction name="actionClean_Pick"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -217,6 +219,9 @@
    <addaction name="actionWLOP_Setting"/>
    <addaction name="actionNormal_Setting"/>
    <addaction name="separator"/>
+   <addaction name="actionRecompute_Quad"/>
+   <addaction name="actionClean_Pick"/>
+   <addaction name="actionReorient_Pick"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
@@ -720,6 +725,16 @@
    </property>
    <property name="text">
     <string>Pick Dual</string>
+   </property>
+  </action>
+  <action name="actionReorient_Pick">
+   <property name="text">
+    <string>Reorient Pick</string>
+   </property>
+  </action>
+  <action name="actionClean_Pick">
+   <property name="text">
+    <string>Clean Pick</string>
    </property>
   </action>
  </widget>

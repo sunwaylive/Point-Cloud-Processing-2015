@@ -5,6 +5,7 @@
 #include <QtWidgets/QFileDialog>
 #include "Algorithm/normal_extrapolation.h"
 #include "ui_mainwindow.h"
+#include "GeneratedFiles/ui_mainwindow.h"
 #include "GLArea.h"
 #include "UI/std_para_dlg.h"
 #include "UI/dlg_wlop_para.h"
@@ -59,12 +60,11 @@ private slots:
 	void setStop();
 
 	void removePickPoints();
-
   void switchSampleDualSample();
 
+  void reorientPick();
+  void cleanPick();
 
-
-	
 
 private slots:
 	void runWLop();

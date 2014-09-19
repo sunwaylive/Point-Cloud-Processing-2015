@@ -126,6 +126,10 @@ void MainWindow::initConnect()
 	connect(ui.actionErase_Pick,SIGNAL(triggered()),this,SLOT(removePickPoints()));
   connect(ui.actionSwitch_Sample_DualSample,SIGNAL(triggered()),this,SLOT(switchSampleDualSample()));
 
+
+  connect(ui.actionReorient_Pick, SIGNAL(triggered()), this, SLOT(reorientPick()));
+  connect(ui.actionClean_Pick, SIGNAL(triggered()), this, SLOT(cleanPick()));
+
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this->area, SLOT(update()));
 	timer->start(100);
@@ -805,3 +809,20 @@ void MainWindow::switchSampleDualSample()
   area->dataMgr.switchSampleDualSample();
   area->updateUI();
 }
+
+void MainWindow::reorientPick()
+{
+  area->reorientPick();
+  area->updateUI();
+  area->updateGL();
+}
+
+void MainWindow::cleanPick()
+{
+  area->cleanPick();
+  area->updateUI();
+  area->updateGL();
+}
+
+
+

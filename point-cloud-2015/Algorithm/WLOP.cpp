@@ -38,6 +38,8 @@ void WLOP::setInput(DataMgr* pData)
     {
       _original = pData->getCurrentDualSamples();
     }
+    //_original = pData->getCurrentDualSamples();
+
 
 		if(_samples == NULL || _original == NULL)
 		{
@@ -769,6 +771,11 @@ double WLOP::iterate()
     {
       CVertex& v = samples->vert[i];
       c = v.P();
+
+      if (v.is_fixed_sample)
+      {
+        continue;
+      }
 
       if (average_weight_sum[i] > 1e-20)
       {
@@ -1574,7 +1581,7 @@ void WLOP::runRegularizeNormals()
     CVertex& v = samples->vert[i];
 
     int neighbor_idx = v.neighbors[0];
-
+    //int neighbor_idx = i;
     CVertex& dual_v = dual_samples->vert[neighbor_idx];
 
     Point3f dir = (v.P() - dual_v.P()).Normalize();
