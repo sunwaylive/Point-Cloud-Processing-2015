@@ -172,10 +172,22 @@
      <addaction name="actionShow_Skeleton"/>
      <addaction name="actionShow_colorful_branches"/>
     </widget>
+    <widget class="QMenu" name="menuDual_Sample_Render">
+     <property name="title">
+      <string>Dual Sample Render</string>
+     </property>
+     <addaction name="actionShow_Dual"/>
+     <addaction name="separator"/>
+     <addaction name="action_Dual_Dot"/>
+     <addaction name="action_Dual_Quad"/>
+     <addaction name="action_Dual_Circle"/>
+     <addaction name="action_Dual_Sphere"/>
+    </widget>
     <addaction name="menuColor"/>
     <addaction name="separator"/>
     <addaction name="menuSample_Render"/>
     <addaction name="menuOriginal_Render"/>
+    <addaction name="menuDual_Sample_Render"/>
     <addaction name="menuSkeleton_Render"/>
     <addaction name="actionShow_Normals"/>
     <addaction name="actionCull_Points"/>
@@ -184,7 +196,6 @@
     <addaction name="menuSnap_Shot"/>
     <addaction name="menuShow_Neighbor_Size"/>
     <addaction name="menuPick_Point"/>
-    <addaction name="actionShow_Dual"/>
     <addaction name="actionShow_Connection"/>
    </widget>
    <addaction name="menuFile"/>
@@ -735,6 +746,38 @@
   <action name="actionClean_Pick">
    <property name="text">
     <string>Clean Pick</string>
+   </property>
+  </action>
+  <action name="action_Dual_Dot">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dot</string>
+   </property>
+  </action>
+  <action name="action_Dual_Quad">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Quad</string>
+   </property>
+  </action>
+  <action name="action_Dual_Circle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Circle</string>
+   </property>
+  </action>
+  <action name="action_Dual_Sphere">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sphere</string>
    </property>
   </action>
  </widget>

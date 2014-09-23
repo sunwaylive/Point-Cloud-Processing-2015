@@ -285,39 +285,39 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 {
 	double average_power = para->getDouble("Average Power");
 	bool need_density = para->getBool("Need Compute Density");
-  bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
-	double radius = para->getDouble("CGrid Radius"); 
+	bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
+	double radius = para->getDouble("CGrid Radius");
 
 	double radius2 = radius * radius;
-	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
-  
-  double close_threshold = radius2 / 16;
-  bool use_tangent = para->getBool("Use Tangent Vector");
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+
+	double close_threshold = radius2 / 16;
+	bool use_tangent = para->getBool("Use Tangent Vector");
 
 
-  bool L2 = para->getBool("Need Sample Average");
-  
-  cout << "dual" << endl;
+	bool L2 = para->getBool("Need Sample Average");
+
+	cout << "dual" << endl;
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
-  for(int i = 0; i < samples->vert.size(); i++)
+	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
 
 		for (int j = 0; j < v.original_neighbors.size(); j++)
 		{
 			CVertex& t = original->vert[v.original_neighbors[j]];
-			
-			Point3f diff = t.P() - v.P();
-      double proj_dist = diff * v.N();
-      double proj_dist2 = proj_dist * proj_dist;
 
-			double dist2  = diff.SquaredNorm();
+			Point3f diff = t.P() - v.P();
+			double proj_dist = diff * v.N();
+			double proj_dist2 = proj_dist * proj_dist;
+
+			double dist2 = diff.SquaredNorm();
 
 			double w = 1;
 			if (para->getBool("Run Anisotropic LOP"))
 			{
 				double len = sqrt(dist2);
-				if(len <= 0.001 * radius) len = radius*0.001;
+				if (len <= 0.001 * radius) len = radius*0.001;
 				double hn = diff * v.N();
 				double phi = exp(hn * hn * iradius16);
 				w = phi / pow(len, 2 - average_power);
@@ -325,7 +325,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			else if (average_power < 2)
 			{
 				double len = sqrt(dist2);
-				if(len <= 0.001 * radius) len = radius*0.001;
+				if (len <= 0.001 * radius) len = radius*0.001;
 				w = exp(dist2 * iradius16) / pow(len, 2 - average_power);
 			}
 			else
@@ -333,45 +333,47 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				w = exp(dist2 * iradius16);
 			}
 
-      if (use_elliptical_neighbor)
-      {
-        w *= exp(proj_dist2 * iradius16);
-      }
+
 
 			if (need_density)
 			{
 				w *= original_density[t.m_index];
 			}
 
-      if (L2)
-      {
-        w = 1.0;
-      }
+			if (use_elliptical_neighbor)
+			{
+				w = exp(proj_dist2 * iradius16);
+			}
 
-      if (use_tangent)
-      {
-//         if (i < 10)
-//         {
-//           cout << "tangent" << endl;
-//         }
-        Point3f proj_point = v.P() + v.N() * proj_dist;
-        average[i] += proj_point * w;  
+			if (L2)
+			{
+				w = 1.0;
+			}
 
-      }
-      else
-      {
-        average[i] += t.P() * w;  
-      }
-			average_weight_sum[i] += w;  
+			if (use_tangent)
+			{
+				//         if (i < 10)
+				//         {
+				//           cout << "tangent" << endl;
+				//         }
+				Point3f proj_point = v.P() + v.N() * proj_dist;
+				average[i] += proj_point * w;
+
+			}
+			else
+			{
+				average[i] += t.P() * w;
+			}
+			average_weight_sum[i] += w;
 
 
-      //if (use_adaptive_mu && !is_sample_close_to_original[v.m_index])
-      //{
-      //  if (dist2 < close_threshold)
-      //  {
-      //    is_sample_close_to_original[v.m_index] = true;
-      //  }
-      //}
+			//if (use_adaptive_mu && !is_sample_close_to_original[v.m_index])
+			//{
+			//  if (dist2 < close_threshold)
+			//  {
+			//    is_sample_close_to_original[v.m_index] = true;
+			//  }
+			//}
 		}
 	}
 }

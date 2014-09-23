@@ -21,12 +21,15 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 
 	original_draw_width = para->getDouble("Original Draw Width");
 	sample_draw_width = para->getDouble("Sample Draw Width");
+	dual_sample_draw_width = para->getDouble("Dual Sample Draw Width");
 
 	original_color = para->getColor("Original Point Color");
 	sample_color = para->getColor("Sample Point Color");
 	normal_width = para->getDouble("Normal Line Width");
 	normal_length  = para->getDouble("Normal Line Length");
 	sample_dot_size = para->getDouble("Sample Dot Size");
+	dual_sample_dot_size = para->getDouble("Dual Sample Dot Size");
+
 	original_dot_size = para->getDouble("Original Dot Size");
 	normal_color = para->getColor("Normal Line Color");
 	feature_color = para->getColor("Feature Color");
@@ -73,7 +76,7 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 		Point3f& p = vi->P();      
 		Point3f& normal = vi->N();
 
-    if(!(bCullFace /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
+    if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
 			{
@@ -173,6 +176,10 @@ void GLDrawer::drawDot(const CVertex& v)
 	{
 		size = original_dot_size;
 	}
+	else if (v.is_dual_sample)
+	{
+		size = dual_sample_dot_size;
+	}
 	else
 	{
 		size = sample_dot_size;
@@ -195,6 +202,10 @@ void GLDrawer::drawSphere(const CVertex& v)
 	{
 		radius = original_draw_width;
 	}
+	else if (v.is_dual_sample)
+	{
+		radius = dual_sample_draw_width;
+	}
 	else
 	{
 		radius = sample_draw_width;
@@ -211,6 +222,19 @@ void GLDrawer::drawSphere(const CVertex& v)
 void GLDrawer::drawCircle(const CVertex& v)
 {
 	double radius = sample_draw_width;
+	if (v.bIsOriginal)
+	{
+		radius = original_draw_width;
+	}
+	else if (v.is_dual_sample)
+	{
+		radius = dual_sample_draw_width;
+	}
+	else
+	{
+		radius = sample_draw_width;
+	}
+
 	GLColor color = getColorByType(v);
 
 	Point3f p = v.P(); 
@@ -256,6 +280,18 @@ void GLDrawer::drawCircle(const CVertex& v)
 void GLDrawer::drawQuade(const CVertex& v)
 {
 	double h = sample_draw_width;
+	if (v.bIsOriginal)
+	{
+		h = original_draw_width;
+	}
+	else if (v.is_dual_sample)
+	{
+		h = dual_sample_draw_width;
+	}
+	else
+	{
+		h = sample_draw_width;
+	}
 	
 	GLColor color = getColorByType(v);
 	glColor4f(color.r, color.g, color.b, 1);

@@ -45,7 +45,7 @@ private slots:
 	void openImage();
 	void saveView();
 	void saveSkel();
-  void getQianSample();
+    void getQianSample();
 
 	void showWLopDlg();
 	void showNormalDlg();
@@ -60,10 +60,10 @@ private slots:
 	void setStop();
 
 	void removePickPoints();
-  void switchSampleDualSample();
+    void switchSampleDualSample();
 
-  void reorientPick();
-  void cleanPick();
+    void reorientPick();
+    void cleanPick();
 
 
 private slots:
@@ -78,7 +78,7 @@ private slots:
 	void showOriginal(bool _val);
 	void showSamples(bool _val);
 	void showNormals(bool _val);
-  void showSkeleton(bool _val);
+    void showSkeleton(bool _val);
 	void cullPoints(bool _val);
 	void showNormalColor(bool _val);
 	void showNeighborhoodBall(bool _val);
@@ -86,19 +86,17 @@ private slots:
 	void showIndividualColor(bool _val);
 	void setSnapshotEachIteration(bool _val);
 	void setNoSnapshotWithRadius(bool _val);
-  void showColorfulBranches(bool _val);
+    void showColorfulBranches(bool _val);
 
-  void showPickPointNeighbor(bool _val);
+    void showPickPointNeighbor(bool _val);
 
-  void showDualPoints(bool _val);
-  void showConnection(bool _val);
-  void pickDualPoints(bool _val);
-
-
+    void showDualPoints(bool _val);
+    void showConnection(bool _val);
+    void pickDualPoints(bool _val);
 
 	void setSmapleType(QAction * action);
+	void setDualSmapleType(QAction * action);
 	void setOriginalType(QAction * action);
-
 
 private slots:
 	void sampleColor();
@@ -122,7 +120,7 @@ private:
 	QLabel * downSample_num_label;
 	QLabel * radius_label;
 	QLabel * error_label;
-  QLabel * iteration_label;
+    QLabel * iteration_label;
 
 	ParameterMgr * paras;
 	StdParaDlg * paraDlg_Skeleton;
@@ -131,6 +129,7 @@ private:
 	StdParaDlg * paraDlg_Normal;
 
 	QActionGroup * sample_draw_type;
+	QActionGroup * dual_sample_draw_type;
 	QActionGroup * original_draw_type;
 
 private:

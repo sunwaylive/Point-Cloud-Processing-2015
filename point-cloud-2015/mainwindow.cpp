@@ -38,6 +38,11 @@ void MainWindow::initWidgets()
 	ui.actionShow_Sample_Dot->setChecked(paras->glarea.getBool("Show Samples Dot"));
 	ui.actionShow_Sample_Circle->setChecked(paras->glarea.getBool("Show Samples Circle"));
 	ui.actionShow_Sample_Sphere->setChecked(paras->glarea.getBool("Show Samples Sphere"));
+
+	ui.action_Dual_Quad->setChecked(paras->glarea.getBool("Show Dual Samples Quad"));
+	ui.action_Dual_Dot->setChecked(paras->glarea.getBool("Show Dual Samples Dot"));
+	ui.action_Dual_Circle->setChecked(paras->glarea.getBool("Show Dual Samples Circle"));
+	ui.action_Dual_Sphere->setChecked(paras->glarea.getBool("Show Dual Samples Sphere"));
 	
   ui.actionShow_Dual->setChecked(global_paraMgr.glarea.getBool("Show Dual Samples"));
   ui.actionShow_Connection->setChecked(global_paraMgr.glarea.getBool("Show Dual Connection"));
@@ -113,6 +118,7 @@ void MainWindow::initConnect()
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
+	connect(dual_sample_draw_type, SIGNAL(triggered(QAction *)), this, SLOT(setDualSmapleType(QAction *)));
 
 	connect(ui.actionSample_Color,SIGNAL(triggered()),this,SLOT(sampleColor()));
 	connect(ui.actionOriginal_Color,SIGNAL(triggered()),this,SLOT(originalColor()));
@@ -251,6 +257,12 @@ void MainWindow::createActionGroups()
 	ui.actionShow_Original_Dot->setActionGroup(original_draw_type);
 	ui.actionShow_Original_Circle->setActionGroup(original_draw_type);
 	ui.actionShow_Original_Sphere->setActionGroup(original_draw_type);
+
+	dual_sample_draw_type = new QActionGroup(this);
+	ui.action_Dual_Quad->setActionGroup(dual_sample_draw_type);
+	ui.action_Dual_Dot->setActionGroup(dual_sample_draw_type);
+	ui.action_Dual_Circle->setActionGroup(dual_sample_draw_type);
+	ui.action_Dual_Sphere->setActionGroup(dual_sample_draw_type);
 
 	QString str = strTitle + " -- Welcome!";
 	setWindowTitle(str);
@@ -651,6 +663,41 @@ void MainWindow::setSmapleType(QAction * action)
 	}
 	area->updateGL();
 }
+
+
+void MainWindow::setDualSmapleType(QAction * action)
+{
+	if (action == ui.action_Dual_Quad)
+	{
+		paras->glarea.setValue("Show Dual Samples Quad", BoolValue(true));
+		paras->glarea.setValue("Show Dual Samples Dot", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Circle", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Sphere", BoolValue(false));
+	}
+	else if (action == ui.action_Dual_Dot)
+	{
+		paras->glarea.setValue("Show Dual Samples Quad", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Dot", BoolValue(true));
+		paras->glarea.setValue("Show Dual Samples Circle", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Sphere", BoolValue(false));
+	}
+	else if (action == ui.action_Dual_Circle)
+	{
+		paras->glarea.setValue("Show Dual Samples Quad", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Dot", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Circle", BoolValue(true));
+		paras->glarea.setValue("Show Dual Samples Sphere", BoolValue(false));
+	}
+	else if (action == ui.action_Dual_Sphere)
+	{
+		paras->glarea.setValue("Show Dual Samples Quad", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Dot", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Circle", BoolValue(false));
+		paras->glarea.setValue("Show Dual Samples Sphere", BoolValue(true));
+	}
+	area->updateGL();
+}
+
 
 void MainWindow::setOriginalType(QAction * action)
 {

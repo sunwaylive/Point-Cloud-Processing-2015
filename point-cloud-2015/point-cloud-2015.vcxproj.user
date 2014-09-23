@@ -10,11 +10,11 @@
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QTDIR>E:\Qt\Qt5.3.1\5.3\msvc2013_64_opengl\</QTDIR>
+    <QTDIR>E:\Qt\Qt5.3.1\5.3\msvc2013_64_opengl</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b"$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QTDIR>E:\Qt\Qt5.3.1\5.3\msvc2013_64_opengl\</QTDIR>
+    <QTDIR>E:\Qt\Qt5.3.1\5.3\msvc2013_64_opengl</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b"$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>

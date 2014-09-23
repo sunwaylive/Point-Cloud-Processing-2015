@@ -74,6 +74,11 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
   glarea.addParam(new RichBool("Show Dual Samples", false) );
+  glarea.addParam(new RichBool("Show Dual Samples Quad", false));
+  glarea.addParam(new RichBool("Show Dual Samples Dot", true));
+  glarea.addParam(new RichBool("Show Dual Samples Circle", false));
+  glarea.addParam(new RichBool("Show Dual Samples Sphere", false));
+
   glarea.addParam(new RichBool("Show Dual Connection", false) );
   glarea.addParam(new RichBool("Pick Dual Point", false) );
 
@@ -131,8 +136,11 @@ void ParameterMgr::initDrawerParameter()
 
 
 	drawer.addParam(new RichDouble("Original Draw Width", 0.0015));
-	drawer.addParam(new RichDouble("Sample Draw Width", 0.025));
+	drawer.addParam(new RichDouble("Sample Draw Width", 0.015));
+	drawer.addParam(new RichDouble("Dual Sample Draw Width", 0.015));
+
 	drawer.addParam(new RichDouble("Sample Dot Size", 6));
+	drawer.addParam(new RichDouble("Dual Sample Dot Size", 6));
 	drawer.addParam(new RichDouble("Original Dot Size", 1));
 	drawer.addParam(new RichDouble("Normal Line Width", 2));
 	drawer.addParam(new RichDouble("Normal Line Length", 0.06));

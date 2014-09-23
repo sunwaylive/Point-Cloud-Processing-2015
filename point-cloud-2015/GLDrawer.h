@@ -106,9 +106,12 @@ private:
 
 	double original_draw_width;
 	double sample_draw_width;
+	double dual_sample_draw_width;
+
 	double normal_width;
 	double normal_length;
 	double sample_dot_size;
+	double dual_sample_dot_size;
 	double original_dot_size;
 
 	QColor original_color;

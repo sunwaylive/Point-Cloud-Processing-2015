@@ -106,12 +106,17 @@ void NormalParaDlg::applyPCANormal()
 	{
     int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
     CMesh* samples;
-    if (global_paraMgr.glarea.getBool("Show Dual Samples"))
+
+	if (global_paraMgr.glarea.getBool("Show Dual Samples"))
+	{
+	  samples = area->dataMgr.getCurrentSamples();
+	}
+    else if (global_paraMgr.glarea.getBool("Show Dual Samples"))
     {
       samples = area->dataMgr.getCurrentDualSamples();
     }
     else if(global_paraMgr.glarea.getBool("Show Original")
-      && !area->dataMgr.isOriginalEmpty())
+            && !area->dataMgr.isOriginalEmpty())
     {
       samples = area->dataMgr.getCurrentOriginal();
     }
@@ -129,7 +134,6 @@ void NormalParaDlg::applyPCANormal()
 	}
 	area->dataMgr.recomputeQuad();
 	area->updateGL();
-
 }
 
 NormalParaDlg::~NormalParaDlg()

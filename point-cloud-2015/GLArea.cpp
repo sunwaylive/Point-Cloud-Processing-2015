@@ -218,33 +218,33 @@ void GLArea::paintGL()
 
 	if(para->getBool("Show Samples"))  
 	{
-		if(para->getBool("Show Samples Quad"))
+		if (para->getBool("Show Samples Quad"))
 			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentSamples());
-		if(para->getBool("Show Samples Dot"))
-    {
-      lightOnOff(false);
+		if (para->getBool("Show Samples Dot"))
+		{
+			lightOnOff(false);
 			glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentSamples());
-    }
-		if(para->getBool("Show Samples Circle"))
-			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentSamples());	
+		}
+		if (para->getBool("Show Samples Circle"))
+			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentSamples());
 		if (para->getBool("Show Samples Sphere"))
-			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());	
+			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());
 	}
 
   
 
   if(para->getBool("Show Dual Samples"))
   {
-    if(para->getBool("Show Samples Quad"))
+		if (para->getBool("Show Dual Samples Quad"))
       glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
-    if(para->getBool("Show Samples Dot"))
+		if (para->getBool("Show Dual Samples Dot"))
     {
       lightOnOff(false);
       glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
     }
-    if(para->getBool("Show Samples Circle"))
+		if (para->getBool("Show Dual Samples Circle"))
       glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
-    if (para->getBool("Show Samples Sphere"))
+		if (para->getBool("Show Dual Samples Sphere"))
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
   }
 
@@ -261,17 +261,15 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
     }
 
-      if(para->getBool("Show Samples"))
+    if(para->getBool("Show Samples"))
 		{
 			glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentSamples());
 		}
 		else
 		{
 			if(!dataMgr.isOriginalEmpty())
-				glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
+			  glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
-
-
 	}
 
  	if(para->getBool("Show Original"))
@@ -1420,6 +1418,15 @@ void GLArea::wheelEvent(QWheelEvent *e)
 
 				global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(size_temp));
 			}
+			else if (!para->getBool("Show Samples") && para->getBool("Show Dual Samples") &&  para->getBool("Show Dual Samples Dot"))
+			{
+				size_temp = global_paraMgr.drawer.getDouble("Dual Sample Dot Size") * change;
+				if (size_temp < 1)
+				{
+					size_temp = 1;
+				}
+				global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(size_temp));
+			}
 			else if(para->getBool("Show Samples") &&  para->getBool("Show Samples Dot") )
 			{
 				size_temp = global_paraMgr.drawer.getDouble("Sample Dot Size") * change;
@@ -1438,6 +1445,16 @@ void GLArea::wheelEvent(QWheelEvent *e)
 				}
 				//cout << "draw width: " <<size_temp << endl;
 				global_paraMgr.drawer.setValue("Sample Draw Width", DoubleValue(size_temp));
+			}
+			else if (para->getBool("Show Dual Samples") && !para->getBool("Show Dual Samples Dot"))
+			{
+				size_temp = global_paraMgr.drawer.getDouble("Dual Sample Draw Width") * change;
+				if (size_temp < 0)
+				{
+					size_temp = 0.001;
+				}
+				//cout << "draw width: " <<size_temp << endl;
+				global_paraMgr.drawer.setValue("Dual Sample Draw Width", DoubleValue(size_temp));
 			}
 			else if(para->getBool("Show Original") && para->getBool("Show Original Dot") )
 			{
