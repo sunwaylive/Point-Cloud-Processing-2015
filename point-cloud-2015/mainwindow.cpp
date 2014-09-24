@@ -33,6 +33,7 @@ void MainWindow::initWidgets()
 	ui.actionShow_All_Raidus->setChecked(global_paraMgr.glarea.getBool("Show All Radius"));	
 	ui.actionCull_Points->setChecked(global_paraMgr.drawer.getBool("Need Cull Points"));
 	ui.actionShow_Individual_Color->setChecked(global_paraMgr.drawer.getBool("Show Individual Color"));
+	ui.actionShow_Confidence_Color->setChecked(global_paraMgr.drawer.getBool("Show Confidence Color"));
 
 	ui.actionShow_Sample_Quads->setChecked(paras->glarea.getBool("Show Samples Quad"));
 	ui.actionShow_Sample_Dot->setChecked(paras->glarea.getBool("Show Samples Dot"));
@@ -110,6 +111,7 @@ void MainWindow::initConnect()
   connect(ui.actionShow_Skeleton,SIGNAL(toggled(bool)),this,SLOT(showSkeleton(bool)));
   connect(ui.actionShow_colorful_branches,SIGNAL(toggled(bool)),this,SLOT(showColorfulBranches(bool)));
   connect(ui.actionShow_Picked_Neighbor,SIGNAL(toggled(bool)),this,SLOT(showPickPointNeighbor(bool)));
+	connect(ui.actionShow_Confidence_Color, SIGNAL(toggled(bool)), this, SLOT(showConfidenceColor(bool)));
 
   connect(ui.actionShow_Dual,SIGNAL(toggled(bool)),this,SLOT(showDualPoints(bool)));
   connect(ui.actionShow_Connection,SIGNAL(toggled(bool)),this,SLOT(showConnection(bool)));
@@ -135,6 +137,9 @@ void MainWindow::initConnect()
 
   connect(ui.actionReorient_Pick, SIGNAL(triggered()), this, SLOT(reorientPick()));
   connect(ui.actionClean_Pick, SIGNAL(triggered()), this, SLOT(cleanPick()));
+
+	connect(ui.actionShow_Confidence_Color, SIGNAL(toggled(bool)), this, SLOT(pickDualPoints(bool)));
+
 
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this->area, SLOT(update()));
@@ -871,5 +876,9 @@ void MainWindow::cleanPick()
   area->updateGL();
 }
 
-
+void MainWindow::showConfidenceColor(bool _val)
+{
+	global_paraMgr.drawer.setValue("Show Confidence Color", BoolValue(_val));
+	area->updateGL();
+}
 

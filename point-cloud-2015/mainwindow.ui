@@ -197,6 +197,7 @@
     <addaction name="menuShow_Neighbor_Size"/>
     <addaction name="menuPick_Point"/>
     <addaction name="actionShow_Connection"/>
+    <addaction name="actionShow_Confidence_Color"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -233,6 +234,7 @@
    <addaction name="actionRecompute_Quad"/>
    <addaction name="actionClean_Pick"/>
    <addaction name="actionReorient_Pick"/>
+   <addaction name="actionShow_Confidence_Color"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
@@ -778,6 +780,14 @@
    </property>
    <property name="text">
     <string>Sphere</string>
+   </property>
+  </action>
+  <action name="actionShow_Confidence_Color">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Confidence Color</string>
    </property>
   </action>
  </widget>

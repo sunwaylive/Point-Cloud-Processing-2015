@@ -1358,8 +1358,26 @@ void GLArea::wheelEvent(QWheelEvent *e)
 	
 	if( (e->modifiers() & Qt::AltModifier) && (e->modifiers() & Qt::ControlModifier) )
 	{
-		size_temp = global_paraMgr.drawer.getDouble("Normal Line Length");
-		global_paraMgr.drawer.setValue("Normal Line Length", DoubleValue(size_temp * change));
+		if (para->getBool("Show Normal"))
+		{
+			size_temp = global_paraMgr.drawer.getDouble("Normal Line Length");
+			global_paraMgr.drawer.setValue("Normal Line Length", DoubleValue(size_temp * change));
+		}
+		else if (para->getBool("Show Samples"))
+		{
+			size_temp = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
+			if (e->delta() < 0)
+			{
+				size_temp += 0.02;
+			}
+			else
+			{
+				size_temp -= 0.02;
+			}
+			global_paraMgr.glarea.setValue("Point ISO Value Shift", DoubleValue(size_temp));
+			cout << "Point ISO Value Shift" << size_temp << endl;
+		}
+
 	}
 	else if( (e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::ControlModifier) )
 	{
@@ -1373,6 +1391,16 @@ void GLArea::wheelEvent(QWheelEvent *e)
       size_temp = global_paraMgr.drawer.getDouble("Normal Line Width");
       global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(size_temp * change));
     }
+
+		if (global_paraMgr.drawer.getBool("Show Confidence Color"))
+		{
+			if (para->getBool("Show Samples"))
+			{
+				size_temp = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
+				global_paraMgr.glarea.setValue("Sample Confidence Color Scale", DoubleValue(size_temp * change));
+				cout << "Sample Confidence Color Scale = " << size_temp * change << endl;
+			}
+		}
 	}
 	else if((e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::AltModifier))
 	{

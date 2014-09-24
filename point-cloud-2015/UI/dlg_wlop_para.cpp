@@ -397,8 +397,6 @@ void WlopParaDlg::applyStepForward()
   m_paras->wLop.setValue("Run Step Forward", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Step Forward", BoolValue(false));
-
-  
 }
 
 void WlopParaDlg::applySkelWlop()

@@ -57,6 +57,7 @@ private:
 	void recomputePCA_Normal();
 
   void stepForward();
+	void smoothSkelDistance();
 
   void updateAdaptiveNeighbor();
 

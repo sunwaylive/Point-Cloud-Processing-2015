@@ -86,6 +86,7 @@ private:
 	void glDrawBranches(vector<Branch>& branches, GLColor gl_color);	
 	//void glDrawCurves(vector<Curve>& curves, GLColor gl_color);
 
+	GLColor isoValue2color(double value, double scale_threshold, double shift, bool need_negative);
 
 private:
 	int x1, y1, x2, y2;
@@ -114,6 +115,9 @@ private:
 	double dual_sample_dot_size;
 	double original_dot_size;
 
+	double sample_cofidence_color_scale;
+	double iso_value_shift;
+
 	QColor original_color;
 	QColor sample_color;
 	QColor feature_color;
@@ -127,6 +131,7 @@ private:
 	double skel_node_size;
 	double skel_branch_size;
 
+	bool bUseConfidenceColor;
 
 	int prevPickIndex;
 	Point3f curr_pick;

@@ -98,6 +98,9 @@ private slots:
 	void setDualSmapleType(QAction * action);
 	void setOriginalType(QAction * action);
 
+	void showConfidenceColor(bool _val);
+
+
 private slots:
 	void sampleColor();
 	void originalColor();

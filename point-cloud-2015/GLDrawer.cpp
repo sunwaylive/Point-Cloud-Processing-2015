@@ -35,6 +35,10 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	feature_color = para->getColor("Feature Color");
 	pick_color = para->getColor("Pick Point Color");
 
+	bUseConfidenceColor = global_paraMgr.drawer.getBool("Show Confidence Color");
+	sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
+	iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
+
 	skel_bone_color = para->getColor("Skeleton Bone Color");
 	skel_node_color = para->getColor("Skeleton Node Color");
 	skel_branch_color = para->getColor("Skeleton Branch Color");
@@ -45,6 +49,7 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	{
 		curr_pick_indx = pickList[0];
 	}
+
 
 }
 
@@ -165,6 +170,13 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 	{
 // 		return feature_color;
 // 	}
+
+	if (bUseConfidenceColor)
+	{
+		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+	}
+
+
 	return sample_color;
 	
 }
@@ -794,4 +806,76 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
   //  glDrawLine(v.P(), dual_v.P(), cGreen, 2);
   //}
 
+}
+
+
+
+GLColor GLDrawer::isoValue2color(double iso_value,
+	double scale_threshold,
+	double shift,
+	bool need_negative)
+{
+	iso_value += shift;
+	//if (!bShowSlice)
+	//{
+	//  iso_value += shift;
+	//}
+
+	if (scale_threshold <= 0)
+	{
+		scale_threshold = 1;
+	}
+
+	iso_value = (std::min)((std::max)(iso_value, -scale_threshold), scale_threshold);
+
+	bool is_inside = true;
+	if (iso_value < 0)
+	{
+		if (!need_negative)
+		{
+			iso_value = 0;
+		}
+		else
+		{
+			iso_value /= -scale_threshold;
+		}
+	}
+	else
+	{
+		iso_value /= scale_threshold;
+		is_inside = false;
+	}
+
+	vector<Point3f> base_colors(5);
+	double step_size = 1.0 / (base_colors.size() - 1);
+	int base_id = iso_value / step_size;
+	if (base_id == base_colors.size() - 1)
+	{
+		base_id = base_colors.size() - 2;
+	}
+	Point3f mixed_color;
+
+	if (is_inside && need_negative)
+	{
+		base_colors[4] = Point3f(0.0, 0.0, 1.0);
+		base_colors[3] = Point3f(0.0, 0.7, 1.0);
+		base_colors[2] = Point3f(0.0, 1.0, 1.0);
+		base_colors[1] = Point3f(0.0, 1.0, 0.7);
+		base_colors[0] = Point3f(0.0, 1.0, 0.0);
+	}
+	else
+	{
+		base_colors[4] = Point3f(1.0, 0.0, 0.0);
+		base_colors[3] = Point3f(1.0, 0.7, 0.0);
+		base_colors[2] = Point3f(1.0, 1.0, 0.0);
+		base_colors[1] = Point3f(0.7, 1.0, 0.0);
+		base_colors[0] = Point3f(0.0, 1.0, 0.0);
+	}
+
+	mixed_color = base_colors[base_id] * (base_id * step_size + step_size - iso_value)
+		+ base_colors[base_id + 1] * (iso_value - base_id * step_size);
+
+	return GLColor(mixed_color.X() / float(step_size),
+		mixed_color.Y() / float(step_size),
+		mixed_color.Z() / float(step_size));
 }

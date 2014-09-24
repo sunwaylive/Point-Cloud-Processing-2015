@@ -118,6 +118,10 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichBool("SnapShot Each Iteration", false));
 	glarea.addParam(new RichBool("No Snap Radius", false));
+
+
+	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 1));
+	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
 }
 
 
@@ -131,6 +135,7 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Show Individual Color", false));
 	drawer.addParam(new RichBool("Use Color From Normal", false));
   drawer.addParam(new RichBool("Use Differ Branch Color", false));
+	drawer.addParam(new RichBool("Show Confidence Color", true));
 
   drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
 

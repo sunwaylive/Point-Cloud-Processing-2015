@@ -140,7 +140,8 @@ void WLOP::run()
   if (para->getBool("Run Step Forward"))
   {
     cout << "Run Step Forward" << endl;
-    stepForward();
+    //stepForward();
+		smoothSkelDistance();
     return;
   }
 
@@ -964,6 +965,64 @@ void WLOP::stepForward()
   }
   //recomputePCA_Normal();
 }
+
+
+void WLOP::smoothSkelDistance()
+{
+	GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+
+		int neighbor_idx = v.neighbors[0];
+		//int neighbor_idx = i;
+		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+		v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+
+		samples->bbox.Add(v.P());
+	}
+
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+	vector<double> average_radiuses;
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		double sum_radius = 0;
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = samples->vert[v.neighbors[j]];
+			sum_radius += t.skel_radius;
+		}
+
+		double avarage_radius = v.skel_radius;
+
+		if (!v.neighbors.empty())
+		{
+			avarage_radius = sum_radius / v.neighbors.size();
+		}
+		average_radiuses.push_back(avarage_radius);
+	}
+
+	GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		//v.skel_radius = average_radiuses[i];
+
+		int neighbor_idx = v.neighbors[0];
+		CVertex dual_v = dual_samples->vert[neighbor_idx];
+		Point3f direction = (v.P() - dual_v.P()).Normalize();
+
+		v.P() = dual_v.P() + direction * average_radiuses[i];
+		//v.P() = dual_v.P() + direction * v.skel_radius;
+
+	}
+}
+
 
 void WLOP::computeInitialSampleNeighbor()
 {
