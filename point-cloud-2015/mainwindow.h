@@ -78,7 +78,7 @@ private slots:
 	void showOriginal(bool _val);
 	void showSamples(bool _val);
 	void showNormals(bool _val);
-    void showSkeleton(bool _val);
+  void showSkeleton(bool _val);
 	void cullPoints(bool _val);
 	void showNormalColor(bool _val);
 	void showNeighborhoodBall(bool _val);
@@ -86,13 +86,16 @@ private slots:
 	void showIndividualColor(bool _val);
 	void setSnapshotEachIteration(bool _val);
 	void setNoSnapshotWithRadius(bool _val);
-    void showColorfulBranches(bool _val);
+  void showColorfulBranches(bool _val);
+  
+  void showPickPointNeighbor(bool _val);
+  
+  void showDualPoints(bool _val);
+  void showConnection(bool _val);
+  void pickDualPoints(bool _val);
 
-    void showPickPointNeighbor(bool _val);
+	void showClosestDualConnection(bool _val);
 
-    void showDualPoints(bool _val);
-    void showConnection(bool _val);
-    void pickDualPoints(bool _val);
 
 	void setSmapleType(QAction * action);
 	void setDualSmapleType(QAction * action);

@@ -97,6 +97,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Red Radius Line", true));
 	glarea.addParam(new RichBool("Multiply Pick Point", true) );
   glarea.addParam(new RichDouble("Picked Index", 0));
+	glarea.addParam(new RichBool("Show Cloest Dual Connection", false));
 
 	glarea.addParam(new RichBool("GLarea Busying", false) );
   glarea.addParam(new RichBool("Algorithom Stop", false) );
@@ -119,9 +120,9 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("SnapShot Each Iteration", false));
 	glarea.addParam(new RichBool("No Snap Radius", false));
 
-
-	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 1));
+	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
+
 }
 
 
@@ -183,6 +184,7 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichDouble("Sample Average Mu3", 0.1));
   wLop.addParam(new RichBool("Need Sample Average", false));
+	wLop.addParam(new RichBool("Use Confidence", false));
 
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
@@ -194,7 +196,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Regularize Normals", false));
 
   wLop.addParam(new RichBool("Run Projection", false));
-
+	wLop.addParam(new RichBool("Run Compute Confidence", false));
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
@@ -209,6 +211,8 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Normal Reform", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
+	wLop.addParam(new RichDouble("Original KNN", 100));
+
 }
 
 void ParameterMgr::initSkeletonParameter()

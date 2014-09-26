@@ -918,3 +918,31 @@ void GlobalFun::removeNormalOverlaps(CMesh* mesh)
   }
 
 }
+
+
+void GlobalFun::normalizeConfidence(vector<CVertex>& vertexes, float delta)
+{
+	float min_confidence = GlobalFun::getDoubleMAXIMUM();
+	float max_confidence = 0;
+	for (int i = 0; i < vertexes.size(); i++)
+	{
+		CVertex& v = vertexes[i];
+		min_confidence = min_confidence < v.eigen_confidence ? min_confidence : v.eigen_confidence;
+		max_confidence = max_confidence > v.eigen_confidence ? max_confidence : v.eigen_confidence;
+	}
+	float space = max_confidence - min_confidence;
+
+	for (int i = 0; i < vertexes.size(); i++)
+	{
+		CVertex& v = vertexes[i];
+		v.eigen_confidence = (v.eigen_confidence - min_confidence) / space;
+
+		v.eigen_confidence += delta;
+
+		if (!(v.eigen_confidence > 0 || v.eigen_confidence <= 1.0))
+		{
+			v.eigen_confidence = 0.0;
+		}
+	}
+
+}

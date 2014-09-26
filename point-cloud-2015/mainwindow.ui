@@ -198,6 +198,7 @@
     <addaction name="menuPick_Point"/>
     <addaction name="actionShow_Connection"/>
     <addaction name="actionShow_Confidence_Color"/>
+    <addaction name="actionShow_Cloest_Dual"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -235,6 +236,7 @@
    <addaction name="actionClean_Pick"/>
    <addaction name="actionReorient_Pick"/>
    <addaction name="actionShow_Confidence_Color"/>
+   <addaction name="actionShow_Cloest_Dual"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
@@ -788,6 +790,14 @@
    </property>
    <property name="text">
     <string>Show Confidence Color</string>
+   </property>
+  </action>
+  <action name="actionShow_Cloest_Dual">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Cloest Dual</string>
    </property>
   </action>
  </widget>

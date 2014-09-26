@@ -788,23 +788,33 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 
   double width = normal_width;
 
-  for (int i = 0; i < dual_samples->vert.size(); i++)
+//   for (int i = 0; i < dual_samples->vert.size(); i++)
+//   {
+//     CVertex& v = dual_samples->vert[i];
+//     //CVertex& dual_v = dual_samples->vert[i];
+//     CVertex& dual_v = samples->vert[i];
+// 
+//     glDrawLine(v.P(), dual_v.P(), cBrown, width);
+//   }
+
+  for (int i = 0; i < samples->vert.size(); i++)
   {
-    CVertex& v = dual_samples->vert[i];
-    //CVertex& dual_v = dual_samples->vert[i];
-    CVertex& dual_v = samples->vert[i];
+    CVertex& v = samples->vert[i];
 
-    glDrawLine(v.P(), dual_v.P(), cBrown, width);
+		int index = i;
+		if (global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+		{
+			if (v.dual_index > 0 && v.dual_index < dual_samples->vert.size())
+			{
+				index = v.dual_index;
+			}
+		}
+
+		CVertex& dual_v = dual_samples->vert[index];
+    //CVertex& dual_v = samples->vert[v.dual_index];
+
+		glDrawLine(v.P(), dual_v.P(), cBrown, width);
   }
-
-  //for (int i = 0; i < samples->vert.size(); i++)
-  //{
-  //  CVertex& v = samples->vert[i];
-  //  CVertex& dual_v = dual_samples->vert[v.dual_index];
-  //  //CVertex& dual_v = samples->vert[v.dual_index];
-
-  //  glDrawLine(v.P(), dual_v.P(), cGreen, 2);
-  //}
 
 }
 

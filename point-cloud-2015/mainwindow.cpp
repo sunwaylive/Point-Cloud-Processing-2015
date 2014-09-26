@@ -60,6 +60,7 @@ void MainWindow::initWidgets()
   ui.actionShow_Skeleton->setChecked(paras->glarea.getBool("Show Skeleton"));
   ui.actionShow_colorful_branches->setChecked(paras->drawer.getBool("Use Differ Branch Color"));
   ui.actionShow_Picked_Neighbor->setChecked(paras->drawer.getBool("Draw Picked Point Neighbor"));
+	ui.actionShow_Cloest_Dual->setChecked(paras->glarea.getBool("Show Cloest Dual Connection"));
 
 }
 
@@ -139,6 +140,7 @@ void MainWindow::initConnect()
   connect(ui.actionClean_Pick, SIGNAL(triggered()), this, SLOT(cleanPick()));
 
 	connect(ui.actionShow_Confidence_Color, SIGNAL(toggled(bool)), this, SLOT(pickDualPoints(bool)));
+	connect(ui.actionShow_Cloest_Dual, SIGNAL(toggled(bool)), this, SLOT(showClosestDualConnection(bool)));
 
 
 	QTimer *timer = new QTimer(this);
@@ -547,6 +549,27 @@ void MainWindow::showColorfulBranches(bool _val)
   area->updateGL();
 }
 
+
+void MainWindow::showClosestDualConnection(bool _val)
+{
+	CMesh* samples = area->dataMgr.getCurrentSamples();
+	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+	paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(_val));
+
+	if (_val)
+	{
+		GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "showClosestDualConnection");
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "showClosestDualConnection");
+
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			v.dual_index = v.neighbors[0];
+		}
+	}
+
+}
 
 void MainWindow::lightOnOff(bool _val)
 {

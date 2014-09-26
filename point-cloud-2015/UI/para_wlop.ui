@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>271</width>
-     <height>306</height>
+     <height>338</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -186,13 +186,20 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QCheckBox" name="Use_confidence">
+      <property name="text">
+       <string>Use_confidence</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QPushButton" name="anisotropic_lop_apply">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>440</y>
+     <x>180</x>
+     <y>470</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -204,8 +211,8 @@
   <widget class="QPushButton" name="wlop_apply">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>320</y>
+     <x>10</x>
+     <y>350</y>
      <width>61</width>
      <height>31</height>
     </rect>
@@ -217,8 +224,8 @@
   <widget class="QPushButton" name="dual_wlop_apply">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>360</y>
+     <x>10</x>
+     <y>390</y>
      <width>71</width>
      <height>31</height>
     </rect>
@@ -231,7 +238,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>320</y>
+     <y>350</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -244,7 +251,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>360</y>
+     <y>390</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -256,8 +263,8 @@
   <widget class="QPushButton" name="dual_connection">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>400</y>
+     <x>170</x>
+     <y>430</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -269,8 +276,8 @@
   <widget class="QPushButton" name="skel_wlop">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>400</y>
+     <x>10</x>
+     <y>430</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -282,8 +289,8 @@
   <widget class="QPushButton" name="dual_drag_wlop">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>440</y>
+     <x>10</x>
+     <y>470</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -295,8 +302,8 @@
   <widget class="QPushButton" name="regularize_samples">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>480</y>
+     <x>10</x>
+     <y>510</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -308,8 +315,8 @@
   <widget class="QPushButton" name="regularize_normals">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>480</y>
+     <x>150</x>
+     <y>510</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -321,14 +328,27 @@
   <widget class="QPushButton" name="normal_reform">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>530</y>
+     <x>10</x>
+     <y>550</y>
      <width>101</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>Normal reform</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="compute_confidence">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>550</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Compute Confidence</string>
    </property>
   </widget>
  </widget>

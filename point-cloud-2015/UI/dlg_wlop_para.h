@@ -44,6 +44,7 @@ class WlopParaDlg : public QFrame
     void useAdaptiveSampleNeighbor(bool _val);
     void useAdaptiveMu(bool _val);
     void useTangentVector(bool _val);
+		void useConfidence(bool _val);
 
 		//
 		void applyWlop();
@@ -59,6 +60,7 @@ class WlopParaDlg : public QFrame
 
     void applyProjection();
     void applyNormalReform();
+		void applyComputeConfidence();
 
 	private:
 		Ui::para_wlop * ui;

@@ -86,6 +86,11 @@ void WlopParaDlg::initConnects()
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
+	if (!connect(ui->Use_confidence, SIGNAL(clicked(bool)), this, SLOT(useConfidence(bool))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
+
 
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
@@ -107,6 +112,9 @@ void WlopParaDlg::initConnects()
   connect(ui->regularize_normals,SIGNAL(clicked()),this,SLOT(applyRegularizeNormals()));
 
   connect(ui->wlop_projection,SIGNAL(clicked()),this,SLOT(applyProjection()));
+
+	connect(ui->compute_confidence, SIGNAL(clicked()), this, SLOT(applyComputeConfidence()));
+
 }
 
 
@@ -146,6 +154,9 @@ bool WlopParaDlg::initWidgets()
 
   state = m_paras->wLop.getBool("Use Tangent Vector") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Use_tangent_vector->setCheckState(state);
+
+	state = m_paras->wLop.getBool("Use Confidence") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_confidence->setCheckState(state);
 
 	update();
 	repaint();
@@ -246,6 +257,11 @@ void WlopParaDlg::useAdaptiveSampleNeighbor(bool _val)
 void WlopParaDlg::useTangentVector(bool _val)
 {
   m_paras->wLop.setValue("Use Tangent Vector", BoolValue(_val));
+}
+
+void WlopParaDlg::useConfidence(bool _val)
+{
+	m_paras->wLop.setValue("Use Confidence", BoolValue(_val));
 }
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
@@ -446,4 +462,12 @@ void WlopParaDlg::applyNormalReform()
   m_paras->wLop.setValue("Run Normal Reform", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Normal Reform", BoolValue(false));
+}
+
+
+void WlopParaDlg::applyComputeConfidence()
+{
+	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(false));
 }

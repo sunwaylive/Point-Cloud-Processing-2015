@@ -62,7 +62,7 @@ private:
   void updateAdaptiveNeighbor();
 
   void runProjection();
-
+	void runComputeConfidence();
 
 private:
 	RichParameterSet* para;
