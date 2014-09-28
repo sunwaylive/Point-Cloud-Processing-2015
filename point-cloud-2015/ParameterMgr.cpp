@@ -211,7 +211,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Normal Reform", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
-	wLop.addParam(new RichDouble("Original KNN", 100));
+	wLop.addParam(new RichDouble("Original KNN", 55));
 
 }
 

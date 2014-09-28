@@ -559,7 +559,7 @@ void MainWindow::showClosestDualConnection(bool _val)
 
 	if (_val)
 	{
-		GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "showClosestDualConnection");
+		//GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "showClosestDualConnection");
 		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "showClosestDualConnection");
 
 		for (int i = 0; i < samples->vert.size(); i++)

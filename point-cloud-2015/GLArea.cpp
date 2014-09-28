@@ -310,13 +310,12 @@ void GLArea::paintGL()
     //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
 
 
-//     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
-//     {
-//       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-//       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
-//       glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
-// 
-//     }
+     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
+     {
+       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+       //glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+     }
 
 
 //     if (!pickList.empty())
