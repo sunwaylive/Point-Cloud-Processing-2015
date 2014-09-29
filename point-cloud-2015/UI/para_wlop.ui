@@ -126,7 +126,7 @@
     <item>
      <widget class="QCheckBox" name="Need_sample_average">
       <property name="text">
-       <string>Need Sample Average</string>
+       <string>Need Sample Average （similarity）</string>
       </property>
      </widget>
     </item>

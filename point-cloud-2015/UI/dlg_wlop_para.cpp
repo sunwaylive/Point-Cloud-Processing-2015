@@ -133,9 +133,12 @@ bool WlopParaDlg::initWidgets()
 
 	state = m_paras->wLop.getBool("Need Compute PCA") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
 	ui->compute_pca->setCheckState(state);
+// 
+//   state = m_paras->wLop.getBool("Need Sample Average") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
+//   ui->Need_sample_average->setCheckState(state);
 
-  state = m_paras->wLop.getBool("Need Sample Average") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
-  ui->Need_sample_average->setCheckState(state);
+	state = m_paras->wLop.getBool("Need Similarity") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Need_sample_average->setCheckState(state);
 
   state = m_paras->wLop.getBool("Original Combine Sample") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->Need_original_combine_sample->setCheckState(state);
@@ -217,8 +220,9 @@ void WlopParaDlg::isDensity(bool _val)
 
  void WlopParaDlg::needSampleAverage(bool _val)
  {
-   m_paras->wLop.setValue("Need Sample Average", BoolValue(_val));
-
+   //m_paras->wLop.setValue("Need Sample Average", BoolValue(_val));
+	 m_paras->wLop.setValue("Need Similarity", BoolValue(_val));
+	 cout << "Need Similarity" << endl;
  }
 
 void WlopParaDlg::isPca(bool _val)

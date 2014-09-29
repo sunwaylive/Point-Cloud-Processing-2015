@@ -177,12 +177,12 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("H Gaussian Para", 4));
 	wLop.addParam(new RichDouble("Repulsion Power", 1.0));
 	wLop.addParam(new RichDouble("Average Power", 2.0));
-	wLop.addParam(new RichBool("Need Compute Density", false));
+	wLop.addParam(new RichBool("Need Compute Density", true));
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 
-  wLop.addParam(new RichDouble("Sample Average Mu3", 0.1));
+  wLop.addParam(new RichDouble("Sample Average Mu3", 0.3));
   wLop.addParam(new RichBool("Need Sample Average", false));
 	wLop.addParam(new RichBool("Use Confidence", false));
 
@@ -200,12 +200,14 @@ void ParameterMgr::initWLopParameter()
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
-  wLop.addParam(new RichBool("Need Averaging Movement", false));
+  wLop.addParam(new RichBool("Need Averaging Movement", true));
+	wLop.addParam(new RichBool("Need Similarity", false));
+
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
-  wLop.addParam(new RichBool("Use Tangent Vector", false));
+  wLop.addParam(new RichBool("Use Tangent Vector", true));
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
   wLop.addParam(new RichBool("Run Normal Reform", false));

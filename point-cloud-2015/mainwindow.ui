@@ -237,6 +237,9 @@
    <addaction name="actionReorient_Pick"/>
    <addaction name="actionShow_Confidence_Color"/>
    <addaction name="actionShow_Cloest_Dual"/>
+   <addaction name="separator"/>
+   <addaction name="actionShow_Sample_Circle"/>
+   <addaction name="actionShow_Sample_Dot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
