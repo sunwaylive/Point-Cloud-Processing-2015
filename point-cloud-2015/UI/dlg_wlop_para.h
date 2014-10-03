@@ -33,6 +33,10 @@ class WlopParaDlg : public QFrame
 		void getIter(int _val);
 		void getMu(double _val);
     void getMu3(double _val);
+		void getOriginalAverageKNN(double _val);
+		void getDualRadius(double _val);
+
+
 
 		void isDensity(bool _val);
 		void isPca(bool _val);
@@ -45,6 +49,7 @@ class WlopParaDlg : public QFrame
     void useAdaptiveMu(bool _val);
     void useTangentVector(bool _val);
 		void useConfidence(bool _val);
+		void useOriginalKNN(bool _val);
 
 		//
 		void applyWlop();

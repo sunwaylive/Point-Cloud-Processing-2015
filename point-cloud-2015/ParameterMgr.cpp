@@ -69,8 +69,8 @@ void ParameterMgr::initGlareaParameter()
 	
 	glarea.addParam(new RichBool("Show Samples", true) );
 	glarea.addParam(new RichBool("Show Samples Quad", false) );
-	glarea.addParam(new RichBool("Show Samples Dot", true) );
-	glarea.addParam(new RichBool("Show Samples Circle", false) );
+	glarea.addParam(new RichBool("Show Samples Dot", false) );
+	glarea.addParam(new RichBool("Show Samples Circle", true) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
   glarea.addParam(new RichBool("Show Dual Samples", false) );
@@ -113,7 +113,7 @@ void ParameterMgr::initGlareaParameter()
 	//glarea.addParam(new RichColor("Light Diffuse Color", QColor(204, 204, 204)));
 	//glarea.addParam(new RichColor("Light Specular Color", QColor(255, 255, 255)));
 
-	glarea.addParam(new RichDouble("Snapshot Resolution", 2));
+	glarea.addParam(new RichDouble("Snapshot Resolution", 1));
 	glarea.addParam(new RichDouble("Snapshot Index", 1));
 	glarea.addParam(new RichDouble("Radius Ball Transparency", 0.3));
 
@@ -181,8 +181,10 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
+	wLop.addParam(new RichDouble("Dual Radius", 0.20));
 
-  wLop.addParam(new RichDouble("Sample Average Mu3", 0.3));
+
+  wLop.addParam(new RichDouble("Dual Mu3", 0.35));
   wLop.addParam(new RichBool("Need Sample Average", false));
 	wLop.addParam(new RichBool("Use Confidence", false));
 
@@ -200,20 +202,28 @@ void ParameterMgr::initWLopParameter()
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
-  wLop.addParam(new RichBool("Need Averaging Movement", true));
-	wLop.addParam(new RichBool("Need Similarity", false));
+  wLop.addParam(new RichBool("Need Averaging Movement", false));
+	wLop.addParam(new RichBool("Need Similarity", true));
 
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
   wLop.addParam(new RichBool("Use Tangent Vector", true));
+	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
+
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
   wLop.addParam(new RichBool("Run Normal Reform", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
-	wLop.addParam(new RichDouble("Original KNN", 55));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
+
+	wLop.addParam(new RichDouble("Original Averaging KNN", 215));
+
+	wLop.addParam(new RichDouble("sigmoid threshold", 0.4));
+
+
 
 }
 
@@ -317,7 +327,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 30));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 45));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 30));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 

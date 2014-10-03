@@ -444,6 +444,10 @@ void GLArea::openByDrop(QString fileName)
 		{
 			dataMgr.loadPlyToOriginal(fileName);
 		}
+		else if (fileName.contains("dual"))
+		{
+			dataMgr.loadPlyToDualSample(fileName);
+		}
 		else
 		{
 			dataMgr.loadPlyToSample(fileName);
@@ -1385,13 +1389,7 @@ void GLArea::wheelEvent(QWheelEvent *e)
       size_temp = global_paraMgr.skeleton.getDouble("Branches Merge Max Dist");
       global_paraMgr.skeleton.setValue("Branches Merge Max Dist", DoubleValue(size_temp * change));
     }
-    else
-    {
-      size_temp = global_paraMgr.drawer.getDouble("Normal Line Width");
-      global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(size_temp * change));
-    }
-
-		if (global_paraMgr.drawer.getBool("Show Confidence Color"))
+		else if (global_paraMgr.drawer.getBool("Show Confidence Color"))
 		{
 			if (para->getBool("Show Samples"))
 			{
@@ -1400,6 +1398,13 @@ void GLArea::wheelEvent(QWheelEvent *e)
 				cout << "Sample Confidence Color Scale = " << size_temp * change << endl;
 			}
 		}
+    else
+    {
+      size_temp = global_paraMgr.drawer.getDouble("Normal Line Width");
+      global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(size_temp * change));
+    }
+
+
 	}
 	else if((e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::AltModifier))
 	{

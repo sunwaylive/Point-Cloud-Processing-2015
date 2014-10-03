@@ -67,6 +67,36 @@ void DataMgr::loadPlyToOriginal(QString fileName)
 	original.vn = original.vert.size();
 }
 
+void DataMgr::loadPlyToDualSample(QString fileName)
+{
+	clearCMesh(dual_samples);
+	curr_file_name = fileName;
+
+	int mask = tri::io::Mask::IOM_VERTCOORD + tri::io::Mask::IOM_VERTNORMAL;
+
+	int err = tri::io::Importer<CMesh>::Open(dual_samples, curr_file_name.toStdString().data(), mask);
+	if (err)
+	{
+		cout << "Failed reading mesh: " << err << "\n";
+		return;
+	}
+	cout << "points loaded\n";
+
+
+	CMesh::VertexIterator vi;
+	int idx = 0;
+	for (vi = dual_samples.vert.begin(); vi != dual_samples.vert.end(); ++vi)
+	{
+		vi->is_dual_sample = true;
+		vi->m_index = idx++;
+		//vi->N() = Point3f(0, 0, 0);
+		dual_samples.bbox.Add(vi->P());
+	}
+	dual_samples.vn = dual_samples.vert.size();
+}
+
+
+
 void DataMgr::loadPlyToSample(QString fileName)
 {
 	clearCMesh(samples);
@@ -107,7 +137,6 @@ void DataMgr::loadXYZN(QString fileName)
     float temp = 0.;
     for (int j=0; j<3; j++)
     {
-
       infile >> temp;
       v.P()[j] = temp;
     }
@@ -116,6 +145,11 @@ void DataMgr::loadXYZN(QString fileName)
     for (int j=0; j<3; j++) {
       infile >> v.N()[j];
     }
+
+		for (int j = 0; j < 3; j++) {
+			infile >> temp;
+			//infile >> v.C()[j];
+		}
 
     v.m_index = i++;
 

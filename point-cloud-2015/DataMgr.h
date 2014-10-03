@@ -26,6 +26,7 @@ public:
 	~DataMgr(void);
 
 	void loadPlyToOriginal(QString fileName);
+	void loadPlyToDualSample(QString fileName);
 	void loadPlyToSample(QString fileName);
 	void savePly(QString fileName, CMesh& mesh);
 	void loadImage(QString fileName);

@@ -28,7 +28,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
-
+	if (!connect(ui->dual_radius, SIGNAL(valueChanged(double)), this, SLOT(getDualRadius(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 	//if(!connect(ui->rep_pow,SIGNAL(valueChanged(double)),this,SLOT(getRepPow(double))))
 	//{
 	//	cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -37,6 +40,10 @@ void WlopParaDlg::initConnects()
 	//{
 	//	cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	//}
+	if (!connect(ui->original_averaging_KNN, SIGNAL(valueChanged(double)), this, SLOT(getOriginalAverageKNN(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 	if(!connect(ui->mu,SIGNAL(valueChanged(double)),this,SLOT(getMu(double))))
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -90,7 +97,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
-
+	if (!connect(ui->Use_original_Averaging_KNN, SIGNAL(clicked(bool)), this, SLOT(useOriginalKNN(bool))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
@@ -125,7 +135,9 @@ bool WlopParaDlg::initWidgets()
 	/*ui->rep_pow->setValue(m_paras->wLop.getDouble("Repulsion Power"));
 	ui->fit_pow->setValue(m_paras->wLop.getDouble("Average Power"));*/
 	ui->iter->setValue(m_paras->wLop.getDouble("Num Of Iterate Time"));
-  ui->sample_average_mu3->setValue(m_paras->wLop.getDouble("Sample Average Mu3"));
+  ui->sample_average_mu3->setValue(m_paras->wLop.getDouble("Dual Mu3"));
+	ui->original_averaging_KNN->setValue(m_paras->wLop.getDouble("Original Averaging KNN"));
+	ui->dual_radius->setValue(m_paras->wLop.getDouble("Dual Radius"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -160,6 +172,9 @@ bool WlopParaDlg::initWidgets()
 
 	state = m_paras->wLop.getBool("Use Confidence") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->Use_confidence->setCheckState(state);
+
+	state = m_paras->wLop.getBool("Use Original Averaging KNN") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_original_Averaging_KNN->setCheckState(state);
 
 	update();
 	repaint();
@@ -206,7 +221,17 @@ void WlopParaDlg::getMu(double _val)
 
 void WlopParaDlg::getMu3(double _val)
 {
-  m_paras->wLop.setValue("Sample Average Mu3", DoubleValue(_val));
+  m_paras->wLop.setValue("Dual Mu3", DoubleValue(_val));
+}
+
+void WlopParaDlg::getOriginalAverageKNN(double _val)
+{
+	m_paras->wLop.setValue("Original Averaging KNN", DoubleValue(_val));
+}
+
+void WlopParaDlg::getDualRadius(double _val)
+{
+	m_paras->wLop.setValue("Dual Radius", DoubleValue(_val));
 }
 
 void WlopParaDlg::isDensity(bool _val)
@@ -267,6 +292,12 @@ void WlopParaDlg::useConfidence(bool _val)
 {
 	m_paras->wLop.setValue("Use Confidence", BoolValue(_val));
 }
+
+void WlopParaDlg::useOriginalKNN(bool _val)
+{
+	m_paras->wLop.setValue("Use Original Averaging KNN", BoolValue(_val));
+}
+
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
 {
