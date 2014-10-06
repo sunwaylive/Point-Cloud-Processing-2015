@@ -92,6 +92,9 @@ private:
 	vector<Point3f> average;
 	vector<double>  average_weight_sum;
 
+	vector<Point3f> average_low_confidence;
+	vector<double>  average_weight_sum_low_confidence;
+
 	vector<CVertex> mesh_temp;
 
   bool use_adaptive_mu;
