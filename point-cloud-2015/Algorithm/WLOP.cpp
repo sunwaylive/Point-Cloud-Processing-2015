@@ -29,8 +29,11 @@ void WLOP::setFirstIterate()
 
 void WLOP::setInput(DataMgr* pData)
 {
+	use_closest_dual = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+
 	if(!pData->isSamplesEmpty() && !pData->isOriginalEmpty())
 	{
+		default_sphere = pData->default_sphere;
 		CMesh* _samples = pData->getCurrentSamples();
 		CMesh* _original = pData->getCurrentOriginal();
 
@@ -203,6 +206,12 @@ void WLOP::run()
 	if (para->getBool("Run Compute Confidence"))
 	{
 		runComputeConfidence();
+		return;
+	}
+
+	if (para->getBool("Run Compute Distribution"))
+	{
+		runComputeDistribution();
 		return;
 	}
 
@@ -1861,10 +1870,10 @@ void WLOP::smoothSkelDistance()
 	{
 		CVertex& v = samples->vert[i];
 		v.recompute_m_render();
-		// 		if (v.eigen_confidence > 0.7)
-		// 		{
-		// 			continue;
-		// 		}
+		//if (v.eigen_confidence > 0.7)
+		//{
+		//	continue;
+		//}
 		//v.skel_radius = new_radiuses[i];
 
 		int neighbor_idx = v.neighbors[0];
@@ -2537,6 +2546,89 @@ void WLOP::runRegularizeNormals()
   }
 }
 
+
+void WLOP::runComputeDistribution()
+{
+	cout << "runComputeDistribution" << endl;
+
+	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+	cout << "knn:	" << knn <<endl;
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, knn, false, "void runComputeDistribution()");
+
+	if (use_closest_dual)
+	{
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	}
+	//return;
+
+	vector<SphereSlots> sphere_distributions(dual_samples->vert.size(), default_sphere);
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex dual_v = dual_samples->vert[i];
+		CVertex& v = samples->vert[i];
+
+		if (use_closest_dual)
+		{
+			int neighbor_idx = v.neighbors[0];
+			dual_v = dual_samples->vert[neighbor_idx];
+		}
+		Point3f direction = (v.P() - dual_v.P()).Normalize();
+		
+		SphereSlots& sphere_slots = sphere_distributions[i];
+		updateSphereSlots(sphere_slots, direction);
+
+		for (int j = 0; j < dual_v.neighbors.size(); j++)
+		{
+			int dual_neighbor_idx = dual_v.neighbors[j];
+			CVertex dual_t = dual_samples->vert[dual_neighbor_idx];
+			CVertex& dual_t_v = samples->vert[dual_neighbor_idx];
+
+			if (use_closest_dual)
+			{
+				int neighbor_idx = dual_t_v.neighbors[0];
+				dual_t = dual_samples->vert[neighbor_idx];
+			}
+
+			Point3f direction = (dual_t_v.P() - dual_t.P()).Normalize();
+			updateSphereSlots(sphere_slots, direction);
+		}
+
+		v.eigen_confidence = getSphereSlotsConfidence(sphere_slots);
+	}
+
+	GlobalFun::normalizeConfidence(samples->vert, 0.0);
+
+}
+
+void WLOP::updateSphereSlots(SphereSlots& sphere_slots, Point3f dir)
+{
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+
+	for (int i = 0; i < sphere_slots.size(); i++)
+	{
+		SphereSlot& sphere_slot = sphere_slots[i];
+		Point3f slot_direction = sphere_slot.slot_direction;
+
+		double direction_diff = exp(-pow(1 - slot_direction * dir, 2) / sigma_threshold);
+		sphere_slot.slot_value += direction_diff;
+	}
+}
+
+double WLOP::getSphereSlotsConfidence(SphereSlots& sphere_slots)
+{
+	double sum_confidence = 0.0;
+	for (int i = 0; i < sphere_slots.size(); i++)
+	{
+		SphereSlot& sphere_slot = sphere_slots[i];
+		double confidence = sphere_slot.slot_value < 2.0 ? sphere_slot.slot_value : 1.0;
+		//double confidence = sphere_slot.slot_value;
+		sum_confidence += confidence;
+	}
+	return sum_confidence;
+}
 
 
 

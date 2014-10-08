@@ -31,6 +31,7 @@ public:
 
   void computeInitialSampleNeighbor();
 	void computeNearestNeighborDist();
+	
 
 
   void runSkelWlop();
@@ -38,6 +39,10 @@ public:
   void runRegularizeSamples();
   void runRegularizeNormals();
 
+	void runComputeDistribution();
+
+	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir);
+	double getSphereSlotsConfidence(SphereSlots& sphere_slots);
 
   void computeJointNeighborhood();
 
@@ -106,5 +111,6 @@ private:
   vector<Point3f> pioneer_points_position;
   vector< vector<Point3f>> pioneer_points_origininal;
 
-
+	SphereSlots default_sphere;
+	bool use_closest_dual;
 };
