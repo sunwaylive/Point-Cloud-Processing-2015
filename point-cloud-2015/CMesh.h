@@ -62,6 +62,7 @@ public:
   bool is_fixed_original; 
   
   double skel_radius; // remember radius for branches
+	float nearest_neighbor_dist;
 
   bool is_dual_sample;
   bool is_new;
@@ -82,18 +83,19 @@ public:
 		return P()[i];
 	}
 
-	CVertex():
+	CVertex() :
 		m_index(0),
-    dual_index(0),
+		dual_index(0),
 		bIsOriginal(false),
 		is_fixed_sample(false),
 		eigen_confidence(0.),
 		is_skel_branch(false),
 		is_skel_ignore(false),
 		is_skel_virtual(false),
-    is_fixed_original(false),
-    is_dual_sample(false),
-    is_new(false),
+		is_fixed_original(false),
+		is_dual_sample(false),
+		is_new(false),
+		nearest_neighbor_dist(0.0),
 		eigen_vector0(Point3f(1, 0, 0)),
 		eigen_vector1(Point3f(0, 1, 0)),
     skel_radius(-1.0)

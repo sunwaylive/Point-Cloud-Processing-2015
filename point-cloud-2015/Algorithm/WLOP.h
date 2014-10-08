@@ -30,6 +30,8 @@ public:
 	double getErrorX(){ return error_x; }
 
   void computeInitialSampleNeighbor();
+	void computeNearestNeighborDist();
+
 
   void runSkelWlop();
   void runDragWlop();

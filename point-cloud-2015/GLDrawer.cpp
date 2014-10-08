@@ -847,7 +847,7 @@ GLColor GLDrawer::isoValue2color(double iso_value,
 		}
 		else
 		{
-			iso_value /= -scale_threshold;
+			iso_value /= -(scale_threshold+1e-10);
 		}
 	}
 	else
@@ -858,7 +858,7 @@ GLColor GLDrawer::isoValue2color(double iso_value,
 
 	vector<Point3f> base_colors(5);
 	double step_size = 1.0 / (base_colors.size() - 1);
-	int base_id = iso_value / step_size;
+	int base_id = iso_value / (step_size + 1e-10);
 	if (base_id == base_colors.size() - 1)
 	{
 		base_id = base_colors.size() - 2;
