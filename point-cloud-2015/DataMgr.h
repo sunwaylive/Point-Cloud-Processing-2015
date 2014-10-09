@@ -19,6 +19,8 @@ using namespace std;
 using namespace tri;
 
 
+
+
 class DataMgr
 {
 public:
@@ -60,6 +62,8 @@ public:
   void replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual);
   void switchSampleDualSample();
 
+	void loadDefaultSphere();
+
 private:
 	void clearCMesh(CMesh& mesh);
 
@@ -70,6 +74,8 @@ public:
 
 	Skeleton skeleton;
 	//cv::Mat image;
+
+	SphereSlots default_sphere;
 
 	RichParameterSet* para;
 	double init_radius;

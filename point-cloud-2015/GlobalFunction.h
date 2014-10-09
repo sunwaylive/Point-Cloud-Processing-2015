@@ -1,9 +1,24 @@
 
 
 #pragma once
+// #include "TriMesh.h"
+// #include "TriMesh_algo.h"
+// #include "ICP.h"
+
+
 #include <vector>
 #include "CMesh.h"
 #include "grid.h"
+
+
+// #define WIN32_LEAN_AND_MEAN
+// # include <windows.h>
+// #include <WindowsX.h>
+
+
+
+
+
 //#include "LAP_Others/eigen.h"
 #include <fstream>
 #include <float.h>
@@ -16,6 +31,9 @@
 #include <math.h>
 #include "ANN/ANN.h"
 #include <vcg/space/fitting3.h>
+#include <eigenlib/Eigen/Dense>
+
+
 
 #define EIGEN_DEFAULT_TO_ROW_MAJOR
 #define EIGEN_EXCEPTIONS
@@ -72,6 +90,9 @@ namespace GlobalFun
   Point3f getTangentVector(Point3f& diff_vecotr, Point3f& normal);
 
 	void normalizeConfidence(vector<CVertex>& vertexes, float delta);
+
+
+	//void computeICP(CMesh *dst, CMesh *src);
 }
 
 class Timer
@@ -109,6 +130,43 @@ private:
 	string _str;
 };
 
+
+class SphereSlot
+{
+public:
+	Point3f slot_direction;
+	double slot_value;
+
+	SphereSlot()
+	{
+		slot_direction = Point3f(0., 0., 0.);
+		slot_value = 0.0;
+	}
+
+	SphereSlot(Point3f dir, double val)
+	{
+		slot_direction = dir;
+		slot_value = val;
+	}
+
+	SphereSlot(const SphereSlot& sphere_slot)
+	{
+		slot_direction = sphere_slot.slot_direction;
+		slot_value = sphere_slot.slot_value;
+	}
+
+	SphereSlot& SphereSlot::operator = (const SphereSlot& sphere_slot)
+	{
+		if (&sphere_slot != this)
+		{
+			slot_direction = sphere_slot.slot_direction;
+			slot_value = sphere_slot.slot_value;
+		}
+		return *this;
+	}
+};
+
+typedef vector<SphereSlot> SphereSlots;
 
 class NeighborDisk
 {

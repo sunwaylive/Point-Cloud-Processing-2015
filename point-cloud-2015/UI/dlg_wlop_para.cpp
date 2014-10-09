@@ -124,6 +124,8 @@ void WlopParaDlg::initConnects()
   connect(ui->wlop_projection,SIGNAL(clicked()),this,SLOT(applyProjection()));
 
 	connect(ui->compute_confidence, SIGNAL(clicked()), this, SLOT(applyComputeConfidence()));
+	connect(ui->compute_distribution, SIGNAL(clicked()), this, SLOT(applyComputeDistribution()));
+	connect(ui->inner_clustering, SIGNAL(clicked()), this, SLOT(applyComputeInnerClustering()));
 
 }
 
@@ -506,3 +508,19 @@ void WlopParaDlg::applyComputeConfidence()
 	area->runWlop();
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(false));
 }
+
+void WlopParaDlg::applyComputeDistribution()
+{
+	m_paras->wLop.setValue("Run Compute Distribution", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Compute Distribution", BoolValue(false));
+}
+
+
+void WlopParaDlg::applyComputeInnerClustering()
+{
+	m_paras->wLop.setValue("Run Inner Clustering", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Inner Clustering", BoolValue(false));
+}
+

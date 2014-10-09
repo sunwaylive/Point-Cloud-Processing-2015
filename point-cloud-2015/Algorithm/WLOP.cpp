@@ -215,6 +215,12 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Run Inner Clustering"))
+	{
+		runComputeInnerClusering();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -1760,6 +1766,105 @@ void WLOP::runComputeConfidence()
 // }
 
 
+void WLOP::runComputeInnerClusering()
+{
+	if (global_paraMgr.glarea.getBool("Show Dual Connection") && global_paraMgr.glarea.getBool("Show Samples"))
+	{
+		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius") * 0.5, dual_samples->bbox);
+
+		int current_group_id = 0;
+		vector<double> group_ids(samples->vert.size(), -1.0);
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& dual_v = dual_samples->vert[i];
+			if (group_ids[i] >= 0)
+			{
+				continue;
+			}
+
+			group_ids[i] = current_group_id;
+			for (int j = 0; j < dual_v.neighbors.size(); j++)
+			{
+				int idx = dual_v.neighbors[j];
+				if (group_ids[idx] >= 0)
+				{
+					continue;
+				}
+				group_ids[idx] = current_group_id;
+			}
+			current_group_id += 1.0;
+		}
+
+		cout << "group: " << current_group_id << endl;
+
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+
+			v.eigen_confidence = group_ids[i] / double(current_group_id - 1.0);
+		}
+		GlobalFun::normalizeConfidence(samples->vert, 0.0);
+		return;
+	}
+	Timer time;
+	time.start("Samples Initial");
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+	time.end();
+
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	//double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+	double sigma_threshold = pow(max(1e-8, 1 - pow(cos(sigma / 180.0*3.1415926), 2)), 2);
+
+	double radius = para->getDouble("CGrid Radius");
+	double radius2 = radius * radius;
+	double iradius16 = -4.0 / radius2;
+	
+	vector<Point3f> new_positions(samples->vert.size());
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+		dual_v.N() = dual_v.eigen_vector0;
+
+		Point3f sum_p = Point3f(0,0,0);
+		double sum_w = 0.0;
+		for (int j = 0; j < dual_v.neighbors.size(); j++)
+		{
+			int idx = dual_v.neighbors[j];
+			CVertex& dual_t = dual_samples->vert[idx];
+
+			float dist2 = (dual_v.P() - dual_t.P()).SquaredNorm();
+			float dist_diff = exp(dist2 * iradius16);
+			double direction_diff = exp(-pow(1 - pow(dual_v.eigen_vector0.Normalize() * dual_t.eigen_vector0.Normalize(), 2), 2) / sigma_threshold);
+
+			double w = direction_diff * dist_diff;
+			//double w = direction_diff;
+
+			sum_p += dual_t.P() * w;
+			sum_w += w;
+		}
+
+		if (!dual_v.neighbors.empty())
+		{
+			new_positions[i] = sum_p / sum_w;
+		}
+		else
+		{
+			new_positions[i] = dual_v.P();
+		}
+	}
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+		dual_v.P() = new_positions[i];
+	}
+
+
+
+
+}
+
 void WLOP::smoothSkelDistance()
 {
 	//GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
@@ -3024,3 +3129,6 @@ void WLOP::runProjection()
 // 
 //   return;
 // }
+
+
+

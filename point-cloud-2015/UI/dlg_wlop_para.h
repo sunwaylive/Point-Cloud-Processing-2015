@@ -66,6 +66,10 @@ class WlopParaDlg : public QFrame
     void applyProjection();
     void applyNormalReform();
 		void applyComputeConfidence();
+		void applyComputeDistribution();
+
+		void applyComputeInnerClustering();
+
 
 	private:
 		Ui::para_wlop * ui;

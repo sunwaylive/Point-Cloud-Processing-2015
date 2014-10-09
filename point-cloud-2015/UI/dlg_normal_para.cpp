@@ -127,10 +127,10 @@ void NormalParaDlg::applyPCANormal()
     //vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(samples->vert.begin(), samples->vert.end(), knn, -1);
     cout << "new normal estimation: " << endl;
 
-    vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
-    pca_para.fittingAdjNum = knn;
-
-    vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+     vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+     pca_para.fittingAdjNum = knn;
+ 
+     vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
 	}
 	area->dataMgr.recomputeQuad();
 	area->updateGL();

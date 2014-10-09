@@ -169,6 +169,12 @@
     <ClInclude Include="Algorithm\pointcloud_normal.h">
       <Filter>Algorithm</Filter>
     </ClInclude>
+    <ClInclude Include="SparseICP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nanoflann.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm\NormalSmoother.cpp">

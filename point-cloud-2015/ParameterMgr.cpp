@@ -89,7 +89,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Original Circle", false) );
 	glarea.addParam(new RichBool("Show Original Sphere", false) );
 
-	glarea.addParam(new RichBool("Show Skeleton", true));
+	glarea.addParam(new RichBool("Show Skeleton", false));
 
 	glarea.addParam(new RichBool("Show Radius", true));
 	glarea.addParam(new RichBool("Show All Radius", false));
@@ -199,6 +199,8 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichBool("Run Projection", false));
 	wLop.addParam(new RichBool("Run Compute Confidence", false));
+	wLop.addParam(new RichBool("Run Compute Distribution", false));
+	wLop.addParam(new RichBool("Run Inner Clustering", false));
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));

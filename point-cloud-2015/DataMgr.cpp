@@ -146,10 +146,10 @@ void DataMgr::loadXYZN(QString fileName)
       infile >> v.N()[j];
     }
 
-		for (int j = 0; j < 3; j++) {
-			infile >> temp;
-			//infile >> v.C()[j];
-		}
+// 		for (int j = 0; j < 3; j++) {
+// 			infile >> temp;
+// 			//infile >> v.C()[j];
+// 		}
 
     v.m_index = i++;
 
@@ -1048,4 +1048,24 @@ void DataMgr::switchSampleDualSample()
 //   replaceMeshDual(original, temp_mesh, false);
 //   replaceMeshDual(samples, original, true);
 //   replaceMeshDual(temp_mesh, samples, false);
+}
+
+
+
+void DataMgr::loadDefaultSphere()
+{
+	loadPlyToSample("sphere_wlop.ply");
+	
+	Point3f center = Point3f(0., 0., 0.);
+	default_sphere.clear();
+	for (int i = 0; i < samples.vert.size(); i++)
+	{
+		CVertex& v = samples.vert[i];
+		Point3f direction = (v.P() - center).Normalize();
+
+		SphereSlot slot(direction, 0.0);
+		default_sphere.push_back(slot);
+	}
+
+	cout << "default slot size: " << default_sphere.size() << endl;
 }

@@ -34,6 +34,7 @@ GLArea::GLArea(QWidget *parent): QGLWidget(/*QGLFormat(QGL::DoubleBuffer | QGL::
 
 	CVertex v;
 	cout << sizeof(v) << endl;
+	loadDefaultModel();
 }
 
 GLArea::~GLArea(void)
@@ -480,6 +481,7 @@ void GLArea::openByDrop(QString fileName)
 
 void GLArea::loadDefaultModel()
 {
+	dataMgr.loadDefaultSphere();
 	dataMgr.loadPlyToSample("default.ply");
 	dataMgr.loadPlyToOriginal("default_original.ply");
 	initAfterOpenFile();

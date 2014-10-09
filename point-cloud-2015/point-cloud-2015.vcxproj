@@ -73,8 +73,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;C:\QT\5.2.1\5.2.1\msvc2012_64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;$(LibraryPath);C:\Program Files\TBB\lib\intel64\vc10;D:\boost_1_53_0\lib64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;C:\QT\5.2.1\5.2.1\msvc2012_64\lib;$(WindowsSdkDir)lib\x64</LibraryPath>
+    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;C:\QT\5.2.1\5.2.1\msvc2012_64\include;IncludeLib\trimesh\include;$(IncludePath)</IncludePath>
+    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;$(LibraryPath);C:\Program Files\TBB\lib\intel64\vc10;D:\boost_1_53_0\lib64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;C:\QT\5.2.1\5.2.1\msvc2012_64\lib;$(WindowsSdkDir)lib\x64;IncludeLib\trimesh\lib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -240,10 +240,12 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I." "-I$(QTDIR)\include\QtTest" "-I$(INHERIT)\." "-ID:\boost_1_53_0\boost_include" "-IC:\Program Files\TBB\include"</Command>
     </CustomBuild>
+    <ClInclude Include="nanoflann.hpp" />
     <ClInclude Include="Parameter.h" />
     <ClInclude Include="ParameterMgr.h" />
     <ClInclude Include="plylib.h" />
     <ClInclude Include="plystuff.h" />
+    <ClInclude Include="SparseICP.h" />
     <ClInclude Include="trackball.h" />
     <ClInclude Include="trackmode.h" />
     <CustomBuild Include="UI\std_para_dlg.h">

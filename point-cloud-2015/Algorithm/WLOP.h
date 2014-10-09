@@ -71,6 +71,8 @@ private:
 
   void runProjection();
 	void runComputeConfidence();
+	void runComputeInnerClusering();
+
 
 private:
 	RichParameterSet* para;
