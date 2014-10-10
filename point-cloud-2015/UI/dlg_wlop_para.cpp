@@ -127,6 +127,8 @@ void WlopParaDlg::initConnects()
 	connect(ui->compute_distribution, SIGNAL(clicked()), this, SLOT(applyComputeDistribution()));
 	connect(ui->inner_clustering, SIGNAL(clicked()), this, SLOT(applyComputeInnerClustering()));
 
+	connect(ui->show_pick_distribution, SIGNAL(clicked()), this, SLOT(applyShowPickDistribution()));
+
 }
 
 
@@ -524,3 +526,9 @@ void WlopParaDlg::applyComputeInnerClustering()
 	m_paras->wLop.setValue("Run Inner Clustering", BoolValue(false));
 }
 
+void WlopParaDlg::applyShowPickDistribution()
+{
+	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(false));
+}

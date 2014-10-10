@@ -261,8 +261,7 @@ void GLArea::paintGL()
     {
       glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
     }
-
-    if(para->getBool("Show Samples"))
+    else if(para->getBool("Show Samples"))
 		{
 			glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentSamples());
 		}

@@ -67,8 +67,9 @@ class WlopParaDlg : public QFrame
     void applyNormalReform();
 		void applyComputeConfidence();
 		void applyComputeDistribution();
-
 		void applyComputeInnerClustering();
+
+		void applyShowPickDistribution();
 
 
 	private:

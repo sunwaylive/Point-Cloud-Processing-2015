@@ -201,6 +201,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Compute Confidence", false));
 	wLop.addParam(new RichBool("Run Compute Distribution", false));
 	wLop.addParam(new RichBool("Run Inner Clustering", false));
+	wLop.addParam(new RichBool("Run Show Pick Distribution", false));
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));

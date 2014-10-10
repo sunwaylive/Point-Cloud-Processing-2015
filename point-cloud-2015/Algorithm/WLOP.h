@@ -43,8 +43,10 @@ public:
 
 	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir);
 	double getSphereSlotsConfidence(SphereSlots& sphere_slots);
+	
 
   void computeJointNeighborhood();
+	void runShowPickDistribution();
 
 protected:
 	WLOP(){}
