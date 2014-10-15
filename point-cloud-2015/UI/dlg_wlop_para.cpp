@@ -364,8 +364,25 @@ void WlopParaDlg::applyWlop()
 //}
 
 
+void WlopParaDlg::copySamplesToDualSamples()
+{
+	CMesh* samples = area->dataMgr.getCurrentSamples();
+	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		dual_samples->vert[i] = samples->vert[i];
+		dual_samples->vert[i].is_dual_sample = true;
+	}
+
+}
+
 void WlopParaDlg::applyDualConnection()
 {
+	copySamplesToDualSamples();
+	return;
+
+
   CMesh* samples = area->dataMgr.getCurrentSamples();
   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
 
@@ -405,14 +422,33 @@ void WlopParaDlg::applyDualConnection()
 
  void WlopParaDlg::applyDualWlop()
  {
-   double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
-   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+	 global_paraMgr.glarea.setValue("Algorithom Stop", BoolValue(false));
+	 //applyWlop();
+	 area->runWlop();
 
-   m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
-   area->runWlop();
-   m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
 
-   global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+	 copySamplesToDualSamples();
+
+ 	 double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+ 	 double dual_radius = global_paraMgr.wLop.getDouble("Dual Radius");
+ 	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(dual_radius));
+ 	 //applySkelWlop();
+	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
+	 area->runWlop();
+	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
+ 	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+
+
+
+   //double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+   //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+
+   //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+   //area->runWlop();
+   //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
+
+   //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+
 
    //if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
    //{
@@ -427,6 +463,19 @@ void WlopParaDlg::applyDualConnection()
    //  calculation_thread.setArea(area);
    //  calculation_thread.start();
    //}
+ }
+
+ void WlopParaDlg::applySkelWlop()
+ {
+	 //m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
+	 //area->runWlop();
+	 //m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
+
+	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
+	 global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
+	 calculation_thread.setArea(area);
+	 calculation_thread.start();
+	 
  }
 
 void WlopParaDlg::applyAnisotropicLop()
@@ -454,12 +503,7 @@ void WlopParaDlg::applyStepForward()
   m_paras->wLop.setValue("Run Step Forward", BoolValue(false));
 }
 
-void WlopParaDlg::applySkelWlop()
-{
-  m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
-  area->runWlop();
-  m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
-}
+
 
 void WlopParaDlg::applyDragWlop()
 {

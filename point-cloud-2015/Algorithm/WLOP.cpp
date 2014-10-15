@@ -41,7 +41,7 @@ void WLOP::setInput(DataMgr* pData)
     {
 			_samples = pData->getCurrentDualSamples();
 
-			if (global_paraMgr.glarea.getBool("Show Samples"))
+			if (global_paraMgr.glarea.getBool("Show Samples") || !global_paraMgr.glarea.getBool("Show Original"))
 			{
 				_original = pData->getCurrentSamples();
 			}
@@ -362,8 +362,8 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	double radius = para->getDouble("CGrid Radius");
 
 	double fix_original_weight = global_paraMgr.skeleton.getDouble("Fix Original Weight");
-	bool use_fixed_original = (para->getBool("Run Skel WLOP") && global_paraMgr.glarea.getBool("Show Samples"));
-
+	//bool use_fixed_original = (para->getBool("Run Skel WLOP") && global_paraMgr.glarea.getBool("Show Samples"));
+	bool use_fixed_original = para->getBool("Run Skel WLOP");
 
 
 	double radius2 = radius * radius;
@@ -378,6 +378,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	bool L2 = para->getBool("Need Sample Average");
 	bool use_confidence = para->getBool("Use Confidence");
 
+	if (para->getBool("Run Skel WLOP"))
+	{
+		use_elliptical_neighbor = use_nearest_neighbor = use_tangent = L2 = use_confidence = false;
+	}
 
 	cout << "dual" << endl;
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
@@ -502,6 +506,11 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   bool use_tangent = para->getBool("Use Tangent Vector");
+
+	if (para->getBool("Run Skel WLOP"))
+	{
+		use_tangent = false;
+	}
 
 	cout << endl<< endl<< "Sample Neighbor Size:" << samples->vert[0].neighbors.size() << endl<< endl;
 	for(int i = 0; i < samples->vert.size(); i++)

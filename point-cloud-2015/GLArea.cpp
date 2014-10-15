@@ -381,7 +381,7 @@ void GLArea::lightOnOff(bool _val)
 void GLArea::initAfterOpenFile()
 {
 	//dataMgr.downSamplesByNum();
-	//dataMgr.recomputeQuad();
+	dataMgr.recomputeQuad();
 	//initView();
   dataMgr.getInitRadiuse();
 	initSetting();
@@ -1007,6 +1007,15 @@ void GLArea::runWlop()
 		{
 			saveSnapshot();
 		}
+
+		int sleep_time = 100;
+		QTime dieTime = QTime::currentTime().addMSecs(sleep_time);
+		while (QTime::currentTime() < dieTime)
+			QCoreApplication::processEvents(QEventLoop::AllEvents, sleep_time);
+
+		updateUI();
+		update();
+		updateGL();
     emit needUpdateStatus();
 	}
   
@@ -1027,7 +1036,7 @@ void GLArea::runWlop()
 	//}
 
 	global_paraMgr.wLop.setValue("Run Anisotropic LOP", BoolValue(false));
-
+	global_paraMgr.wLop.setValue("Run Skel WLOP", BoolValue(false));
 	
 }
 

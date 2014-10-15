@@ -58,6 +58,8 @@ class WlopParaDlg : public QFrame
     void applyStepForward();
     void applyDualConnection();
 
+		void copySamplesToDualSamples();
+
     void applySkelWlop();
     void applyDragWlop();
     void applyRegularizeSamples();

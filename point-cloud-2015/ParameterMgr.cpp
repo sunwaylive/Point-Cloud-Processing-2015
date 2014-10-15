@@ -69,8 +69,8 @@ void ParameterMgr::initGlareaParameter()
 	
 	glarea.addParam(new RichBool("Show Samples", true) );
 	glarea.addParam(new RichBool("Show Samples Quad", false) );
-	glarea.addParam(new RichBool("Show Samples Dot", false) );
-	glarea.addParam(new RichBool("Show Samples Circle", true) );
+	glarea.addParam(new RichBool("Show Samples Dot", true) );
+	glarea.addParam(new RichBool("Show Samples Circle", false) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
   glarea.addParam(new RichBool("Show Dual Samples", false) );
@@ -136,7 +136,7 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Show Individual Color", false));
 	drawer.addParam(new RichBool("Use Color From Normal", false));
   drawer.addParam(new RichBool("Use Differ Branch Color", false));
-	drawer.addParam(new RichBool("Show Confidence Color", true));
+	drawer.addParam(new RichBool("Show Confidence Color", false));
 
   drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
 
@@ -206,14 +206,14 @@ void ParameterMgr::initWLopParameter()
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
-	wLop.addParam(new RichBool("Need Similarity", true));
+	wLop.addParam(new RichBool("Need Similarity", false));
 
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
-  wLop.addParam(new RichBool("Use Tangent Vector", true));
-	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
+  wLop.addParam(new RichBool("Use Tangent Vector", false));
+	wLop.addParam(new RichBool("Use Original Averaging KNN", false));
 
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
