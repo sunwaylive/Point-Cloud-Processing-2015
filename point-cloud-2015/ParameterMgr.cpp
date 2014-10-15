@@ -296,7 +296,7 @@ void ParameterMgr::initSkeletonParameter()
 
 	//step3
 	skeleton.addParam(new RichDouble("Clean Near Branches Dist", 0.05));
-	skeleton.addParam(new RichDouble("Fix Original Weight", 0.91));
+	skeleton.addParam(new RichDouble("Fix Original Weight", 0.81));
 	skeleton.addParam(new RichDouble("Curve Segment Length", 0.051));
 	skeleton.addParam(new RichInt("Fix Original Mode", 4)); // 1 for noisy , 4 for clean
 

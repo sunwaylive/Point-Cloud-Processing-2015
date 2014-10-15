@@ -1033,15 +1033,15 @@ void DataMgr::switchSampleDualSample()
    for (int i = 0; i < samples.vert.size(); i++)
    {
      CVertex& v = samples.vert[i];
-     v.is_dual_sample = false;
-     v.is_fixed_sample = false;
+      v.is_dual_sample = false;
+//      v.is_fixed_sample = false;
    }
 
    for (int i = 0; i < dual_samples.vert.size(); i++)
    {
      CVertex& v = dual_samples.vert[i];
-     v.is_dual_sample = true;
-     v.is_fixed_sample = false;
+      v.is_dual_sample = true;
+//      v.is_fixed_sample = false;
 
    }
 

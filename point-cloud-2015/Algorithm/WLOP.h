@@ -41,7 +41,7 @@ public:
 
 	void runComputeDistribution();
 
-	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir);
+	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir, double dist_weight);
 	double getSphereSlotsConfidence(SphereSlots& sphere_slots);
 	
 

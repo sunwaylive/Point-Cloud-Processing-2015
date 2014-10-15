@@ -240,6 +240,7 @@
    <addaction name="separator"/>
    <addaction name="actionShow_Sample_Circle"/>
    <addaction name="actionShow_Sample_Dot"/>
+   <addaction name="actionSwitch_Sample_DualSample"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
