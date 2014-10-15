@@ -67,7 +67,8 @@ public:
 	void setRGBNormals(vector<Point3f>& normals){RGB_normals = normals; }
 
   void drawDualSampleRelations(CMesh* samples, CMesh* dual_samples);
-private:
+
+public:
 	GLColor getColorByType(const CVertex& v);
 	void draw(DrawType type);
 	bool isCanSee(const Point3f& pos,  const Point3f& normal);

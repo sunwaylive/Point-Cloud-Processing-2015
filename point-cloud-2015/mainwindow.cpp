@@ -61,6 +61,7 @@ void MainWindow::initWidgets()
   ui.actionShow_colorful_branches->setChecked(paras->drawer.getBool("Use Differ Branch Color"));
   ui.actionShow_Picked_Neighbor->setChecked(paras->drawer.getBool("Draw Picked Point Neighbor"));
 	ui.actionShow_Cloest_Dual->setChecked(paras->glarea.getBool("Show Cloest Dual Connection"));
+	ui.actionShow_Target->setChecked(paras->glarea.getBool("Show Target Samples"));
 
 }
 
@@ -141,6 +142,7 @@ void MainWindow::initConnect()
 
 	connect(ui.actionShow_Confidence_Color, SIGNAL(toggled(bool)), this, SLOT(pickDualPoints(bool)));
 	connect(ui.actionShow_Cloest_Dual, SIGNAL(toggled(bool)), this, SLOT(showClosestDualConnection(bool)));
+	connect(ui.actionShow_Target, SIGNAL(toggled(bool)), this, SLOT(showTargets(bool)));
 
 
 	QTimer *timer = new QTimer(this);
@@ -511,7 +513,15 @@ void MainWindow::saveSkel()
 	QString file = QFileDialog::getSaveFileName(this, "Save samples as", "", "*.skel");
 	if(!file.size()) return;
 
-	area->dataMgr.saveSkeletonAsSkel(file);
+	if (global_paraMgr.glarea.getBool("Show Skeleton"))
+	{
+		area->dataMgr.saveTargetSkeletonAsSkel(file);
+	}
+	else
+	{
+		area->dataMgr.saveSkeletonAsSkel(file);
+	}
+
 	file.replace(".skel", ".View");
 	area->saveView(file);
 
@@ -547,6 +557,15 @@ void MainWindow::showColorfulBranches(bool _val)
   }
   paras->drawer.setValue("Use Differ Branch Color", BoolValue(_val));
   area->updateGL();
+}
+
+
+void MainWindow::showTargets(bool _val)
+{
+	paras->drawer.setValue("Show Target Samples", BoolValue(_val));
+	paras->drawer.setValue("Show Target Dual Samples", BoolValue(_val));
+
+	area->updateGL();
 }
 
 

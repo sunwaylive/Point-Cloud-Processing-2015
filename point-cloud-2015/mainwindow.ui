@@ -199,6 +199,7 @@
     <addaction name="actionShow_Connection"/>
     <addaction name="actionShow_Confidence_Color"/>
     <addaction name="actionShow_Cloest_Dual"/>
+    <addaction name="actionShow_Target"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -802,6 +803,14 @@
    </property>
    <property name="text">
     <string>Show Cloest Dual</string>
+   </property>
+  </action>
+  <action name="actionShow_Target">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Target</string>
    </property>
   </action>
  </widget>

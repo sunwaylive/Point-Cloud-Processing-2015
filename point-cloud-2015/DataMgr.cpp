@@ -490,7 +490,9 @@ Box3f DataMgr::normalizeAllMesh()
 		}
 		original.bbox =box;
 	}
+
 	samples.bbox = box;
+	dual_samples.bbox = box;
 
 	normalizeROSA_Mesh(samples);
   normalizeROSA_Mesh(dual_samples);
@@ -555,6 +557,165 @@ void DataMgr::recomputeQuad()
   }
 }
 
+
+void DataMgr::saveTargetSkeletonAsSkel(QString fileName)
+{
+	ofstream outfile;
+	outfile.open(fileName.toStdString().c_str());
+
+	ostringstream strStream;
+
+	strStream << "ON " << original.vert.size() << endl;
+	for (int i = 0; i < original.vert.size(); i++)
+	{
+		CVertex& v = original.vert[i];
+		strStream << v.P()[0] << "	" << v.P()[1] << "	" << v.P()[2] << "	";
+		strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
+	}
+	strStream << endl;
+
+	strStream << "SN " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		CVertex& v = target_samples.vert[i];
+		strStream << v.P()[0] << "	" << v.P()[1] << "	" << v.P()[2] << "	";
+		strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
+	}
+	strStream << endl;
+
+	strStream << "CN " << skeleton.branches.size() << endl;
+	for (int i = 0; i < skeleton.branches.size(); i++)
+	{
+		Branch& branch = skeleton.branches[i];
+		strStream << "CNN " << branch.curve.size() << endl;
+		for (int j = 0; j < branch.curve.size(); j++)
+		{
+			strStream << branch.curve[j][0] << "	" << branch.curve[j][1] << "	" << branch.curve[j][2] << "	" << endl;
+		}
+	}
+	strStream << endl;
+
+	strStream << "EN " << 0 << endl;
+	strStream << endl;
+
+
+	strStream << "BN " << 0 << endl;
+	strStream << endl;
+
+
+	strStream << "S_onedge " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		CVertex& v = target_samples.vert[i];
+		strStream << v.is_fixed_sample << "	";
+	}
+	strStream << endl;
+
+	strStream << "GroupID " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		int id = target_samples.vert[i].m_index;//group_id no use now
+		strStream << id << "	";
+	}
+	strStream << endl;
+
+	//strStream << "SkelRadius " << 0 << endl;
+	//strStream << endl;
+
+	strStream << "SkelRadius " << skeleton.size << endl;
+	for (int i = 0; i < skeleton.branches.size(); i++)
+	{
+		for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+		{
+			double skel_radius = skeleton.branches[i].curve[j].skel_radius;
+			strStream << skel_radius << "	";
+		}
+	}
+	strStream << endl;
+
+	strStream << "Confidence_Sigma	" << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		double sigma = target_samples.vert[i].eigen_confidence;
+		strStream << sigma << "	";
+	}
+	strStream << endl;
+
+	strStream << "SkelRadius2 " << 0 << endl;
+	strStream << endl;
+
+	strStream << "Alpha " << 0 << endl;
+	strStream << endl;
+
+	strStream << "Sample_isVirtual " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		CVertex& v = target_samples.vert[i];
+		strStream << v.is_skel_virtual << "	";
+	}
+	strStream << endl;
+
+	strStream << "Sample_isBranch " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		CVertex& v = target_samples.vert[i];
+		strStream << v.is_skel_branch << "	";
+	}
+	strStream << endl;
+
+	strStream << "Sample_radius " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		CVertex& v = target_samples.vert[i];
+		strStream << 0 << "	";
+	}
+	strStream << endl;
+
+	strStream << "Skel_isVirtual " << skeleton.size << endl;
+	for (int i = 0; i < skeleton.branches.size(); i++)
+	{
+		for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+		{
+			bool is_virtual = skeleton.branches[i].curve[j].is_skel_virtual;
+			strStream << is_virtual << "	";
+		}
+	}
+	strStream << endl;
+
+
+	strStream << "Corresponding_sample_index " << skeleton.size << endl;
+	for (int i = 0; i < skeleton.branches.size(); i++)
+	{
+		for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+		{
+			int index = skeleton.branches[i].curve[j].m_index;
+			strStream << index << "	";
+		}
+	}
+	strStream << endl;
+
+	strStream << "DSN " << target_dual_samples.vert.size() << endl;
+	for (int i = 0; i < target_dual_samples.vert.size(); i++)
+	{
+		CVertex& v = target_dual_samples.vert[i];
+		strStream << v.P()[0] << "	" << v.P()[1] << "	" << v.P()[2] << "	";
+		strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
+	}
+	strStream << endl;
+
+	strStream << "dual_corresponding_index " << target_samples.vert.size() << endl;
+	for (int i = 0; i < target_dual_samples.vert.size(); i++)
+	{
+		CVertex& v = target_dual_samples.vert[i];
+		strStream << target_dual_samples.vert[i].dual_index << endl;
+	}
+	strStream << endl;
+
+
+	outfile.write(strStream.str().c_str(), strStream.str().size());
+	outfile.close();
+
+}
 
 void DataMgr::saveSkeletonAsSkel(QString fileName)
 {
@@ -1428,7 +1589,7 @@ void DataMgr::loadDefaultSphere()
 		Point3f direction = (v.P() - center).Normalize();
 
 		SphereSlot slot(direction, 0.0);
-		default_sphere.push_back(slot);
+		default_sphere.addSlot(slot);
 	}
 
 	cout << "default slot size: " << default_sphere.size() << endl;

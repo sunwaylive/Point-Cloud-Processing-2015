@@ -128,6 +128,7 @@ void WlopParaDlg::initConnects()
 	connect(ui->inner_clustering, SIGNAL(clicked()), this, SLOT(applyComputeInnerClustering()));
 
 	connect(ui->show_pick_distribution, SIGNAL(clicked()), this, SLOT(applyShowPickDistribution()));
+	connect(ui->compute_correspondence, SIGNAL(clicked()), this, SLOT(applyComputeCorrespondence()));
 
 }
 
@@ -507,9 +508,21 @@ void WlopParaDlg::applyStepForward()
 
 void WlopParaDlg::applyDragWlop()
 {
-  m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(true));
-  area->runWlop();
-  m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(false));
+	Point3f shift_direction = Point3f(0.0, 0.0, 1.0);
+	double step_size = 0.1;
+
+	CMesh* target_samples = area->dataMgr.getCurrentTargetSamples();
+	CMesh* target_dual_samples = area->dataMgr.getCurrentTargetDualSamples();
+
+	for (int i = 0; i < target_samples->vert.size(); i++)
+	{
+		target_samples->vert[i].P() += shift_direction * step_size;
+		target_dual_samples->vert[i].P() += shift_direction * step_size;
+	}
+
+//   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(true));
+//   area->runWlop();
+//   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(false));
 }
 
 void WlopParaDlg::applyRegularizeSamples()
@@ -569,6 +582,14 @@ void WlopParaDlg::applyComputeInnerClustering()
 	area->runWlop();
 	m_paras->wLop.setValue("Run Inner Clustering", BoolValue(false));
 }
+
+void WlopParaDlg::applyComputeCorrespondence()
+{
+	m_paras->wLop.setValue("Run Compute Correspondence", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Compute Correspondence", BoolValue(false));
+}
+
 
 void WlopParaDlg::applyShowPickDistribution()
 {

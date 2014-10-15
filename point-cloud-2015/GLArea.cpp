@@ -281,8 +281,11 @@ void GLArea::paintGL()
 
   lightOnOff(para->getBool("Light On or Off"));
 
-   if(para->getBool("Show Dual Connection"))
-       glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
+	if (para->getBool("Show Dual Connection"))
+	{
+		glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
+		glDrawer.drawDualSampleRelations(dataMgr.getCurrentTargetSamples(), dataMgr.getCurrentTargetDualSamples());
+	}
 
 
 	if (para->getBool("Show Normal")) 
@@ -317,6 +320,10 @@ void GLArea::paintGL()
  		}		
  	}
 
+	if ("Show Correspondences")
+	{
+		drawCorrespondences();
+	}
 	if (para->getBool("Show Skeleton"))
 	{
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
@@ -327,7 +334,7 @@ void GLArea::paintGL()
 		Box3f box = dataMgr.getCurrentSamples()->bbox;
 		glBoxWire(box);
 
-		CoordinateFrame(dataMgr.box.Diag() / 2.0).Render(this, NULL);
+		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
 	}
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
@@ -419,7 +426,7 @@ void GLArea::lightOnOff(bool _val)
 void GLArea::initAfterOpenFile()
 {
 	//dataMgr.downSamplesByNum();
-	dataMgr.recomputeQuad();
+	//dataMgr.recomputeQuad();
 	//initView();
   dataMgr.getInitRadiuse();
 	initSetting();
@@ -1411,6 +1418,10 @@ void GLArea::wheelEvent(QWheelEvent *e)
 	const int WHEEL_STEP = 120;
 	double change_rate = 0.1;
 	double change = (e->delta() < 0) ? (1 + change_rate) : (1 - change_rate);
+
+	double change_rate2 = 0.05;
+	double change2 = (e->delta() < 0) ? (1 + change_rate2) : (1 - change_rate2);
+
 	double size_temp = 0.0;
 
 	
@@ -1463,13 +1474,29 @@ void GLArea::wheelEvent(QWheelEvent *e)
 	}
 	else if((e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::AltModifier))
 	{
-		size_temp = global_paraMgr.glarea.getDouble("Radius Ball Transparency") * change;
-		global_paraMgr.glarea.setValue("Radius Ball Transparency", DoubleValue(size_temp));
-		cout << "trans: " << size_temp << endl;
-		if(size_temp < 0)
+		if (para->getBool("Show Skeleton"))
 		{
-			size_temp = 0;
+			size_temp = global_paraMgr.glarea.getDouble("Radius Ball Transparency") * change;
+			global_paraMgr.glarea.setValue("Radius Ball Transparency", DoubleValue(size_temp));
+			cout << "trans: " << size_temp << endl;
+			if (size_temp < 0)
+			{
+				size_temp = 0;
+			}
 		}
+
+		if ("Show Correspondences")
+		{
+			size_temp = global_paraMgr.glarea.getDouble("Show Confidence Percentage") * change2;
+			global_paraMgr.glarea.setValue("Show Confidence Percentage", DoubleValue(size_temp));
+			cout << "percentage: " << size_temp << endl;
+			if (size_temp < 0)
+			{
+				size_temp = 0;
+			}
+
+		}
+
 	}
 	else
 	{
@@ -2002,4 +2029,55 @@ void GLArea::readRGBNormal(QString fileName)
 	glDrawer.setRGBNormals(rgb_normal);
 
 	infile.clear();
+}
+
+void GLArea::drawCorrespondences()
+{
+	CMesh* samples = dataMgr.getCurrentSamples();
+	CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+	CMesh* target_samples = dataMgr.getCurrentTargetSamples();
+	CMesh* target_dual_samples = dataMgr.getCurrentTargetDualSamples();
+
+	double normal_width = global_paraMgr.drawer.getDouble("Normal Line Width");
+	double show_percentage = para->getDouble("Show Confidence Percentage");
+
+	if (para->getBool("Show Dual Samples"))
+	{
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			CVertex& dual_v = dual_samples->vert[i];
+
+			if (v.eigen_confidence < show_percentage)
+			{
+				continue;
+			}
+			int target_index = v.target_index;
+			if (target_index < 0)
+			{
+				continue;
+			}
+			CVertex& target_v = target_dual_samples->vert[target_index];
+			glDrawer.glDrawLine(dual_v.P(), target_v.P(), cBlue, normal_width);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			if (v.eigen_confidence < show_percentage)
+			{
+				continue;
+			}
+			int target_index = v.target_index;
+			if (target_index < 0)
+			{
+				continue;
+			}
+			CVertex& target_v = target_samples->vert[target_index];
+			glDrawer.glDrawLine(v.P(), target_v.P(), cYellow, normal_width);
+		}
+
+	}
 }

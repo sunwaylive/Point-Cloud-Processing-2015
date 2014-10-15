@@ -87,6 +87,9 @@ private slots:
 	void setSnapshotEachIteration(bool _val);
 	void setNoSnapshotWithRadius(bool _val);
   void showColorfulBranches(bool _val);
+
+	void showTargets(bool _val);
+
   
   void showPickPointNeighbor(bool _val);
   

@@ -32,14 +32,16 @@ public:
   void computeInitialSampleNeighbor();
 	void computeNearestNeighborDist();
 	
-
-
   void runSkelWlop();
   void runDragWlop();
   void runRegularizeSamples();
   void runRegularizeNormals();
 
 	void runComputeDistribution();
+
+	void runComputeCorrespondence();
+	vector<SphereSlots> computeDistributions(CMesh* samples, CMesh* dual_samples);
+
 
 	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir, double dist_weight);
 	double getSphereSlotsConfidence(SphereSlots& sphere_slots);
@@ -83,6 +85,8 @@ private:
 	CMesh* samples;
 	CMesh* original;
   CMesh* dual_samples;
+	CMesh* target_samples;
+	CMesh* target_dual_samples;
 
 	Box3f box;
 	int nTimeIterated;

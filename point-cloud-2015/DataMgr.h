@@ -63,6 +63,8 @@ public:
 	void loadTargetSkeletonFromSkel(QString fileName);
 
 	void saveSkeletonAsSkel(QString fileName);
+	void saveTargetSkeletonAsSkel(QString fileName);
+
 
   void replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual);
   void switchSampleDualSample();

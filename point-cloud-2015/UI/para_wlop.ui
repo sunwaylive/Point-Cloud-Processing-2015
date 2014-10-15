@@ -442,6 +442,19 @@
     <string>Show Pick Distribution</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="compute_correspondence">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>730</y>
+     <width>141</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Compute Correspondence</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -36,6 +36,8 @@ void WLOP::setInput(DataMgr* pData)
 		default_sphere = pData->default_sphere;
 		CMesh* _samples = pData->getCurrentSamples();
 		CMesh* _original = pData->getCurrentOriginal();
+		target_samples = pData->getCurrentTargetSamples();
+		target_dual_samples = pData->getCurrentTargetDualSamples();
 
     if (para->getBool("Run Skel WLOP"))
     {
@@ -225,6 +227,11 @@ void WLOP::run()
 	{
 		runShowPickDistribution();
 		return;
+	}
+
+	if (para->getBool("Run Compute Correspondence"))
+	{
+		runComputeCorrespondence();
 	}
 
 	//int nTimes = para->getDouble("Num Of Iterate Time");
@@ -2688,65 +2695,214 @@ void WLOP::runRegularizeNormals()
 
 void WLOP::runShowPickDistribution()
 {
-// 	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
-// 	if (pick_index < 0 || pick_index >= samples->vert.size())
-// 	{
-// 		return;
-// 	}
-// 	
-// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius") * 0.5, dual_samples->bbox);
-// 
-// 	SphereSlots pick_sphere = default_sphere;
-// 	CVertex& v = samples->vert[pick_index];
-// 	CVertex& dual_v = dual_samples->vert[pick_index];
-// 
-// 	Point3f base = dual_v.P();
-// 
-// 	vector<CVertex> new_dual_samples;
-// 	CVertex new_dual_vector = dual_v;
-// 	new_dual_vector.N() = v.P() - dual_v.P();
-// 	new_dual_samples.push_back(dual_v);
-// 
-// 	for (int i = 0; i < dual_v.neighbors[i]; i++)
-// 	{
-// 		int dual_neighbor_idx = dual_v.neighbors[i];
-// 		CVertex dual_t = dual_samples->vert[dual_neighbor_idx];
-// 		CVertex& dual_t_v = samples->vert[dual_neighbor_idx];
-// 
-// 		Point3f direction = (dual_t_v.P() - dual_t.P()).Normalize();
-// 		updateSphereSlots(pick_sphere, direction);
-// 
-// 		CVertex new_dual_vector = dual_t;
-// 		new_dual_vector.N() = v.P() - dual_t.P();
-// 		new_dual_samples.push_back(dual_t);
-// 	}
-// 
-// 	samples->vert.clear();
-// 	for (int i = 0; i < pick_sphere.size(); i++)
-// 	{
-// 		CVertex new_v;
-// 		new_v.P() = pick_sphere[i].slot_direction;
-// 		new_v.N() = pick_sphere[i].slot_direction;
-// 
-// 		//double confidence = pick_sphere[i].slot_value < 2.0 ? pick_sphere[i].slot_value : 1.0;
-// 		double confidence = pick_sphere[i].slot_value;
-// 		new_v.eigen_confidence = confidence;
-// 		samples->vert.push_back(new_v);
-// 	}
-// 	samples->vn = samples->vert.size();
-// 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
-// 
-// 
-// 	dual_samples->vert.clear();
-// 	for (int i = 0; i < new_dual_samples.size(); i++)
-// 	{
-// 		new_dual_samples[i].P() -= base;
-// 		dual_samples->vert.push_back(new_dual_samples[i]);
-// 	}
-// 	dual_samples->vn = dual_samples->vert.size();
+ //	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+ //	if (pick_index < 0 || pick_index >= samples->vert.size())
+ //	{
+ //		return;
+ //	}
+ //	
+ //	SphereSlots pick_sphere = default_sphere;
+ //	CVertex& v = samples->vert[pick_index];
+ //	CVertex& dual_v = dual_samples->vert[pick_index];
+	//Point3f dir = (v.P() - dual_v.P()).Normalize();
+	//pick_sphere.rearrangeSlots(dir);
+
+	//samples->vert.clear();
+	//for (int i = 0; i < pick_sphere.size(); i++)
+	//{
+	//	CVertex new_v;
+	//	new_v.P() = pick_sphere.getSlot(i)->slot_direction;
+	//	new_v.N() = pick_sphere.getSlot(i)->slot_direction;
+	//
+	//	//double confidence = pick_sphere[i].slot_value < 2.0 ? pick_sphere[i].slot_value : 1.0;
+	//	double confidence = pick_sphere.getSlot(i)->slot_value;
+	//	new_v.eigen_confidence = confidence;
+	//	samples->vert.push_back(new_v);
+	//}
+	//samples->vn = samples->vert.size();
+	//GlobalFun::normalizeConfidence(samples->vert, 0.0);
+
+
+
+ 	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+ 	if (pick_index < 0 || pick_index >= samples->vert.size())
+ 	{
+ 		return;
+ 	}
+ 	
+ 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius") * 0.5, dual_samples->bbox);
+ 
+	double radius = para->getDouble("CGrid Radius");
+	double radius2 = radius * radius;
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+
+ 	SphereSlots pick_sphere = default_sphere;
+ 	CVertex& v = samples->vert[pick_index];
+ 	CVertex& dual_v = dual_samples->vert[pick_index];
+
+	Point3f dir = (v.P() - dual_v.P()).Normalize();
+	pick_sphere.rearrangeSlots(dir);
+
+ 	Point3f base = dual_v.P();
+ 
+ 	vector<CVertex> new_dual_samples;
+ 	CVertex new_dual_vector = dual_v;
+ 	new_dual_vector.N() = v.P() - dual_v.P();
+ 	new_dual_samples.push_back(dual_v);
+ 
+ 	for (int i = 0; i < dual_v.neighbors[i]; i++)
+ 	{
+ 		int dual_neighbor_idx = dual_v.neighbors[i];
+ 		CVertex dual_t = dual_samples->vert[dual_neighbor_idx];
+ 		CVertex& dual_t_v = samples->vert[dual_neighbor_idx];
+ 
+ 		Point3f direction = (dual_t_v.P() - dual_t.P()).Normalize();
+
+		double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t_v.P());
+		double dist_diff = exp(dist2 * iradius16);
+
+ 		updateSphereSlots(pick_sphere, direction, dist_diff);
+ 
+ 		CVertex new_dual_vector = dual_t;
+ 		new_dual_vector.N() = v.P() - dual_t.P();
+ 		new_dual_samples.push_back(dual_t);
+ 	}
+ 
+ 	samples->vert.clear();
+ 	for (int i = 0; i < pick_sphere.size(); i++)
+ 	{
+ 		CVertex new_v;
+ 		new_v.P() = pick_sphere.getSlot(i)->slot_direction;
+		new_v.N() = pick_sphere.getSlot(i)->slot_direction;
+ 
+ 		//double confidence = pick_sphere[i].slot_value < 2.0 ? pick_sphere[i].slot_value : 1.0;
+		double confidence = pick_sphere.getSlot(i)->slot_value;
+ 		new_v.eigen_confidence = confidence;
+ 		samples->vert.push_back(new_v);
+ 	}
+ 	samples->vn = samples->vert.size();
+ 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
+ 
+ 
+ 	dual_samples->vert.clear();
+ 	for (int i = 0; i < new_dual_samples.size(); i++)
+ 	{
+ 		new_dual_samples[i].P() -= base;
+ 		dual_samples->vert.push_back(new_dual_samples[i]);
+ 	}
+ 	dual_samples->vn = dual_samples->vert.size();
 }
 
 
+
+void WLOP::runComputeCorrespondence()
+{
+	vector<SphereSlots> source_distributions = computeDistributions(samples, dual_samples);
+	vector<SphereSlots> target_distributions = computeDistributions(target_samples, target_dual_samples);
+
+	Timer time;
+	time.start("correspondence");
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+
+		SphereSlots& src_slots = source_distributions[i];
+		double min_dist = GlobalFun::getDoubleMAXIMUM();
+		int min_index = -1;
+		for (int j = 0; j < target_distributions.size(); j++)
+		{
+			SphereSlots& target_slots = target_distributions[j];
+			double dist = src_slots.computeDistance(target_slots);
+			//double dist = src_slots.computeL1Distance(target_slots);
+
+			if (dist < min_dist)
+			{
+				min_dist = dist;
+				min_index = j;
+			}
+		}
+
+		if (min_index >= 0)
+		{
+			v.target_index = min_index;
+			v.eigen_confidence = min_dist;
+		}
+	}
+	time.end();
+
+	GlobalFun::normalizeConfidence(samples->vert, 0);
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		v.eigen_confidence = 1 - v.eigen_confidence;
+	}
+}
+
+vector<SphereSlots> WLOP::computeDistributions(CMesh* samples, CMesh* dual_samples)
+{
+	cout << "runComputeDistribution" << endl;
+
+	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+	cout << "knn:	" << knn << endl;
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, knn, false, "void runComputeDistribution()");
+
+	if (use_closest_dual)
+	{
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	}
+	//return;
+
+	double radius = para->getDouble("CGrid Radius");
+	double radius2 = radius * radius;
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+
+	vector<SphereSlots> sphere_distributions(dual_samples->vert.size(), default_sphere);
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex dual_v = dual_samples->vert[i];
+		CVertex& v = samples->vert[i];
+
+		if (use_closest_dual)
+		{
+			int neighbor_idx = v.neighbors[0];
+			dual_v = dual_samples->vert[neighbor_idx];
+		}
+		//Point3f direction = (v.P() - dual_v.P()).Normalize();
+		Point3f direction = v.P() - dual_v.P();
+
+		SphereSlots& sphere_slots = sphere_distributions[i];
+		//sphere_slots.rearrangeSlots(direction.Normalize());
+		
+		updateSphereSlots(sphere_slots, direction, 1.0);
+
+		for (int j = 0; j < dual_v.neighbors.size(); j++)
+		{
+			int dual_neighbor_idx = dual_v.neighbors[j];
+			CVertex dual_t = dual_samples->vert[dual_neighbor_idx];
+			CVertex& dual_t_v = samples->vert[dual_neighbor_idx];
+
+			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t_v.P());
+			double dist_diff = exp(dist2 * iradius16);
+
+			if (use_closest_dual)
+			{
+				int neighbor_idx = dual_t_v.neighbors[0];
+				dual_t = dual_samples->vert[neighbor_idx];
+			}
+
+			Point3f direction = (dual_t_v.P() - dual_t.P()).Normalize();
+			updateSphereSlots(sphere_slots, direction, dist_diff);
+		}
+
+		//v.eigen_confidence = getSphereSlotsConfidence(sphere_slots);
+	}
+
+	//GlobalFun::normalizeConfidence(samples->vert, 0.0);
+
+	return sphere_distributions;
+}
 
 
 void WLOP::runComputeDistribution()
@@ -2843,11 +2999,12 @@ void WLOP::updateSphereSlots(SphereSlots& sphere_slots, Point3f dir, double dist
 
 	double length = sqrt(dir.SquaredNorm());
 	dir = dir.Normalize();
-	bool use_length_confidence = para->getBool("Use Confidence");
+	//bool use_length_confidence = para->getBool("Use Confidence");
+	bool use_length_confidence = true;
 
 	for (int i = 0; i < sphere_slots.size(); i++)
 	{
-		SphereSlot& sphere_slot = sphere_slots[i];
+		SphereSlot& sphere_slot = *sphere_slots.getSlot(i);
 		Point3f slot_direction = sphere_slot.slot_direction;
 
 		double direction_diff = exp(-pow(1 - slot_direction * dir, 2) / sigma_threshold);
@@ -2871,7 +3028,7 @@ double WLOP::getSphereSlotsConfidence(SphereSlots& sphere_slots)
 
 	for (int i = 0; i < sphere_slots.size(); i++)
 	{
-		SphereSlot& sphere_slot = sphere_slots[i];
+		SphereSlot& sphere_slot = *sphere_slots.getSlot(i);
 
 		double confidence = sphere_slot.slot_value < 2.0 ? sphere_slot.slot_value : 1.0;
 		

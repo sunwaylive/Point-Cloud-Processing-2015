@@ -164,9 +164,79 @@ public:
 		}
 		return *this;
 	}
+
+	bool SphereSlot::operator < (const SphereSlot& sphere_slot)
+	{
+		return slot_value < sphere_slot.slot_value;
+	}
 };
 
-typedef vector<SphereSlot> SphereSlots;
+// bool cmpare_slots(SphereSlot &a, SphereSlot &b)
+// {
+// 	return a.slot_value < b.slot_value;
+// }
+
+class SphereSlots
+{
+public:
+	SphereSlots(){}
+	~SphereSlots(){}
+	vector<SphereSlot> getSphereSlots(){ return sphere_slots; }
+	void clear(){ sphere_slots.clear(); }
+	void addSlot(SphereSlot& slot){ sphere_slots.push_back(slot); }
+	SphereSlot* getSlot(int i) { return &sphere_slots[i]; };
+	int size(){ return sphere_slots.size(); }
+
+
+
+	void rearrangeSlots(Point3f main_dir)
+	{
+		for (int i = 0; i < sphere_slots.size(); i++)
+		{
+			SphereSlot& slot = sphere_slots[i];
+			slot.slot_value = GlobalFun::computeEulerDistSquare(main_dir, slot.slot_direction);
+		}
+		//sort(sphere_slots.begin(), sphere_slots.end(), cmpare_slots);
+		sort(sphere_slots.begin(), sphere_slots.end());
+	}
+
+	double computeDistance(SphereSlots& another_slots)
+	{
+		double sum_dist = 0.0;
+		for (int i = 0; i < sphere_slots.size(); i++)
+		{
+			SphereSlot& this_slot = sphere_slots[i];
+			SphereSlot& other_slot = *another_slots.getSlot(i);
+
+			double dist = abs(this_slot.slot_value - other_slot.slot_value);
+			sum_dist += dist;
+		}
+		return sum_dist;
+	}
+
+	double computeL1Distance(SphereSlots& another_slots)
+	{
+		vector<double> dist_vec;
+		for (int i = 0; i < sphere_slots.size(); i++)
+		{
+			SphereSlot& this_slot = sphere_slots[i];
+			SphereSlot& other_slot = *another_slots.getSlot(i);
+
+			double dist = abs(this_slot.slot_value - other_slot.slot_value);
+			dist_vec.push_back(dist);
+		}
+		sort(dist_vec.begin(), dist_vec.end());
+		double mid_val = dist_vec[int(dist_vec.size() / 2)];
+		return mid_val;
+	}
+
+
+public:
+	vector<SphereSlot> sphere_slots;
+};
+
+
+//typedef vector<SphereSlot> SphereSlots;
 
 class NeighborDisk
 {

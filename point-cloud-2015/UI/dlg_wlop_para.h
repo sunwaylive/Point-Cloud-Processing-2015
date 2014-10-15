@@ -70,7 +70,7 @@ class WlopParaDlg : public QFrame
 		void applyComputeConfidence();
 		void applyComputeDistribution();
 		void applyComputeInnerClustering();
-
+		void applyComputeCorrespondence();
 		void applyShowPickDistribution();
 
 

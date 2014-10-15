@@ -48,6 +48,7 @@ public:
 	int m_index;
 
   int dual_index;
+	int target_index;
 
 	bool is_fixed_sample; //feature points (blue color) 
 	bool is_skel_ignore;
@@ -99,6 +100,7 @@ public:
 		nearest_neighbor_dist(0.0),
 		eigen_vector0(Point3f(1, 0, 0)),
 		eigen_vector1(Point3f(0, 1, 0)),
+		target_index(-1),
     skel_radius(-1.0)
 		{
 			N() = Point3f(0,0,0);

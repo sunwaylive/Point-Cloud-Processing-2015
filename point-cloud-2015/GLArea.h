@@ -78,6 +78,8 @@ public:
   void reorientPick();
   void cleanPick();
 
+	void drawCorrespondences();
+
 signals:
 	void needUpdateStatus();
 

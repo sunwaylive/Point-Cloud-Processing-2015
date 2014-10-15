@@ -89,8 +89,13 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Original Circle", false) );
 	glarea.addParam(new RichBool("Show Original Sphere", false) );
 
+
 	glarea.addParam(new RichBool("Show Target Samples", true));
-	glarea.addParam(new RichBool("Show Target Dual Samples", false));
+	glarea.addParam(new RichBool("Show Target Dual Samples", true));
+	glarea.addParam(new RichBool("Show Correspondences", false));
+
+
+
 	glarea.addParam(new RichBool("Show Bounding Box", false));
 
 	glarea.addParam(new RichBool("Show Skeleton", false));
@@ -126,6 +131,9 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
+
+	glarea.addParam(new RichDouble("Show Confidence Percentage", 0.8));
+
 
 }
 
@@ -206,6 +214,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Compute Distribution", false));
 	wLop.addParam(new RichBool("Run Inner Clustering", false));
 	wLop.addParam(new RichBool("Run Show Pick Distribution", false));
+	wLop.addParam(new RichBool("Run Compute Correspondence", false));
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
@@ -334,7 +343,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 30));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 30));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 15));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 
