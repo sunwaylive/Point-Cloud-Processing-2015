@@ -428,6 +428,7 @@
     <ClCompile Include="Algorithm\WLOP.cpp" />
     <ClCompile Include="calculationthread.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="coordinateframe.cpp" />
     <ClCompile Include="DataMgr.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_calculationthread.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

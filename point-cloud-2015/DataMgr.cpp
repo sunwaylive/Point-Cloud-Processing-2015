@@ -209,6 +209,42 @@ void DataMgr::loadImage(QString fileName)
 
 }
 
+CMesh*  DataMgr::getCurrentTargetSamples()
+{
+	if (&target_samples == NULL)
+	{
+		//cout << "DataMgr::getCurrentSamples samples = NULL!!" <<endl;
+		return NULL;
+	}
+
+	if (target_samples.vert.empty())
+	{
+		//cout << "DataMgr::getCurrentSamples samples.vert.empty()!!" <<endl;
+		//return NULL;
+		return &target_samples;
+	}
+
+	return &target_samples;
+}
+
+CMesh*  DataMgr::getCurrentTargetDualSamples()
+{
+	if (&target_dual_samples == NULL)
+	{
+		//cout << "DataMgr::getCurrentSamples samples = NULL!!" <<endl;
+		return NULL;
+	}
+
+	if (target_dual_samples.vert.empty())
+	{
+		//cout << "DataMgr::getCurrentSamples samples.vert.empty()!!" <<endl;
+		//return NULL;
+		return &target_dual_samples;
+	}
+
+	return &target_dual_samples;
+}
+
 CMesh* DataMgr::getCurrentSamples()
 {
   if(&samples == NULL)
@@ -495,6 +531,9 @@ void DataMgr::clearData()
 	clearCMesh(original);
 	clearCMesh(samples);
   clearCMesh(dual_samples);
+	clearCMesh(target_samples);
+	clearCMesh(target_dual_samples);
+
 	skeleton.clear();
 }
 
@@ -676,6 +715,331 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
 }
 
 
+void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
+{
+	clearCMesh(target_samples);
+	clearCMesh(original);
+	clearCMesh(target_dual_samples);
+
+	ifstream infile;
+	infile.open(fileName.toStdString().c_str());
+
+	stringstream sem;
+	sem << infile.rdbuf();
+
+	string str;
+	int num;
+	int num2;
+
+	sem >> str;
+	if (str == "ON")
+	{
+		sem >> num;
+		bool is_same_original = false;
+		if (num == original.vn)
+		{
+			is_same_original = true;
+		}
+		if (is_same_original)
+		{
+			double temp;
+			for (int i = 0; i < num * 6; i++)
+			{
+				sem >> temp;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < num; i++)
+			{
+				CVertex v;
+				v.bIsOriginal = true;
+				v.m_index = i;
+				sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+				sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+				original.vert.push_back(v);
+				original.bbox.Add(v.P());
+			}
+			original.vn = original.vert.size();
+		}
+	}
+
+	sem >> str;
+	if (str == "SN")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			CVertex v;
+			v.bIsOriginal = false;
+			v.m_index = i;
+			sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+			sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+			target_samples.vert.push_back(v);
+			target_samples.bbox.Add(v.P());
+		}
+		target_samples.vn = target_samples.vert.size();
+	}
+
+
+	sem >> str;
+	if (str == "CN")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			Branch branch;
+			sem >> str;
+			sem >> num2;
+			for (int j = 0; j < num2; j++)
+			{
+				Point3f p;
+				CVertex v;
+				sem >> p[0] >> p[1] >> p[2];
+				v.P() = p;
+				branch.curve.push_back(v);
+			}
+			skeleton.branches.push_back(branch);
+		}
+	}
+
+	sem >> str;
+	if (str == "EN")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			int a, b;
+			sem >> a >> b;
+		}
+	}
+
+	sem >> str;
+	if (str == "BN")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			sem >> str;
+			sem >> num2;
+
+			for (int j = 0; j < num2; j++)
+			{
+				int id;
+				sem >> id;
+
+			}
+		}
+
+		if (!sem.eof())
+		{
+			sem >> str;
+			if (str == "S_onedge")
+			{
+				sem >> num;
+				for (int i = 0; i < num; i++)
+				{
+					bool b;
+					sem >> b;
+					target_samples.vert[i].is_fixed_sample = b;
+				}
+			}
+		}
+
+		sem >> str;
+		if (str == "GroupID")
+		{
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				int id;
+				sem >> id;
+
+			}
+		}
+	}
+
+	sem >> str;
+	if (str == "SkelRadius")
+	{
+		sem >> num;
+
+		if (num > 1)
+		{
+			double radius;
+			for (int i = 0; i < skeleton.branches.size(); i++)
+			{
+				for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+				{
+					sem >> radius;
+					skeleton.branches[i].curve[j].skel_radius = radius;
+				}
+			}
+		}
+
+	}
+
+	sem >> str;
+	if (str == "Confidence_Sigma")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			double sigma;
+			sem >> sigma;
+			target_samples.vert[i].eigen_confidence = sigma;
+		}
+	}
+
+	sem >> str;
+	if (str == "SkelRadius2")
+	{
+		sem >> num;
+
+		if (num > 1)
+		{
+			double radius;
+			for (int i = 0; i < skeleton.branches.size(); i++)
+			{
+				for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+				{
+					sem >> radius;
+					//skeleton.branches[i].curve[j].skel_radius = radius;
+				}
+			}
+		}
+
+	}
+
+	sem >> str;
+	if (str == "Alpha")
+	{
+		sem >> num;
+		double Alpha;
+		if (num > 1)
+		{
+			for (int i = 0; i < skeleton.branches.size(); i++)
+			{
+				for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+				{
+					sem >> Alpha;
+					//skeleton.curves[i][j].alpha = Alpha;
+				}
+			}
+		}
+
+	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "Sample_isVirtual")
+		{
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				bool b;
+				sem >> b;
+				target_samples.vert[i].is_skel_virtual = b;
+			}
+		}
+	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "Sample_isBranch")
+		{
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				bool b;
+				sem >> b;
+				target_samples.vert[i].is_skel_branch = b;
+			}
+		}
+	}
+
+	sem >> str;
+	if (str == "Sample_radius")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			double temp;
+			sem >> temp;
+			//target_samples.vert[i].saved_radius = temp;
+		}
+	}
+
+	sem >> str;
+	if (str == "Skel_isVirtual")
+	{
+		sem >> num;
+		bool temp;
+		for (int i = 0; i < skeleton.branches.size(); i++)
+		{
+			for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+			{
+				sem >> temp;
+				skeleton.branches[i].curve[j].is_skel_virtual = temp;
+			}
+		}
+	}
+
+	sem >> str;
+	if (str == "Corresponding_sample_index")
+	{
+		sem >> num;
+		int temp;
+		for (int i = 0; i < skeleton.branches.size(); i++)
+		{
+			for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+			{
+				sem >> temp;
+				skeleton.branches[i].curve[j].m_index = temp;
+			}
+		}
+	}
+
+	sem >> str;
+	if (str == "DSN")
+	{
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			CVertex v;
+			v.bIsOriginal = false;
+			v.is_dual_sample = true;
+			v.m_index = i;
+			sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+			sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+			target_dual_samples.vert.push_back(v);
+			target_dual_samples.bbox.Add(v.P());
+		}
+		target_dual_samples.vn = target_dual_samples.vert.size();
+	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "dual_corresponding_index")
+		{
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				int index;
+				sem >> index;
+				target_dual_samples.vert[i].dual_index = index;
+			}
+		}
+	}
+
+	for (int i = 0; i < target_samples.vert.size(); i++)
+	{
+		target_samples.vert[i].N().Normalize();
+	}
+}
 
 
 void DataMgr::loadSkeletonFromSkel(QString fileName)

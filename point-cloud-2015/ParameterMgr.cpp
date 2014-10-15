@@ -89,6 +89,10 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Original Circle", false) );
 	glarea.addParam(new RichBool("Show Original Sphere", false) );
 
+	glarea.addParam(new RichBool("Show Target Samples", true));
+	glarea.addParam(new RichBool("Show Target Dual Samples", false));
+	glarea.addParam(new RichBool("Show Bounding Box", false));
+
 	glarea.addParam(new RichBool("Show Skeleton", false));
 
 	glarea.addParam(new RichBool("Show Radius", true));

@@ -46,6 +46,7 @@ public:
 
 	bool bIsOriginal;
 	int m_index;
+
   int dual_index;
 
 	bool is_fixed_sample; //feature points (blue color) 

@@ -40,6 +40,9 @@ public:
 
 	CMesh* getCurrentSamples();
   CMesh* getCurrentDualSamples();
+	CMesh* getCurrentTargetSamples();
+	CMesh* getCurrentTargetDualSamples();
+
 	CMesh* getCurrentOriginal();
 	Skeleton* getCurrentSkeleton();
 
@@ -57,6 +60,8 @@ public:
 	void recomputeQuad();
 
 	void loadSkeletonFromSkel(QString fileName);
+	void loadTargetSkeletonFromSkel(QString fileName);
+
 	void saveSkeletonAsSkel(QString fileName);
 
   void replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual);
@@ -71,6 +76,9 @@ public:
 	CMesh original;
 	CMesh samples;
   CMesh dual_samples;
+
+	CMesh target_samples;
+	CMesh target_dual_samples;
 
 	Skeleton skeleton;
 	//cv::Mat image;

@@ -29,7 +29,7 @@
 #include "Algorithm/WLOP.h"
 #include "Algorithm/Skeletonization.h"
 #include "Algorithm/Upsampler.h"
-
+#include "wrap/gui/coordinateframe.h"
 
 using std::cout;
 using std::endl;

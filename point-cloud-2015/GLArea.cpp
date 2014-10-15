@@ -249,6 +249,36 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
   }
 
+	if (para->getBool("Show Target Samples"))
+	{
+		if (para->getBool("Show Samples Quad"))
+			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentTargetSamples());
+		if (para->getBool("Show Samples Dot"))
+		{
+			lightOnOff(false);
+			glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentTargetSamples());
+		}
+		if (para->getBool("Show Samples Circle"))
+			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentTargetSamples());
+		if (para->getBool("Show Samples Sphere"))
+			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentTargetSamples());
+	}
+
+	if (para->getBool("Show Target Dual Samples"))
+	{
+		if (para->getBool("Show Dual Samples Quad"))
+			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentTargetDualSamples());
+		if (para->getBool("Show Dual Samples Dot"))
+		{
+			lightOnOff(false);
+			glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentTargetDualSamples());
+		}
+		if (para->getBool("Show Dual Samples Circle"))
+			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentTargetDualSamples());
+		if (para->getBool("Show Dual Samples Sphere"))
+			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentTargetDualSamples());
+	}
+
   lightOnOff(para->getBool("Light On or Off"));
 
    if(para->getBool("Show Dual Connection"))
@@ -290,6 +320,14 @@ void GLArea::paintGL()
 	if (para->getBool("Show Skeleton"))
 	{
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
+	}
+
+	if (para->getBool("Show Radius") || para->getBool("Show Bounding Box"))
+	{
+		Box3f box = dataMgr.getCurrentSamples()->bbox;
+		glBoxWire(box);
+
+		CoordinateFrame(dataMgr.box.Diag() / 2.0).Render(this, NULL);
 	}
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
@@ -459,7 +497,14 @@ void GLArea::openByDrop(QString fileName)
 	}
 	if (fileName.endsWith("skel"))
 	{
-		dataMgr.loadSkeletonFromSkel(fileName);
+		if (fileName.contains("target"))
+		{
+			dataMgr.loadTargetSkeletonFromSkel(fileName);
+		}
+		else
+		{
+			dataMgr.loadSkeletonFromSkel(fileName);
+		}
 	}
 	else if(fileName.endsWith("RGBN"))
 	{
