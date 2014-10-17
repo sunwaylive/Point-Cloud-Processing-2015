@@ -509,6 +509,8 @@ void WlopParaDlg::applyStepForward()
 void WlopParaDlg::applyDragWlop()
 {
 	Point3f shift_direction = Point3f(0.0, 0.0, 1.0);
+	//Point3f shift_direction = Point3f(0.0, 1.0, 0.0);
+
 	double step_size = 0.1;
 
 	CMesh* target_samples = area->dataMgr.getCurrentTargetSamples();
