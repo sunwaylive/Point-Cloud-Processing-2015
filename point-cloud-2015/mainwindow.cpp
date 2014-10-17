@@ -144,6 +144,7 @@ void MainWindow::initConnect()
 	connect(ui.actionShow_Cloest_Dual, SIGNAL(toggled(bool)), this, SLOT(showClosestDualConnection(bool)));
 	connect(ui.actionShow_Target, SIGNAL(toggled(bool)), this, SLOT(showTargets(bool)));
 
+	connect(ui.actionSpray_Erase, SIGNAL(triggered()), this, SLOT(sprayErasePick()));
 
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this->area, SLOT(update()));
@@ -921,6 +922,12 @@ void MainWindow::cleanPick()
 void MainWindow::showConfidenceColor(bool _val)
 {
 	global_paraMgr.drawer.setValue("Show Confidence Color", BoolValue(_val));
+	area->updateGL();
+}
+
+void MainWindow::sprayErasePick()
+{
+	area->sprayErasePick();
 	area->updateGL();
 }
 

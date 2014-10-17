@@ -164,6 +164,7 @@
      <addaction name="actionPick_Dual"/>
      <addaction name="actionReorient_Pick"/>
      <addaction name="actionClean_Pick"/>
+     <addaction name="actionSpray_Erase"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -268,6 +269,7 @@
    <addaction name="actionShow_Normals"/>
    <addaction name="actionCull_Points"/>
    <addaction name="separator"/>
+   <addaction name="actionSpray_Erase"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -811,6 +813,17 @@
    </property>
    <property name="text">
     <string>Show Target</string>
+   </property>
+  </action>
+  <action name="actionSpray_Erase">
+   <property name="text">
+    <string>Spray Erase Pick</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+E</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
  </widget>

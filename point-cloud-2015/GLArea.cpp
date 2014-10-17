@@ -347,7 +347,7 @@ void GLArea::paintGL()
     else
     {
       glDrawer.drawPickPoint(dataMgr.getCurrentSamples(), pickList, para->getBool("Show Samples Dot"));
-      glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
+      //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, para->getBool("Show Samples Dot"));
     }
 
 
@@ -358,7 +358,7 @@ void GLArea::paintGL()
      if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
      {
        //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        //glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
      }
 
@@ -861,6 +861,8 @@ int GLArea::pickPoint(int x, int y, vector<int> &result, int width, int height, 
 		}
 	}
 
+	pickList.pop_back();
+
 	return result.size();
 }
 
@@ -1045,6 +1047,8 @@ void GLArea::runWlop()
 
   global_paraMgr.glarea.setValue("GLarea Busying", BoolValue(true));
 
+	cout << "wloppppppppppppppppppppppppppppp 1" << endl;
+
   bool is_break = false;
 	for (int i = 0; i < global_paraMgr.wLop.getDouble("Num Of Iterate Time"); i++)
 	{
@@ -1071,6 +1075,8 @@ void GLArea::runWlop()
     emit needUpdateStatus();
 	}
   
+	cout << "wloppppppppppppppppppppppppppppp 2" << endl;
+
   if (is_break)
   {
     global_paraMgr.skeleton.setValue("The Skeletonlization Process Should Stop", BoolValue(false));
@@ -1090,6 +1096,8 @@ void GLArea::runWlop()
 	global_paraMgr.wLop.setValue("Run Anisotropic LOP", BoolValue(false));
 	global_paraMgr.wLop.setValue("Run Skel WLOP", BoolValue(false));
 	
+	cout << "wloppppppppppppppppppppppppppppp 3" << endl;
+
 }
 
 void GLArea::runSkeletonization_linear()
@@ -1863,6 +1871,104 @@ void GLArea::removePickPoint()
 
 	cleanPickPoints();
 }
+
+void GLArea::sprayErasePick()
+{
+	cout << "spray erase" << endl;
+
+	vector<CVertex> pick_union;
+	CMesh* samples = dataMgr.getCurrentSamples();
+
+	CMesh::VertexIterator vi;
+	int j = 0;
+	for (vi = samples->vert.begin(); vi != samples->vert.end(); ++vi, ++j)
+	{
+		vi->m_index = j;
+		vi->neighbors.clear();
+	}
+
+	Point3f union_center(0., 0., 0.);
+	int picked_size = 0;
+	for (int i = 0; i < pickList.size(); i++)
+	{
+		if (pickList[i] < 0 || pickList[i] >= samples->vert.size())
+			continue;
+
+		CVertex &v = samples->vert[pickList[i]];
+		
+		pick_union.push_back(v);
+		union_center += v.P();
+		picked_size++;
+	}
+	union_center /= picked_size;
+	cout << "picked size: " << picked_size;
+
+	double max_dist2 = 0;
+	for (int i = 0; i < picked_size; i++)
+	{
+		CVertex& v = pick_union[i];
+		double dist2 = GlobalFun::computeEulerDistSquare(v.P(), union_center);
+		if (dist2 > max_dist2)
+		{
+			max_dist2 = dist2;
+		}
+	}
+	double threshold_dist2 = max_dist2 * 0.8 * 0.8;
+
+	double iradius16 = -128 / max_dist2;
+	for (int i = 0; i < picked_size; i++)
+	{
+		CVertex& v = pick_union[i];
+		double dist2 = GlobalFun::computeEulerDistSquare(v.P(), union_center);
+		if (dist2 > threshold_dist2)
+		{
+			continue;
+		}
+		double probability = 1-exp(dist2 * iradius16);
+
+		double r = (rand() % 1000) * 0.001;
+		if (r > probability)
+		{
+			v.is_skel_ignore = true;
+		}
+	}
+
+	for (int i = 0; i < picked_size; i++)
+	{
+		CVertex& v = pick_union[i];
+		if (v.is_skel_ignore)
+		{
+			samples->vert[v.m_index].is_skel_ignore = true;
+		}
+	}
+
+
+	vector<CVertex> save_sample_vert;
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		if (!v.is_skel_ignore)
+		{
+			save_sample_vert.push_back(v);
+		}
+	}
+
+	samples->vert.clear();
+	for (int i = 0; i < save_sample_vert.size(); i++)
+	{
+		samples->vert.push_back(save_sample_vert[i]);
+	}
+	samples->vn = samples->vert.size();
+
+	j = 0;
+	for (vi = samples->vert.begin(); vi != samples->vert.end(); ++vi, ++j)
+	{
+		vi->m_index = j;
+	}
+	cleanPickPoints();
+
+}
+
 
 void GLArea::addPointByPick()
 {

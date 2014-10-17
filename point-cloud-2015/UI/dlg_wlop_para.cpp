@@ -323,21 +323,21 @@ void WlopParaDlg::useAdaptiveMu(bool _val)
 // apply
 void WlopParaDlg::applyWlop()
 {
-	//Timer timer;
-	//timer.start("WWWWLLLLLOOOOOPPPP Time");
-	//area->runWlop();
-	//timer.end();
+	Timer timer;
+	timer.start("WWWWLLLLLOOOOOPPPP Time");
+	area->runWlop();
+	timer.end();
 
-  if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
-  {
-    area->runWlop();
-  }
-  else
-  {
-    global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
-    calculation_thread.setArea(area);
-    calculation_thread.start();
-  }
+  //if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
+  //{
+  //  area->runWlop();
+  //}
+  //else
+  //{
+  //  global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
+  //  calculation_thread.setArea(area);
+  //  calculation_thread.start();
+  //}
 
 }
 

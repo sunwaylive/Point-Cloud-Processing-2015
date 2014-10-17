@@ -444,13 +444,42 @@ void DataMgr::savePly(QString fileName, CMesh& mesh)
 		tri::io::ExporterPLY<CMesh>::Save(mesh, fileName.toStdString().data(), mask, false);
 }
 
+//void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
+//{
+//	if (mesh.vert.empty())
+//	{
+//		return;
+//	}
+//	Box3f box = mesh.bbox;
+//	mesh.bbox.SetNull();
+//	float max_x = abs((box.min - box.max).X());
+//	float max_y = abs((box.min - box.max).Y());
+//	float max_z = abs((box.min - box.max).Z());
+//	float max_length = max_x > max_y ? max_x : max_y;
+//	max_length = max_length > max_z ? max_length : max_z;
+//
+//	for(int i = 0; i < mesh.vert.size(); i++)
+//	{
+//		Point3f& p = mesh.vert[i].P();
+//
+//		p -= box.min;
+//		p /= max_length;
+//
+//		p = (p - Point3f(0.5, .5, .5));
+//
+//		mesh.vert[i].N().Normalize(); 
+//		mesh.bbox.Add(p);
+//	}
+//}
+
 void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 {
-	if (mesh.vert.empty())
-	{
-		return;
-	}
+	if (mesh.vert.empty()) return;
+
+	mesh.bbox.SetNull();
 	Box3f box = mesh.bbox;
+
+
 	mesh.bbox.SetNull();
 	float max_x = abs((box.min - box.max).X());
 	float max_y = abs((box.min - box.max).Y());
@@ -458,19 +487,59 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 	float max_length = max_x > max_y ? max_x : max_y;
 	max_length = max_length > max_z ? max_length : max_z;
 
-	for(int i = 0; i < mesh.vert.size(); i++)
+	Box3f box_temp;
+	for (int i = 0; i < mesh.vert.size(); i++)
 	{
 		Point3f& p = mesh.vert[i].P();
 
-		p -= box.min;
 		p /= max_length;
 
-		p = (p - Point3f(0.5, .5, .5));
+		mesh.vert[i].N().Normalize();
+		box_temp.Add(p);
+	}
 
-		mesh.vert[i].N().Normalize(); 
+	Point3f mid_point = (box_temp.min + box_temp.max) / 2.0;
+
+	for (int i = 0; i < mesh.vert.size(); i++)
+	{
+		Point3f& p = mesh.vert[i].P();
+		p -= mid_point;
 		mesh.bbox.Add(p);
 	}
+
 }
+
+//Box3f DataMgr::normalizeAllMesh()
+//{
+//	Box3f box;
+//	if (!isSamplesEmpty())
+//	{
+//		for (int i = 0; i < samples.vert.size(); i++)
+//		{
+//			box.Add(samples.vert[i].P());
+//		}
+//	}
+//	if (!isOriginalEmpty())
+//	{
+//		for (int i = 0; i < original.vert.size(); i++)
+//		{
+//			box.Add(original.vert[i].P());
+//		}
+//		original.bbox =box;
+//	}
+//
+//	samples.bbox = box;
+//	dual_samples.bbox = box;
+//
+//	normalizeROSA_Mesh(samples);
+//  normalizeROSA_Mesh(dual_samples);
+//	normalizeROSA_Mesh(original);
+//
+//	recomputeBox();
+//	getInitRadiuse();
+//
+//	return samples.bbox;
+//}
 
 Box3f DataMgr::normalizeAllMesh()
 {

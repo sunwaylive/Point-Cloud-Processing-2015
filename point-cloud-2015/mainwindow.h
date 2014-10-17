@@ -60,11 +60,12 @@ private slots:
 	void setStop();
 
 	void removePickPoints();
-    void switchSampleDualSample();
+  void switchSampleDualSample();
 
-    void reorientPick();
-    void cleanPick();
-
+  void reorientPick();
+  void cleanPick();
+	
+	void sprayErasePick();
 
 private slots:
 	void runWLop();
