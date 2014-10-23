@@ -36,8 +36,6 @@ class WlopParaDlg : public QFrame
 		void getOriginalAverageKNN(double _val);
 		void getDualRadius(double _val);
 
-
-
 		void isDensity(bool _val);
 		void isPca(bool _val);
     void needSampleAverage(bool _val);

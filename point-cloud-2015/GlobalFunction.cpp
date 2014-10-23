@@ -950,6 +950,34 @@ void GlobalFun::normalizeConfidence(vector<CVertex>& vertexes, float delta)
 }
 
 
+void GlobalFun::addOutliers(CMesh *mesh, int add_num, double max_move_dist)
+{
+	assert(mesh != NULL);
+	for (int i = 0; i < add_num; ++i){
+		int idx = rand() % mesh->vert.size();
+		CVertex v = mesh->vert[idx];
+
+		Point3f move_dir = Point3f(rand() * 1.0f / RAND_MAX, rand() * 1.0f / RAND_MAX, rand() * 1.0f / RAND_MAX)
+			- Point3f(0.5f, 0.5f, 0.5f);
+		v.P() += move_dir * max_move_dist * (rand() / RAND_MAX + 0.5);
+		mesh->vert.push_back(v);
+	}
+
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		mesh->vert[i].m_index = i;
+	}
+	mesh->vn = mesh->vert.size();
+}
+
+void GlobalFun::addOutliers(CMesh *mesh, double outlier_percent, double max_move_dist)
+{
+	cout << "add outliers" << endl;
+	assert(mesh != NULL);
+	int outlier_num = outlier_percent * mesh->vert.size();
+	GlobalFun::addOutliers(mesh, outlier_num, max_move_dist);
+}
+
 //  void
 //  GlobalFun::computeICP(CMesh *dst, CMesh *src)
 //  {

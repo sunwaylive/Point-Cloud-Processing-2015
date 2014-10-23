@@ -1047,7 +1047,7 @@ void GLArea::runWlop()
 
   global_paraMgr.glarea.setValue("GLarea Busying", BoolValue(true));
 
-	cout << "wloppppppppppppppppppppppppppppp 1" << endl;
+	//cout << "wloppppppppppppppppppppppppppppp 1" << endl;
 
   bool is_break = false;
 	for (int i = 0; i < global_paraMgr.wLop.getDouble("Num Of Iterate Time"); i++)
@@ -1075,7 +1075,7 @@ void GLArea::runWlop()
     emit needUpdateStatus();
 	}
   
-	cout << "wloppppppppppppppppppppppppppppp 2" << endl;
+	//cout << "wloppppppppppppppppppppppppppppp 2" << endl;
 
   if (is_break)
   {
@@ -1096,8 +1096,7 @@ void GLArea::runWlop()
 	global_paraMgr.wLop.setValue("Run Anisotropic LOP", BoolValue(false));
 	global_paraMgr.wLop.setValue("Run Skel WLOP", BoolValue(false));
 	
-	cout << "wloppppppppppppppppppppppppppppp 3" << endl;
-
+	//cout << "wloppppppppppppppppppppppppppppp 3" << endl;
 }
 
 void GLArea::runSkeletonization_linear()
@@ -1565,7 +1564,7 @@ void GLArea::wheelEvent(QWheelEvent *e)
 				{
 					size_temp = 0.001;
 				}
-				//cout << "draw width: " <<size_temp << endl;
+				cout << "draw width: " <<size_temp << endl;
 				global_paraMgr.drawer.setValue("Sample Draw Width", DoubleValue(size_temp));
 			}
 			else if (para->getBool("Show Dual Samples") && !para->getBool("Show Dual Samples Dot"))
@@ -1913,9 +1912,9 @@ void GLArea::sprayErasePick()
 			max_dist2 = dist2;
 		}
 	}
-	double threshold_dist2 = max_dist2 * 0.8 * 0.8;
+	double threshold_dist2 = max_dist2 * 0.9 * 0.9;
 
-	double iradius16 = -128 / max_dist2;
+	double iradius16 = -16 / max_dist2;
 	for (int i = 0; i < picked_size; i++)
 	{
 		CVertex& v = pick_union[i];
@@ -1924,10 +1923,10 @@ void GLArea::sprayErasePick()
 		{
 			continue;
 		}
-		double probability = 1-exp(dist2 * iradius16);
+		double probability = exp(dist2 * iradius16);
 
 		double r = (rand() % 1000) * 0.001;
-		if (r > probability)
+		if (r < probability)
 		{
 			v.is_skel_ignore = true;
 		}

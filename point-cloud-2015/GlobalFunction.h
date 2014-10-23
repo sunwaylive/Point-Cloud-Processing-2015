@@ -91,7 +91,8 @@ namespace GlobalFun
 
 	void normalizeConfidence(vector<CVertex>& vertexes, float delta);
 
-
+	void addOutliers(CMesh *mesh, int add_num, double max_move_dist);
+	void addOutliers(CMesh *mesh, double outlier_percent, double max_move_dist);
 	//void computeICP(CMesh *dst, CMesh *src);
 }
 
