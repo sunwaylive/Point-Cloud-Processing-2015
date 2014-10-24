@@ -166,7 +166,7 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 	int				k				= numKnn;			// number of nearest neighbors
 	int				dim				= 3;			// dimension
 	double			eps				= 0;			// error bound
-	int				maxPts			= numKnn + 30000000;			// maximum number of data points
+	int				maxPts			= numKnn + 3000000;			// maximum number of data points
 
 	if (datapts.size() >= maxPts)
 	{
@@ -224,6 +224,8 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 		}
 	}
 
+	annDeallocPt(queryPt);					// deallocate query point
+	annDeallocPts(dataPts);			// deallocate data points
 	delete [] nnIdx;							// clean things up
 	delete [] dists;
 	delete kdTree;
@@ -302,7 +304,7 @@ void GlobalFun::computeKnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 	outfile2.close();
 
 	char mycmd[100];
-	sprintf(mycmd, "RG_NearestNeighbors.exe point_cloud.txt query.txt result.txt %d", numKnn+1);
+	sprintf(mycmd, "ANN32//RG_NearestNeighbors.exe point_cloud.txt query.txt result.txt %d", numKnn+1);
 	//sprintf(mycmd, "RG_NearestNeighbors.exe point_cloud.txt query.txt result.txt", numKnn+1);
 
 	//cout << mycmd;

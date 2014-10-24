@@ -102,7 +102,7 @@ private:
   vector<double>  samples_average_weight_sum;
 
 	vector<Point3f> samples_similarity;
-	vector<double>  samples_similarity_weight_sum;
+	//vector<double>  samples_similarity_weight_sum;
 
 	vector<Point3f> average;
 	vector<double>  average_weight_sum;
