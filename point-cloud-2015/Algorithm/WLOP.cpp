@@ -800,6 +800,12 @@ void WLOP::updateAdaptiveNeighbor()
 
 double WLOP::iterate()
 {
+
+	if (para->getBool("Original Combine Sample"))
+	{
+		addSamplesToOriginalTemporary();
+	}
+
   use_adaptive_mu = para->getBool("Use Adaptive Mu");
   is_sample_close_to_original.assign(samples->vert.size(), false);
   bool use_tangent = para->getBool("Use Tangent Vector");
@@ -905,15 +911,18 @@ double WLOP::iterate()
 // 	time.end();
 
   time.start("Compute Average Term");
-  if (para->getBool("Original Combine Sample"))
-  {
-    computeAverageAddSampleTerm(samples, original);
-  }
-  else
-  {
-    computeAverageTerm(samples, original);
-  }
+
+
+	
+	computeAverageTerm(samples, original);
+
+	if (para->getBool("Original Combine Sample"))
+	{
+		removeSamplesFromOriginal();
+	}
 	time.end();
+
+
 
 	time.start("Compute Repulsion Term");
 	computeRepulsionTerm(samples);
@@ -1231,6 +1240,11 @@ double WLOP::iterate()
 		recomputePCA_Normal();
 		time.end();
 	}
+
+
+
+
+
 	return error_x;
 }
 
@@ -3517,5 +3531,35 @@ void WLOP::runProjection()
 //   return;
 // }
 
+void WLOP::addSamplesToOriginalTemporary()
+{
+	int original_size = original->vert.size();
+	double confdience_threshold = 0.85;
+	added_sample_num = 0;
 
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex v = samples->vert[i];
+
+ 		if (v.eigen_confidence < 0 || v.eigen_confidence > confdience_threshold)
+ 		{
+ 			continue;
+ 		}
+
+		v.bIsOriginal = true;
+		v.m_index = original_size + added_sample_num;
+		added_sample_num++;
+
+		original->vert.push_back(v);
+	}
+	original->vn = original->vert.size();
+}
+
+void WLOP::removeSamplesFromOriginal()
+{
+	//int sample_size = samples->vert.size();
+	int start_pos = original->vert.size() - added_sample_num;
+	original->vert.erase(original->vert.begin() + start_pos, original->vert.end());
+	original->vn = original->vert.size();
+}
 

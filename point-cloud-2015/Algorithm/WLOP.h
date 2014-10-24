@@ -77,6 +77,9 @@ private:
 	void runComputeConfidence();
 	void runComputeInnerClusering();
 
+	void addSamplesToOriginalTemporary();
+	void removeSamplesFromOriginal();
+
 
 private:
 	RichParameterSet* para;
@@ -121,4 +124,5 @@ private:
 
 	SphereSlots default_sphere;
 	bool use_closest_dual;
+	int added_sample_num;
 };
