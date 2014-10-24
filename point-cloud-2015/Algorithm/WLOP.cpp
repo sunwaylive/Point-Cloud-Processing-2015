@@ -483,10 +483,15 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			}
 // 			average_weight_sum[i] += w;
 
-// 			if (use_confidence)
+// 			if (use_confidence && use_tangent && v.eigen_confidence > 0.0)
 // 			{
+// 				Point3f proj_point = v.P() + v.N() * proj_dist;
+// 				average_low_confidence[i] += proj_point * w;
+// 
+// 				average[i] += t.P() * w;
 // 			}
-			if (use_tangent /*&& ! use_confidence*/)
+// 			else
+				if (use_tangent && !use_confidence)
 			{
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
@@ -987,6 +992,12 @@ double WLOP::iterate()
     }
   }
 
+	bool use_confidence = para->getBool("Use Confidence");
+	if (use_confidence)
+	{
+		GlobalFun::normalizeConfidence(samples->vert, 0);
+	}
+
   if (para->getBool("Need Averaging Movement"))
   {
     new_sample_positions.assign(samples->vert.size(), Point3f(0.,0.,0.));
@@ -1180,6 +1191,12 @@ double WLOP::iterate()
 						//mark2
 
 					}
+// 					else if (use_confidence && average_weight_sum[i] > 1e-20 && v.eigen_confidence > 0 && v.eigen_confidence < 1)
+// 					{
+// 						double confidence = v.eigen_confidence;
+// 						//v.P() = average[i] / average_weight_sum[i];
+// 						v.P() = (average[i] / average_weight_sum[i] * confidence + average_low_confidence[i] / average_weight_sum[i] * (1.0 - confidence));
+// 					}
 					else if (average_weight_sum[i] > 1e-20)
 					{
 						v.P() = average[i] / average_weight_sum[i];
@@ -1189,16 +1206,6 @@ double WLOP::iterate()
 					{
 						v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
 					}
-
-					//         if (need_sample_average_term && samples_average_weight_sum[i] > 1e-20 && mu3 >= 0)
-					//         {
-					//           v.P() += samples_average[i] * (mu3 / samples_average_weight_sum[i]);
-					//         }
-
-					// 				if (need_similarity /*&& samples_similarity_weight_sum[i] > 1e-20*/ && mu3 >= 0)
-					// 				{
-					// 					v.P() += samples_similarity[i] * mu3;
-					// 				}
 
 					if (/*average_weight_sum[i] > 1e-20 && */repulsion_weight_sum[i] > 1e-20)
 					{
@@ -2670,15 +2677,20 @@ void WLOP::runRegularizeNormals()
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
+		dual_v.eigen_vector0.Normalize();
 		if (dual_v.eigen_confidence > threshold)
 		{
-			cout << dual_v.eigen_confidence << endl;
+			//cout << dual_v.eigen_confidence << endl;
 			dual_v.is_new = true;
 		}
 	}
 
   GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
   GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	//bool use_confidence = para->getBool("Use Confidence");
+	bool use_confidence = true;
+	//double threshold = global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold");
+	double threshold1 = 0.95;
 
   for(int i = 0; i < samples->vert.size(); i++)
   {
@@ -2693,16 +2705,48 @@ void WLOP::runRegularizeNormals()
     int neighbor_idx = v.neighbors[0];
     //int neighbor_idx = i;
     CVertex& dual_v = dual_samples->vert[neighbor_idx];
+		Point3f diff = v.P() - dual_v.P();
+		double proj_dist = diff * dual_v.eigen_vector0;
+		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
+		Point3f dir = (v.P() - proj_p).Normalize();
 
-    Point3f dir = (v.P() - dual_v.P()).Normalize();
-    if (dir*v.N() < 0)
-    {
-      v.N() = ((dir + -v.N()) / 2.0).Normalize();
-    }
-    else
-    {
-      v.N() = ((dir + v.N()) / 2.0).Normalize();
-    }
+    //Point3f dir = (v.P() - dual_v.P()).Normalize();
+
+		if (use_confidence)
+		{
+			if (v.eigen_confidence < threshold1)
+			{
+				if (dir*v.N() < 0)
+				{
+					v.N() = ((-dir + v.N()) / 2.0).Normalize();
+				}
+				else
+				{
+					v.N() = ((dir + v.N()) / 2.0).Normalize();
+				}
+			}
+
+			//if (dir*v.N() < 0)
+			//{
+			//	v.N() = ((-dir * (1-v.eigen_confidence) + v.N() * v.eigen_confidence) ).Normalize();
+			//}
+			//else
+			//{
+			//	v.N() = ((dir * (1 - v.eigen_confidence) + v.N() * v.eigen_confidence)).Normalize();
+			//}
+		}
+		else
+		{
+			if (dir*v.N() < 0)
+			{
+				v.N() = ((-dir + v.N()) / 2.0).Normalize();
+			}
+			else
+			{
+				v.N() = ((dir + v.N()) / 2.0).Normalize();
+			}
+		}
+
   }
 }
 
