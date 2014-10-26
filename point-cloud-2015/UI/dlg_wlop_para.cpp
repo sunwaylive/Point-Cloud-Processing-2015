@@ -101,6 +101,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+	if (!connect(ui->Use_kite_points, SIGNAL(clicked(bool)), this, SLOT(useKitePoints(bool))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
@@ -129,6 +133,8 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->show_pick_distribution, SIGNAL(clicked()), this, SLOT(applyShowPickDistribution()));
 	connect(ui->compute_correspondence, SIGNAL(clicked()), this, SLOT(applyComputeCorrespondence()));
+
+	connect(ui->detect_kite_points, SIGNAL(clicked()), this, SLOT(applyDetectKitePoints()));
 
 }
 
@@ -180,6 +186,9 @@ bool WlopParaDlg::initWidgets()
 
 	state = m_paras->wLop.getBool("Use Original Averaging KNN") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->Use_original_Averaging_KNN->setCheckState(state);
+
+	state = m_paras->wLop.getBool("Use Kite Points") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_kite_points->setCheckState(state);
 
 	update();
 	repaint();
@@ -302,6 +311,10 @@ void WlopParaDlg::useOriginalKNN(bool _val)
 	m_paras->wLop.setValue("Use Original Averaging KNN", BoolValue(_val));
 }
 
+void WlopParaDlg::useKitePoints(bool _val)
+{
+	m_paras->wLop.setValue("Use Kite Points", BoolValue(_val));
+}
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
 {
@@ -538,6 +551,13 @@ void WlopParaDlg::applyRegularizeNormals()
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(false));
+}
+
+void WlopParaDlg::applyDetectKitePoints()
+{
+	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(false));
 }
 
 void WlopParaDlg::applyProjection()

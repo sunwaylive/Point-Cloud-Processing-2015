@@ -198,7 +198,7 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
   wLop.addParam(new RichBool("Need Sample Average", false));
-	wLop.addParam(new RichBool("Use Confidence", false));
+	wLop.addParam(new RichBool("Use Confidence", true));
 
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
@@ -215,18 +215,23 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Inner Clustering", false));
 	wLop.addParam(new RichBool("Run Show Pick Distribution", false));
 	wLop.addParam(new RichBool("Run Compute Correspondence", false));
+	wLop.addParam(new RichBool("Run Detect Kite Points", false));
+
 
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
-	wLop.addParam(new RichBool("Need Similarity", false));
+	wLop.addParam(new RichBool("Need Similarity", true));
 
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
-  wLop.addParam(new RichBool("Use Tangent Vector", false));
-	wLop.addParam(new RichBool("Use Original Averaging KNN", false));
+  wLop.addParam(new RichBool("Use Tangent Vector", true));
+
+	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
+	wLop.addParam(new RichBool("Use Kite Points", true));
+
 
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
@@ -235,12 +240,12 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
 	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
 
-	wLop.addParam(new RichDouble("Original Averaging KNN", 215));
+	wLop.addParam(new RichDouble("Original Averaging KNN", 315));
 
 	wLop.addParam(new RichDouble("sigmoid threshold", 0.4));
 
-
-
+	wLop.addParam(new RichDouble("Density Confidence Threshold", 0.91));
+	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.98));
 }
 
 void ParameterMgr::initSkeletonParameter()
@@ -341,7 +346,7 @@ void ParameterMgr::initNormalSmootherParameter()
 {
 	norSmooth.addParam(new RichString("Algorithm Name", "NormalSmooth") );
 
-	norSmooth.addParam(new RichInt("PCA KNN", 30));
+	norSmooth.addParam(new RichInt("PCA KNN", 13));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
 	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 15));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));

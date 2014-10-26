@@ -48,6 +48,7 @@ class WlopParaDlg : public QFrame
     void useTangentVector(bool _val);
 		void useConfidence(bool _val);
 		void useOriginalKNN(bool _val);
+		void useKitePoints(bool _val);
 
 		//
 		void applyWlop();
@@ -62,6 +63,8 @@ class WlopParaDlg : public QFrame
     void applyDragWlop();
     void applyRegularizeSamples();
     void applyRegularizeNormals();
+		void applyDetectKitePoints();
+
 
     void applyProjection();
     void applyNormalReform();
@@ -70,6 +73,7 @@ class WlopParaDlg : public QFrame
 		void applyComputeInnerClustering();
 		void applyComputeCorrespondence();
 		void applyShowPickDistribution();
+
 
 
 	private:

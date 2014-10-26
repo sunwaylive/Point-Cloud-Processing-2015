@@ -121,9 +121,9 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
-  if (v.is_new)
+  if (v.is_boundary)
   {
-    return cGray;
+    return cBlue;
   }
 
   if (v.is_dual_sample || v.is_fixed_sample)

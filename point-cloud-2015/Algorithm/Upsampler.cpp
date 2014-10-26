@@ -517,12 +517,12 @@ void Upsampler::pointsExtrapoaltion()
   for (int i = 0; i < sample_number; i++)
   {
     CVertex& v = samples->vert[i];
-    v.is_new = false;
+    v.is_boundary = false;
     v.m_index = i;
   }
 
   CVertex new_v;
-  new_v.is_new = true;
+  new_v.is_boundary = true;
 
 
   if (global_paraMgr.glarea.getDouble("Picked Index") > 0.1)

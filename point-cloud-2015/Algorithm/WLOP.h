@@ -36,6 +36,8 @@ public:
   void runDragWlop();
   void runRegularizeSamples();
   void runRegularizeNormals();
+	void runDetectKitePoitns();
+
 
 	void runComputeDistribution();
 
@@ -58,6 +60,9 @@ private:
 	void initVertexes(bool clear_neighbor);
 
 	double iterate();
+
+	vector<Point3f> computeNewSamplePositions(int& error_x);
+
 	void computeAverageTerm(CMesh* samples, CMesh* original);
   void computeAverageAddSampleTerm(CMesh* samples, CMesh* original);
 
@@ -125,4 +130,5 @@ private:
 	SphereSlots default_sphere;
 	bool use_closest_dual;
 	int added_sample_num;
+	bool use_kite_points;
 };

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>293</width>
-    <height>812</height>
+    <height>820</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>313</width>
-     <height>417</height>
+     <height>440</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -245,6 +245,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QCheckBox" name="Use_kite_points">
+      <property name="text">
+       <string>Use_Kite_Points</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QPushButton" name="anisotropic_lop_apply">
@@ -453,6 +460,19 @@
    </property>
    <property name="text">
     <string>Compute Correspondence</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="detect_kite_points">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>770</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Detect kite points</string>
    </property>
   </widget>
  </widget>
