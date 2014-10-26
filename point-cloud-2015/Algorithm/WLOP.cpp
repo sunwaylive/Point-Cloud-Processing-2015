@@ -1045,6 +1045,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	bool use_tangent = para->getBool("Use Tangent Vector");
 	bool use_confidence = para->getBool("Use Confidence");
 
+	double radius = para->getDouble("CGrid Radius");
+	double radius_threshold = radius * 0.6;
 	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 	Point3f c;
 
@@ -1084,7 +1086,26 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					{
 						if (v.is_boundary)
 						{
-							new_pos[i] = samples_similarity[i];
+							Point3f avg_point = average[i] / average_weight_sum[i];
+							Point3f sim_point = samples_similarity[i];
+
+							double dist = GlobalFun::computeEulerDist(avg_point, sim_point);
+							if (dist < radius_threshold)
+							{
+								if (use_confidence && v.eigen_confidence > 0)
+								{
+									new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1-v.eigen_confidence);
+								}
+								else
+								{
+									new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
+								}
+								//cout << "combine!" << endl;
+							}
+							else
+							{
+								new_pos[i] = samples_similarity[i];
+							}
 						}
 						else
 						{
