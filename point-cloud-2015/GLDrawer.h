@@ -104,6 +104,7 @@ private:
 	bool bCullFace;
 	bool bUseIndividualColor;
 	bool useNormalColor;
+	bool useFeatureColor;
   bool useDifferBranchColor;
 
 	double original_draw_width;

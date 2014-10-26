@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1275</width>
+    <width>1321</width>
     <height>573</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1275</width>
+     <width>1321</width>
      <height>21</height>
     </rect>
    </property>
@@ -243,6 +243,7 @@
    <addaction name="actionShow_Sample_Circle"/>
    <addaction name="actionShow_Sample_Dot"/>
    <addaction name="actionSwitch_Sample_DualSample"/>
+   <addaction name="actionShow_Target"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">

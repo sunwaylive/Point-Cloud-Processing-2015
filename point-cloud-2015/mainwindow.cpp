@@ -566,6 +566,8 @@ void MainWindow::showTargets(bool _val)
 	paras->drawer.setValue("Show Target Samples", BoolValue(_val));
 	paras->drawer.setValue("Show Target Dual Samples", BoolValue(_val));
 
+	paras->drawer.setValue("Show Feature Color", BoolValue(_val));
+
 	area->updateGL();
 }
 

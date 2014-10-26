@@ -551,6 +551,8 @@ void WlopParaDlg::applyRegularizeNormals()
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(false));
+
+	area->dataMgr.recomputeQuad();
 }
 
 void WlopParaDlg::applyDetectKitePoints()

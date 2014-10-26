@@ -608,9 +608,12 @@ void WLOP::computeSampleAverageTerm(CMesh* samples)
 
 void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 {
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::computeSampleSimilarityTerm()");
 
-	double radius = para->getDouble("CGrid Radius") * 3.0;
+	double radius = para->getDouble("CGrid Radius") * 2.0;
 	double radius2 = radius * radius;
 	double iradius16 = -4.0 / radius2;
 	double iradius16_perpend = -4.0 / radius2;
@@ -631,7 +634,12 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		int neighbor_idx = v.neighbors[0];
 
 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
-		v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+
+		Point3f diff = v.P() - dual_v.P();
+		double proj_dist = diff * dual_v.eigen_vector0;
+		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
+
+		v.skel_radius = GlobalFun::computeEulerDist(v.P(), proj_p);
 		v.dual_index = neighbor_idx;
 
 		samples->bbox.Add(v.P());
@@ -651,6 +659,11 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		CVertex& v = samples->vert[i];
 		CVertex& dual_v = dual_samples->vert[v.dual_index];
 		Point3f v_outward_direction = (v.P() - dual_v.P()).Normalize();
+
+		if (use_kite_points && !v.is_boundary)
+		{
+			continue;
+		}
 
 		double sum_radius = 0;
 		double sum_weight = 0;
@@ -703,9 +716,17 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		int neighbor_idx = v.neighbors[0];
 		CVertex dual_v = dual_samples->vert[neighbor_idx];
-		Point3f direction = (v.P() - dual_v.P()).Normalize();
 
-		samples_similarity[i] = dual_v.P() + direction * new_radiuses[i];
+		Point3f diff = v.P() - dual_v.P();
+		double proj_dist = diff * dual_v.eigen_vector0;
+		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
+
+		//Point3f direction = (v.P() - dual_v.P()).Normalize();
+		Point3f direction = (v.P() - proj_p).Normalize();
+
+		//samples_similarity[i] = dual_v.P() + direction * new_radiuses[i];
+		samples_similarity[i] = proj_p + direction * new_radiuses[i];
+
 		//samples_similarity[i] = v.P();
 	}
 }
@@ -2643,6 +2664,9 @@ void WLOP::runRegularizeNormals()
 {
 	if (use_kite_points)
 	{
+		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
 		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 
 		for (int i = 0; i < samples->vert.size(); i++)

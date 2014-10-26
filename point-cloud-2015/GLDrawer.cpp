@@ -17,6 +17,7 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	bCullFace = para->getBool("Need Cull Points");
 	bUseIndividualColor = para->getBool("Show Individual Color");
 	useNormalColor = para->getBool("Use Color From Normal");
+	useFeatureColor = para->getBool("Show Feature Color");
   useDifferBranchColor = para->getBool("Use Differ Branch Color");
 
 	original_draw_width = para->getDouble("Original Draw Width");
@@ -121,7 +122,7 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
-  if (v.is_boundary)
+  if (v.is_boundary && useFeatureColor)
   {
     return cBlue;
   }

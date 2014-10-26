@@ -149,6 +149,8 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Use Color From Normal", false));
   drawer.addParam(new RichBool("Use Differ Branch Color", false));
 	drawer.addParam(new RichBool("Show Confidence Color", false));
+	drawer.addParam(new RichBool("Show Feature Color", true));
+
 
   drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
 
@@ -348,7 +350,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 13));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 15));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 19));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 
