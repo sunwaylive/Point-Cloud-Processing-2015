@@ -1315,27 +1315,29 @@ void WLOP::stepForward()
 
 void WLOP::runComputeConfidence()
 {
-	Timer time;
-	time.start("Samples Initial");
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-	time.end();
+// 	Timer time;
+// 	time.start("Samples Initial");
+// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+// 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+// 	time.end();
+// 
+// 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 
+// 		int neighbor_idx = v.neighbors[0];
+// 
+// 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+// 		v.eigen_confidence = dual_v.eigen_confidence;
+// 	}
+// 
+// 	GlobalFun::normalizeConfidence(samples->vert, 0);
+// 
+// 	return;
 
-	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-
-		int neighbor_idx = v.neighbors[0];
-
-		CVertex& dual_v = dual_samples->vert[neighbor_idx];
-		v.eigen_confidence = dual_v.eigen_confidence;
-	}
-
-	GlobalFun::normalizeConfidence(samples->vert, 0);
-
-	return;
 
 	// 	cout << "compute confidence" << endl;
 	// 	cout << samples->vert.size() << "	" << original->vert.size() << endl;
