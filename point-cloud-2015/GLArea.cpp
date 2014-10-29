@@ -329,13 +329,13 @@ void GLArea::paintGL()
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
 	}
 
-	if (para->getBool("Show Radius") || para->getBool("Show Bounding Box"))
-	{
-		Box3f box = dataMgr.getCurrentSamples()->bbox;
-		glBoxWire(box);
-
-		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
-	}
+// 	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
+// 	{
+// 		Box3f box = dataMgr.getCurrentSamples()->bbox;
+// 		glBoxWire(box);
+// 
+// 		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
+// 	}
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
@@ -1834,7 +1834,7 @@ void GLArea::removePickPoint()
 	}
 	else
 	{		
-		for (int i = 0; i < pickList.size(); i+= 3)
+		for (int i = 0; i < pickList.size(); i+= 2)
 		{
 			samples->vert[pickList[i]].is_skel_ignore = true;
       //dual_samples->vert[pickList[i]].is_skel_ignore = true;
@@ -1914,7 +1914,7 @@ void GLArea::sprayErasePick()
 	}
 	double threshold_dist2 = max_dist2 * 0.9 * 0.9;
 
-	double iradius16 = -16 / max_dist2;
+	double iradius16 = -4 / max_dist2;
 	for (int i = 0; i < picked_size; i++)
 	{
 		CVertex& v = pick_union[i];

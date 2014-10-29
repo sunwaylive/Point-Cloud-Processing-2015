@@ -122,12 +122,12 @@ void ParameterMgr::initGlareaParameter()
 	//glarea.addParam(new RichColor("Light Diffuse Color", QColor(204, 204, 204)));
 	//glarea.addParam(new RichColor("Light Specular Color", QColor(255, 255, 255)));
 
-	glarea.addParam(new RichDouble("Snapshot Resolution", 1));
+	glarea.addParam(new RichDouble("Snapshot Resolution", 2));
 	glarea.addParam(new RichDouble("Snapshot Index", 1));
 	glarea.addParam(new RichDouble("Radius Ball Transparency", 0.3));
 
 	glarea.addParam(new RichBool("SnapShot Each Iteration", false));
-	glarea.addParam(new RichBool("No Snap Radius", false));
+	glarea.addParam(new RichBool("No Snap Radius", true));
 
 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
@@ -195,7 +195,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
-	wLop.addParam(new RichDouble("Dual Radius", 0.20));
+	wLop.addParam(new RichDouble("Dual Radius", 0.33));
 
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
@@ -242,7 +242,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
 	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
 
-	wLop.addParam(new RichDouble("Original Averaging KNN", 315));
+	wLop.addParam(new RichDouble("Original Averaging KNN", 415));
 
 	wLop.addParam(new RichDouble("sigmoid threshold", 0.4));
 

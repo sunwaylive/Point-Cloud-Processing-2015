@@ -91,9 +91,43 @@ void NormalParaDlg::reorientateNormal()
 
 void NormalParaDlg::applyNormalSmoothing()
 {
-	area->runNormalSmoothing();
-	area->dataMgr.recomputeQuad();
-	area->updateGL();
+	if (global_paraMgr.glarea.getBool("Show Normal"))
+	{
+		area->runNormalSmoothing();
+		area->dataMgr.recomputeQuad();
+		area->updateGL();
+	}
+	else
+	{
+		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+		CMesh* samples;
+
+		if (global_paraMgr.glarea.getBool("Show Samples"))
+		{
+			samples = area->dataMgr.getCurrentSamples();
+		}
+
+		vector<Point3f> normals_save(samples->vert.size());
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			samples->vert[i].N() = samples->vert[i].N().Normalize();
+			normals_save[i] = samples->vert[i].N();
+		}
+
+		vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+		pca_para.fittingAdjNum = knn;
+
+		vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			if (normals_save[i] * samples->vert[i].N() < 0)
+			{
+				samples->vert[i].N() *= -1;
+			}
+		}
+
+	}
 }
 
 void NormalParaDlg::applyPCANormal()
