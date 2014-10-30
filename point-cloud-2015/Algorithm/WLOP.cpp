@@ -1312,30 +1312,64 @@ void WLOP::stepForward()
   //recomputePCA_Normal();
 }
 
-
 void WLOP::runComputeConfidence()
 {
-// 	Timer time;
-// 	time.start("Samples Initial");
-// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-// 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-// 	time.end();
-// 
-// 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
-// 
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 
-// 		int neighbor_idx = v.neighbors[0];
-// 
-// 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
-// 		v.eigen_confidence = dual_v.eigen_confidence;
-// 	}
-// 
-// 	GlobalFun::normalizeConfidence(samples->vert, 0);
-// 
-// 	return;
+	//  	//double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	//  	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+	//  	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	//  
+	//  	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+	//  
+	//  	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, knn, false, "WlopParaDlg::runRegularizeNormals()");
+	//  
+	//  	for (int i = 0; i < samples->vert.size(); i++)
+	//  	{
+	//  		CVertex& v = samples->vert[i];
+	//  
+	//  		v.eigen_confidence = 0.0;
+	//  		for (int j = 0; j < v.neighbors.size(); j++)
+	//  		{
+	//  			int neighbor_idx = v.neighbors[0];
+	//  			CVertex& t = original->vert[neighbor_idx];
+	//  			double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+	//  
+	//  			v.eigen_confidence += normal_diff;
+	//  		}
+	//  		v.eigen_confidence /= v.neighbors.size();
+	//  	}
+	//  
+	//  	//GlobalFun::normalizeConfidence(samples->vert, 0.0);
+	//  
+	//  	return;
+
+
+
+//  	 	Timer time;
+//  	 	time.start("Samples Initial");
+//  	 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+//  	 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+//  	 	time.end();
+//  	 
+//  	 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+//  	 
+//  	 	for (int i = 0; i < samples->vert.size(); i++)
+//  	 	{
+//  	 		CVertex& v = samples->vert[i];
+//  	 
+//  	 		int neighbor_idx = v.neighbors[0];
+//  	 
+//  	 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+//  	 		v.eigen_confidence = dual_v.eigen_confidence;
+//  	 	}
+//  	 
+//  	 	GlobalFun::normalizeConfidence(samples->vert, 0);
+//  	 
+//  		vector<double> confidence_save(samples->vert.size());
+//  		for (int i = 0; i < samples->vert.size(); i++)
+//  		{
+//  			confidence_save[i] = 1-samples->vert[i].eigen_confidence;
+//   	}
+	 	//return;
 
 
 
@@ -1343,7 +1377,7 @@ void WLOP::runComputeConfidence()
 	// 	cout << samples->vert.size() << "	" << original->vert.size() << endl;
 	// 	return;
 	double radius = para->getDouble("CGrid Radius");
-	
+
 	double radius2 = radius * radius;
 	double iradius16 = -4.0 / radius2;
 
@@ -1378,53 +1412,56 @@ void WLOP::runComputeConfidence()
 		v.neighbors.clear();
 		//v.eigen_confidence = 1 - v.eigen_confidence;
 
-		v.eigen_confidence = pow(1-v.eigen_confidence, 2);
+		v.eigen_confidence = pow(1 - v.eigen_confidence, 2);
 	}
 	GlobalFun::normalizeConfidence(samples->vert, 0);
 
- 
-//    	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-//    	vector<double> sum_confidences(samples->vn, 1e-15);
-//  		vector<double> sum_weights(samples->vn, 1e-15);
-//   
-//    	for (int i = 0; i < samples->vert.size(); i++)
-//    	{
-//    		CVertex& v = samples->vert[i];
-//    		
-//    		double sum_confidence = 0;
-//    		double weight_sum = 0;
-//    		for (int j = 0; j < v.neighbors.size(); j++)
-//    		{
-//    			CVertex& t = samples->vert[v.neighbors[j]];
-//    			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
-//    
-//    			double dist_diff = exp(dist2 * iradius16);
-//    			double w = dist_diff ;
-//    
-//    			sum_confidence += w * t.eigen_confidence;
-//    			weight_sum += w;
-//    		}
-//    
-//    		sum_confidences[i] = sum_confidence;
-//    		sum_weights[i] = weight_sum;
-//    	}
-//   
-//    	for (int i = 0; i < samples->vert.size(); i++)
-//    	{
-//    		CVertex& v = samples->vert[i];
-//    
-//  			//v.eigen_confidence = 0.0;
-//    		if (sum_weights[i] > 1e-8)
-//    		{
-//    			v.eigen_confidence = sum_confidences[i] / sum_weights[i];
-//    		}
-//    	}
 
 
+//  	for (int i = 0; i < samples->vert.size(); i++)
+//  	{
+// 		samples->vert[i].eigen_confidence *= pow(confidence_save[i], 3);
+//  	}
+//  
+//  	GlobalFun::normalizeConfidence(samples->vert, 0);
 
 
-
-
+	//    	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+	//    	vector<double> sum_confidences(samples->vn, 1e-15);
+	//  		vector<double> sum_weights(samples->vn, 1e-15);
+	//   
+	//    	for (int i = 0; i < samples->vert.size(); i++)
+	//    	{
+	//    		CVertex& v = samples->vert[i];
+	//    		
+	//    		double sum_confidence = 0;
+	//    		double weight_sum = 0;
+	//    		for (int j = 0; j < v.neighbors.size(); j++)
+	//    		{
+	//    			CVertex& t = samples->vert[v.neighbors[j]];
+	//    			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+	//    
+	//    			double dist_diff = exp(dist2 * iradius16);
+	//    			double w = dist_diff ;
+	//    
+	//    			sum_confidence += w * t.eigen_confidence;
+	//    			weight_sum += w;
+	//    		}
+	//    
+	//    		sum_confidences[i] = sum_confidence;
+	//    		sum_weights[i] = weight_sum;
+	//    	}
+	//   
+	//    	for (int i = 0; i < samples->vert.size(); i++)
+	//    	{
+	//    		CVertex& v = samples->vert[i];
+	//    
+	//  			//v.eigen_confidence = 0.0;
+	//    		if (sum_weights[i] > 1e-8)
+	//    		{
+	//    			v.eigen_confidence = sum_confidences[i] / sum_weights[i];
+	//    		}
+	//    	}
 
 
 	// 	double threshold = para->getDouble("sigmoid threshold");
@@ -1438,15 +1475,15 @@ void WLOP::runComputeConfidence()
 	// 
 	// 	}
 
-// 	ofstream out_file("confidence.txt");
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		out_file << samples->vert[i].eigen_confidence << endl;
-// 	}
-// 	out_file.close();
-// 
-// 
- 	cout << "finshed compute confidence#######" << endl;
+	// 	ofstream out_file("confidence.txt");
+	// 	for (int i = 0; i < samples->vert.size(); i++)
+	// 	{
+	// 		out_file << samples->vert[i].eigen_confidence << endl;
+	// 	}
+	// 	out_file.close();
+	// 
+	// 
+	cout << "finshed compute confidence#######" << endl;
 
 	// 	ofstream out_file2("dual_vector_length.txt");
 	// 	for (int i = 0; i < samples->vert.size(); i++)
@@ -1460,6 +1497,180 @@ void WLOP::runComputeConfidence()
 	// 	out_file2.close();
 
 }
+
+
+// this one is useful
+//void WLOP::runComputeConfidence()
+//{
+////  	//double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+////  	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+////  	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+////  
+////  	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+////  
+////  	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, knn, false, "WlopParaDlg::runRegularizeNormals()");
+////  
+////  	for (int i = 0; i < samples->vert.size(); i++)
+////  	{
+////  		CVertex& v = samples->vert[i];
+////  
+////  		v.eigen_confidence = 0.0;
+////  		for (int j = 0; j < v.neighbors.size(); j++)
+////  		{
+////  			int neighbor_idx = v.neighbors[0];
+////  			CVertex& t = original->vert[neighbor_idx];
+////  			double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+////  
+////  			v.eigen_confidence += normal_diff;
+////  		}
+////  		v.eigen_confidence /= v.neighbors.size();
+////  	}
+////  
+////  	//GlobalFun::normalizeConfidence(samples->vert, 0.0);
+////  
+////  	return;
+//
+//
+//
+//// 	Timer time;
+//// 	time.start("Samples Initial");
+//// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+//// 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+//// 	time.end();
+//// 
+//// 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+//// 
+//// 	for (int i = 0; i < samples->vert.size(); i++)
+//// 	{
+//// 		CVertex& v = samples->vert[i];
+//// 
+//// 		int neighbor_idx = v.neighbors[0];
+//// 
+//// 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+//// 		v.eigen_confidence = dual_v.eigen_confidence;
+//// 	}
+//// 
+//// 	GlobalFun::normalizeConfidence(samples->vert, 0);
+//// 
+//// 	return;
+//
+//
+//
+//	// 	cout << "compute confidence" << endl;
+//	// 	cout << samples->vert.size() << "	" << original->vert.size() << endl;
+//	// 	return;
+//	double radius = para->getDouble("CGrid Radius");
+//	
+//	double radius2 = radius * radius;
+//	double iradius16 = -4.0 / radius2;
+//
+//	double original_knn = para->getDouble("Original Confidence KNN");
+//
+//	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runRegularizeNormals()");
+//
+//	//ofstream outfile("nearest_neighbor_dist.txt");
+//
+//	for (int i = 0; i < samples->vert.size(); i++)
+//	{
+//		CVertex& v = samples->vert[i];
+//
+//		double sum_dist = 0;
+//		for (int j = 0; j < v.neighbors.size(); j++)
+//		{
+//			CVertex& t = original->vert[v.neighbors[j]];
+//			sum_dist += GlobalFun::computeEulerDist(v.P(), t.P());
+//		}
+//
+//		v.eigen_confidence = sum_dist / v.neighbors.size();
+//
+//		//outfile << v.nearest_neighbor_dist << endl;
+//	}
+//
+//
+//	GlobalFun::normalizeConfidence(samples->vert, 0);
+//
+//	for (int i = 0; i < samples->vert.size(); i++)
+//	{
+//		CVertex& v = samples->vert[i];
+//		v.neighbors.clear();
+//		//v.eigen_confidence = 1 - v.eigen_confidence;
+//
+//		v.eigen_confidence = pow(1-v.eigen_confidence, 2);
+//	}
+//	GlobalFun::normalizeConfidence(samples->vert, 0);
+//
+// 
+////    	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+////    	vector<double> sum_confidences(samples->vn, 1e-15);
+////  		vector<double> sum_weights(samples->vn, 1e-15);
+////   
+////    	for (int i = 0; i < samples->vert.size(); i++)
+////    	{
+////    		CVertex& v = samples->vert[i];
+////    		
+////    		double sum_confidence = 0;
+////    		double weight_sum = 0;
+////    		for (int j = 0; j < v.neighbors.size(); j++)
+////    		{
+////    			CVertex& t = samples->vert[v.neighbors[j]];
+////    			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+////    
+////    			double dist_diff = exp(dist2 * iradius16);
+////    			double w = dist_diff ;
+////    
+////    			sum_confidence += w * t.eigen_confidence;
+////    			weight_sum += w;
+////    		}
+////    
+////    		sum_confidences[i] = sum_confidence;
+////    		sum_weights[i] = weight_sum;
+////    	}
+////   
+////    	for (int i = 0; i < samples->vert.size(); i++)
+////    	{
+////    		CVertex& v = samples->vert[i];
+////    
+////  			//v.eigen_confidence = 0.0;
+////    		if (sum_weights[i] > 1e-8)
+////    		{
+////    			v.eigen_confidence = sum_confidences[i] / sum_weights[i];
+////    		}
+////    	}
+//
+//
+//	// 	double threshold = para->getDouble("sigmoid threshold");
+//	// 	//double threshold_shift = 0.5 - threshold;
+//	// 	for (int i = 0; i < samples->vert.size(); i++)
+//	// 	{
+//	// 		CVertex& v = samples->vert[i];
+//	// 		double cofidence = (v.eigen_confidence - threshold) * 10;
+//	// 		v.eigen_confidence = 1.0 / (1.0 + exp(-cofidence));
+//	// 		//v.eigen_confidence = 1.0 / (1.0 + exp(-v.eigen_confidence));
+//	// 
+//	// 	}
+//
+//// 	ofstream out_file("confidence.txt");
+//// 	for (int i = 0; i < samples->vert.size(); i++)
+//// 	{
+//// 		out_file << samples->vert[i].eigen_confidence << endl;
+//// 	}
+//// 	out_file.close();
+//// 
+//// 
+// 	cout << "finshed compute confidence#######" << endl;
+//
+//	// 	ofstream out_file2("dual_vector_length.txt");
+//	// 	for (int i = 0; i < samples->vert.size(); i++)
+//	// 	{
+//	// 		CVertex& v = samples->vert[i];
+//	// 		CVertex& dual_v = dual_samples->vert[i];
+//	// 
+//	// 		double length = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+//	// 		out_file2 << length << endl;
+//	// 	}
+//	// 	out_file2.close();
+//
+//}
 
 
 //void WLOP::runComputeConfidence()
@@ -2690,6 +2901,7 @@ void WLOP::runDetectKitePoitns()
   		if (vote > 0.5)
   		{
   			vote_results[i] = true;
+				v.eigen_confidence = 0.00001;
   		}
   		else
   		{
@@ -2697,6 +2909,18 @@ void WLOP::runDetectKitePoitns()
   		}
  	}
  
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		double sum = v.eigen_confidence;
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			sum += samples->vert[v.neighbors[j]].eigen_confidence;
+		}
+		v.eigen_confidence = sum / (v.neighbors.size() + 1);
+	}
+
+
   	for (int i = 0; i < samples->vert.size(); i++)
   	{
   		CVertex& v = samples->vert[i];
