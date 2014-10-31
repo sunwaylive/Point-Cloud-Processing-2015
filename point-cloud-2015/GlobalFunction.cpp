@@ -980,6 +980,85 @@ void GlobalFun::addOutliers(CMesh *mesh, double outlier_percent, double max_move
 	GlobalFun::addOutliers(mesh, outlier_num, max_move_dist);
 }
 
+
+vector<double> GlobalFun::computeDensityConfidence(CMesh *mesh, double radius)
+{
+	double radius2 = radius * radius;
+	double iradius16 = -4 / radius2;
+
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		CVertex& v = mesh->vert[i];
+		vector<int>* neighbors = &v.neighbors;
+		v.eigen_confidence = 1.0;
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = mesh->vert[(*neighbors)[j]];
+			double dist2 = (v.P() - t.P()).SquaredNorm();
+			double den = exp(dist2*iradius16);
+
+			v.eigen_confidence += den;
+		}
+	}
+
+	normalizeConfidence(mesh->vert, 0.0);
+
+	vector<double> confidences(mesh->vert.size());
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		confidences[i] = mesh->vert[i].eigen_confidence;
+	}
+
+	return confidences;
+}
+
+vector<double> GlobalFun::computeNormalDifference(CMesh *mesh, double radius, double sigma)
+{
+	vector<double> confidences(mesh->vert.size());
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		confidences[i] = mesh->vert[i].eigen_confidence;
+	}
+
+	return confidences;
+}
+
+vector<double> GlobalFun::computeBilateralConfidence(CMesh *mesh, double radius, double sigma)
+{
+	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+
+	double radius2 = radius * radius;
+	double iradius16 = -4 / radius2;
+
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		CVertex& v = mesh->vert[i];
+		vector<int>* neighbors = &v.neighbors;
+		v.eigen_confidence = 0.0;
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = mesh->vert[(*neighbors)[j]];
+			double dist2 = (v.P() - t.P()).SquaredNorm();
+			double den = exp(dist2*iradius16);
+			double normal_diff = exp(-pow(1 - v.N()*t.N(), 2) / sigma_threshold);
+
+			v.eigen_confidence += den * normal_diff;
+		}
+	}
+
+	normalizeConfidence(mesh->vert, 0.0);
+
+	vector<double> confidences(mesh->vert.size());
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		confidences[i] = mesh->vert[i].eigen_confidence;
+	}
+	return confidences;
+}
+
+
 //  void
 //  GlobalFun::computeICP(CMesh *dst, CMesh *src)
 //  {

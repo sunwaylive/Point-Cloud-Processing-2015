@@ -94,6 +94,11 @@ namespace GlobalFun
 	void addOutliers(CMesh *mesh, int add_num, double max_move_dist);
 	void addOutliers(CMesh *mesh, double outlier_percent, double max_move_dist);
 	//void computeICP(CMesh *dst, CMesh *src);
+
+	vector<double> computeDensityConfidence(CMesh *mesh, double radius);
+	vector<double> computeNormalDifference(CMesh *mesh, double radius, double sigma);
+	vector<double> computeBilateralConfidence(CMesh *mesh, double radius, double sigma);
+
 }
 
 class Timer

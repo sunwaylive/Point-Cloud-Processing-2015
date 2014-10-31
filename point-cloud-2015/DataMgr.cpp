@@ -368,6 +368,10 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 		return;
 	}
 
+	double radius = para->getDouble("CGrid Radius");
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	GlobalFun::computeBilateralConfidence(&original, radius, sigma);
+
 	int want_sample_num = para->getDouble("Down Sample Num");
 
 	if (want_sample_num > original.vn)
@@ -378,41 +382,130 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 	clearCMesh(samples);
 	samples.vn = want_sample_num;
 
-	vector<int> nCard = GlobalFun::GetRandomCards(original.vert.size());
-	for(int i = 0; i < samples.vn; i++) 
-	{
-		int index = nCard[i]; //could be not random!
 
-    if (!use_random_downsample)
-    {
-      index = i;
-    }
+ 	vector<int> nCard = GlobalFun::GetRandomCards(original.vert.size());
+
+	int inserted_number = 0;
+	int i = 0;
+	while (want_sample_num > inserted_number)
+	{
+		if (i >= nCard.size())
+		{
+			break;
+		}
+
+		int index = nCard[i++];
 
 		CVertex& v = original.vert[index];
-    v.dual_index = i;
-		samples.vert.push_back(v);
-		samples.bbox.Add(v.P());
+		double probability = 1 - v.eigen_confidence;
+
+		double r = (rand() % 1000) * 0.001;
+
+		if (r < probability)
+		{
+			samples.vert.push_back(v);
+			samples.bbox.Add(v.P());
+
+			inserted_number++;
+		}
 	}
+//  	for (int i = 0; i < samples.vn; i++)
+//  	{
+//  		int index = nCard[i]; //could be not random!
+//  
+//  		if (!use_random_downsample)
+//  		{
+//  			index = i;
+//  		}
+//  
+//  		CVertex& v = original.vert[index];
+//  		v.dual_index = i;
+//  		samples.vert.push_back(v);
+//  		samples.bbox.Add(v.P());
+//  	}
+ 
+ 	CMesh::VertexIterator vi;
+ 	for (vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)
+ 	{
+ 		vi->bIsOriginal = false;
+ 	}
+ 
+ 	dual_samples.vert.clear();
+ 	for (int i = 0; i < samples.vert.size(); i++)
+ 	{
+ 		CVertex v = samples.vert[i];
+ 		v.is_dual_sample = true;
+ 		v.dual_index = i;
+ 		dual_samples.vert.push_back(v);
+ 	}
+ 	dual_samples.bbox = samples.bbox;
+ 	dual_samples.vn = samples.vn;
 
-	CMesh::VertexIterator vi;
-	for(vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)
-	{
-		vi->bIsOriginal = false;
-	}
+	cout << "compute density confidence" << endl;
+	GlobalFun::computeBallNeighbors(&original, NULL,
+		para->getDouble("CGrid Radius"), original.bbox);
 
-  dual_samples.vert.clear();
-  for (int i = 0; i < samples.vert.size(); i++)
-  {
-    CVertex v = samples.vert[i];
-    v.is_dual_sample = true;
-    v.dual_index = i;
-    dual_samples.vert.push_back(v);
-  }
-  dual_samples.bbox = samples.bbox;
-  dual_samples.vn = samples.vn;
-
-  getInitRadiuse();
+	getInitRadiuse();
 }
+
+//void DataMgr::downSamplesByNum(bool use_random_downsample)
+//{
+//	if (isOriginalEmpty() && !isSamplesEmpty())
+//	{
+//		subSamples();
+//		return;
+//	}
+//
+//	if (isOriginalEmpty())
+//	{
+//		return;
+//	}
+//
+//	int want_sample_num = para->getDouble("Down Sample Num");
+//
+//	if (want_sample_num > original.vn)
+//	{
+//		want_sample_num = original.vn;
+//	}
+//
+//	clearCMesh(samples);
+//	samples.vn = want_sample_num;
+//
+//	vector<int> nCard = GlobalFun::GetRandomCards(original.vert.size());
+//	for(int i = 0; i < samples.vn; i++) 
+//	{
+//		int index = nCard[i]; //could be not random!
+//
+//    if (!use_random_downsample)
+//    {
+//      index = i;
+//    }
+//
+//		CVertex& v = original.vert[index];
+//    v.dual_index = i;
+//		samples.vert.push_back(v);
+//		samples.bbox.Add(v.P());
+//	}
+//
+//	CMesh::VertexIterator vi;
+//	for(vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)
+//	{
+//		vi->bIsOriginal = false;
+//	}
+//
+//  dual_samples.vert.clear();
+//  for (int i = 0; i < samples.vert.size(); i++)
+//  {
+//    CVertex v = samples.vert[i];
+//    v.is_dual_sample = true;
+//    v.dual_index = i;
+//    dual_samples.vert.push_back(v);
+//  }
+//  dual_samples.bbox = samples.bbox;
+//  dual_samples.vn = samples.vn;
+//
+//  getInitRadiuse();
+//}
 
 void DataMgr::subSamples()
 {
@@ -428,6 +521,8 @@ void DataMgr::subSamples()
 		original.vert.push_back(v);
 		original.bbox.Add(v.P());
 	}
+
+
 
 	downSamplesByNum();
   getInitRadiuse();

@@ -329,13 +329,13 @@ void GLArea::paintGL()
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
 	}
 
-// 	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
-// 	{
-// 		Box3f box = dataMgr.getCurrentSamples()->bbox;
-// 		glBoxWire(box);
-// 
-// 		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
-// 	}
+ 	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
+ 	{
+ 		Box3f box = dataMgr.getCurrentSamples()->bbox;
+ 		glBoxWire(box);
+ 
+ 		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
+ 	}
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{

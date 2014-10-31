@@ -122,15 +122,26 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
-  if (v.is_boundary && useFeatureColor)
-  {
-    return cBlue;
-  }
+//   if (v.is_boundary && useFeatureColor)
+//   {
+//     return cBlue;
+//   }
 
   if (v.is_dual_sample || v.is_fixed_sample)
   {
     return feature_color;
   }
+
+	if (bUseConfidenceColor)
+	{
+		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+	}
+
+	if (bUseIndividualColor)
+	{
+		Color4b c = v.C();
+		return GLColor(c.X() / 255., c.Y() / 255., c.Z() / 255., 1.);
+	}
 
 	if (v.bIsOriginal)
 	{
@@ -162,24 +173,15 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 	}
 
-	if (bUseIndividualColor)
-	{
-		Color4b c = v.C();
-		return GLColor(c.X()/255., c.Y()/255., c.Z()/255., 1.);
-	}
+
 // 	else if (v.is_fixed_sample)
 // 	{
 // 		return feature_color;
 // 	}
 
-	if (bUseConfidenceColor)
-	{
-		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
-	}
 
 
 	return sample_color;
-	
 }
 
 void GLDrawer::drawDot(const CVertex& v)
