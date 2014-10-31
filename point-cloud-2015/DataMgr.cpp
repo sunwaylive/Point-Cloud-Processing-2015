@@ -409,6 +409,7 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 			inserted_number++;
 		}
 	}
+
 //  	for (int i = 0; i < samples.vn; i++)
 //  	{
 //  		int index = nCard[i]; //could be not random!
@@ -571,7 +572,7 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 {
 	if (mesh.vert.empty()) return;
 
-	mesh.bbox.SetNull();
+	//mesh.bbox.SetNull();
 	Box3f box = mesh.bbox;
 
 
@@ -595,6 +596,7 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 
 	Point3f mid_point = (box_temp.min + box_temp.max) / 2.0;
 
+	mesh.bbox.SetNull();
 	for (int i = 0; i < mesh.vert.size(); i++)
 	{
 		Point3f& p = mesh.vert[i].P();
