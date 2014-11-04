@@ -981,6 +981,7 @@ void GlobalFun::addOutliers(CMesh *mesh, double outlier_percent, double max_move
 }
 
 
+
 vector<double> GlobalFun::computeDensityConfidence(CMesh *mesh, double radius)
 {
 	double radius2 = radius * radius;
@@ -1012,6 +1013,51 @@ vector<double> GlobalFun::computeDensityConfidence(CMesh *mesh, double radius)
 
 	return confidences;
 }
+
+vector<double> GlobalFun::smoothConfidences(CMesh *mesh, double radius)
+{
+	double radius2 = radius * radius;
+	double iradius16 = -4 / radius2;
+
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		CVertex& v = mesh->vert[i];
+		vector<int>* neighbors = &v.neighbors;
+
+		if (v.neighbors.empty())
+		{
+			continue;
+		}
+
+		v.eigen_confidence = 0.0;
+
+		double sum_confidence = 0;
+		double weight_sum = 0;
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = mesh->vert[(*neighbors)[j]];
+			double dist2 = (v.P() - t.P()).SquaredNorm();
+			double w = exp(dist2*iradius16);
+
+			sum_confidence += w * t.eigen_confidence;
+			weight_sum += w;
+		}
+
+		v.eigen_confidence += sum_confidence / weight_sum;
+	}
+
+	normalizeConfidence(mesh->vert, 0.0);
+
+	vector<double> confidences(mesh->vert.size());
+	for (int i = 0; i < mesh->vert.size(); i++)
+	{
+		confidences[i] = mesh->vert[i].eigen_confidence;
+	}
+
+	return confidences;
+}
+
 
 vector<double> GlobalFun::computeNormalDifference(CMesh *mesh, double radius, double sigma)
 {

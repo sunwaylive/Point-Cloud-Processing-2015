@@ -246,8 +246,8 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichDouble("sigmoid threshold", 0.4));
 
-	wLop.addParam(new RichDouble("Density Confidence Threshold", 0.91));
-	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.98));
+	wLop.addParam(new RichDouble("Density Confidence Threshold", 0.911));
+	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.95));
 }
 
 void ParameterMgr::initSkeletonParameter()

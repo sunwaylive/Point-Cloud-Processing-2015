@@ -122,10 +122,15 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
-//   if (v.is_boundary && useFeatureColor)
-//   {
-//     return cBlue;
-//   }
+	if (v.is_boundary && !bUseConfidenceColor)
+   {
+     return cBlue;
+   }
+
+	if (v.bIsOriginal)
+	{
+		return original_color;
+	}
 
   if (v.is_dual_sample || v.is_fixed_sample)
   {
@@ -143,10 +148,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return GLColor(c.X() / 255., c.Y() / 255., c.Z() / 255., 1.);
 	}
 
-	if (v.bIsOriginal)
-	{
-		return original_color;
-	}
+
 
 	if (useNormalColor)
 	{
@@ -815,6 +817,11 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 
 		CVertex& dual_v = dual_samples->vert[index];
     //CVertex& dual_v = samples->vert[v.dual_index];
+// 	
+// 		Point3f diff = v.P() - dual_v.P();
+// 		double proj_dist = diff * v.N();
+// 		Point3f proj_point = v.P() - v.N() * proj_dist;
+// 		glDrawLine(v.P(), proj_point, cBrown, width);
 
 		glDrawLine(v.P(), dual_v.P(), cBrown, width);
   }
@@ -884,6 +891,23 @@ GLColor GLDrawer::isoValue2color(double iso_value,
 		base_colors[1] = Point3f(0.7, 1.0, 0.0);
 		base_colors[0] = Point3f(0.0, 1.0, 0.0);
 	}
+
+// 	if (is_inside && need_negative)
+// 	{
+// 		base_colors[4] = Point3f(0.0, 0.0, 1.0);
+// 		base_colors[3] = Point3f(0.75, 0.0, 1.0);
+// 		base_colors[2] = Point3f(0.5, 0.0, 1.0);
+// 		base_colors[1] = Point3f(0.25, 0.0, 1.0);
+// 		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+// 	}
+// 	else
+// 	{
+// 		base_colors[4] = Point3f(1.0, 0.0, 0.0);
+// 		base_colors[3] = Point3f(1.0, 0.0, 0.75);
+// 		base_colors[2] = Point3f(1.0, 0.0, 0.5);
+// 		base_colors[1] = Point3f(1.0, 0.0, 0.25);
+// 		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+// 	}
 
 	mixed_color = base_colors[base_id] * (base_id * step_size + step_size - iso_value)
 		+ base_colors[base_id + 1] * (iso_value - base_id * step_size);

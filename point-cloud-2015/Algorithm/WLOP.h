@@ -82,6 +82,9 @@ private:
 	void runComputeConfidence();
 	void runComputeInnerClusering();
 
+	void runComputeHoleConfidence();
+
+
 	void addSamplesToOriginalTemporary();
 	void removeSamplesFromOriginal();
 

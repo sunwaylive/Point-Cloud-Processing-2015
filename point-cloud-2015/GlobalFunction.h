@@ -96,9 +96,12 @@ namespace GlobalFun
 	//void computeICP(CMesh *dst, CMesh *src);
 
 	vector<double> computeDensityConfidence(CMesh *mesh, double radius);
+
+
 	vector<double> computeNormalDifference(CMesh *mesh, double radius, double sigma);
 	vector<double> computeBilateralConfidence(CMesh *mesh, double radius, double sigma);
 
+	vector<double> smoothConfidences(CMesh *mesh, double radius);
 }
 
 class Timer
