@@ -853,6 +853,17 @@ Point3f GlobalFun::getTangentVector(Point3f& diff_vecotr, Point3f& normal)
   return tangent_vector;
 }
 
+Point3f GlobalFun::getTangentVector2(Point3f& diff_vecotr, Point3f& normal)
+{
+	double proj_dist = diff_vecotr * normal.Normalize();
+	Point3f proj_vector = normal * proj_dist;
+	Point3f tangent_vector = diff_vecotr - proj_vector;
+
+	Point3f tangent_vector_long = tangent_vector.Normalize() * sqrt(diff_vecotr.SquaredNorm());
+
+	return tangent_vector_long;
+}
+
 void GlobalFun::deleteIgnore(CMesh* mesh)
 {
   vector<CVertex> temp_vert;

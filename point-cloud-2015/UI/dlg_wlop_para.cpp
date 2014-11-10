@@ -503,9 +503,13 @@ void WlopParaDlg::applyAnisotropicLop()
 	else
 	{
 		m_paras->wLop.setValue("Run Anisotropic LOP", BoolValue(true));
-		global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
-		calculation_thread.setArea(area);
-		calculation_thread.start();
+		area->runWlop();
+		m_paras->wLop.setValue("Run Anisotropic LOP", BoolValue(false));
+
+// 		m_paras->wLop.setValue("Run Anisotropic LOP", BoolValue(true));
+// 		global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
+// 		calculation_thread.setArea(area);
+// 		calculation_thread.start();
 	}
 
 }

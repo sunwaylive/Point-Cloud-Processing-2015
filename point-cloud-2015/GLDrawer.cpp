@@ -82,7 +82,7 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 		Point3f& p = vi->P();      
 		Point3f& normal = vi->N();
 
-    if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
+    if(!(bCullFace /*&& !vi->is_dual_sample*/ /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
 			{
@@ -806,6 +806,11 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
   {
     CVertex& v = samples->vert[i];
 
+		if (bCullFace && !isCanSee(v.P(), v.N()))
+		{
+			continue;
+		}
+
 		int index = i;
 		if (global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
 		{
@@ -817,13 +822,21 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 
 		CVertex& dual_v = dual_samples->vert[index];
     //CVertex& dual_v = samples->vert[v.dual_index];
-// 	
-// 		Point3f diff = v.P() - dual_v.P();
-// 		double proj_dist = diff * v.N();
-// 		Point3f proj_point = v.P() - v.N() * proj_dist;
-// 		glDrawLine(v.P(), proj_point, cBrown, width);
+ 	
+		if (bUseConfidenceColor)
+		{
+			Point3f diff = v.P() - dual_v.P();
+			double proj_dist = diff * v.N();
+			Point3f proj_point = v.P() - v.N() * proj_dist;
+			glDrawLine(v.P(), proj_point, cBrown, width);
+		}
+		else
+		{
+			glDrawLine(v.P(), dual_v.P(), cBrown, width);
+		}
 
-		glDrawLine(v.P(), dual_v.P(), cBrown, width);
+
+		//glDrawLine(v.P(), dual_v.P(), cBrown, width);
   }
 
 }

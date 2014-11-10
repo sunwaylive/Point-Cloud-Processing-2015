@@ -553,12 +553,14 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 			CVertex& t = samples->vert[v.neighbors[j]];
 			Point3f diff = v.P() - t.P();
 
+			Point3f diff2 = v.P() - t.P();;
       if (use_tangent)
       {
-        diff = GlobalFun::getTangentVector(diff, v.N());
+        diff = GlobalFun::getTangentVector2(diff, v.N());
+				diff2 = GlobalFun::getTangentVector(diff, v.N());
       }
 
-			double dist2  = diff.SquaredNorm();
+			double dist2 = diff2.SquaredNorm();
 			double len = sqrt(dist2);
 			if(len <= 0.001 * radius) len = radius*0.001;
 

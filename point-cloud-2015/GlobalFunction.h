@@ -88,6 +88,8 @@ namespace GlobalFun
   void removeNormalOverlaps(CMesh* mesh);
 
   Point3f getTangentVector(Point3f& diff_vecotr, Point3f& normal);
+	Point3f getTangentVector2(Point3f& diff_vecotr, Point3f& normal);
+
 
 	void normalizeConfidence(vector<CVertex>& vertexes, float delta);
 
