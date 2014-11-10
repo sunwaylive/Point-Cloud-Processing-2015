@@ -110,6 +110,8 @@ public:
 
 	void start(const string& str)
 	{
+		if (!turn_on) return;
+		
 		cout << endl;
 		starttime = clock();
 		mid_start = clock();
@@ -120,6 +122,8 @@ public:
 
 	void insert(const string& str)
 	{
+		if (!turn_on) return;
+
 		mid_end = clock();
 		timeused = mid_end - mid_start;
 		cout << "##" << str << "  time used:  " << timeused / double(CLOCKS_PER_SEC) << " seconds." << endl;
@@ -128,15 +132,31 @@ public:
 
 	void end()
 	{
+		if (!turn_on) return;
+
 		stoptime = clock();
 		timeused = stoptime - starttime;
 		cout << /*endl <<*/ "@@@@ finish	" << _str << "  time used:  " << timeused / double(CLOCKS_PER_SEC) << " seconds." << endl;
 		cout << endl;
 	}
 
+	Timer()
+	{
+		starttime = 0;
+		mid_start = 0;
+		mid_end = 0;
+		stoptime = 0;
+		timeused = 0;
+		_str = "";
+		turn_on = true;
+	}
+
+	bool turn_on;
+
 private:
 	int starttime, mid_start, mid_end, stoptime, timeused;
 	string _str;
+	
 };
 
 

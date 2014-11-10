@@ -370,7 +370,9 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 {
 	double average_power = para->getDouble("Average Power");
 	bool need_density = para->getBool("Need Compute Density");
-	bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
+
+//	bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
+	bool use_elliptical_neighbor = false;
 
 	bool use_nearest_neighbor = para->getBool("Use Adaptive Sample Neighbor");
 
@@ -380,6 +382,11 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	//bool use_fixed_original = (para->getBool("Run Skel WLOP") && global_paraMgr.glarea.getBool("Show Samples"));
 	bool use_fixed_original = para->getBool("Run Skel WLOP");
 
+	//bool need_normal_weight = para->getBool("Need Compute Density");
+	bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
+
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	double radius2 = radius * radius;
 	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
@@ -395,7 +402,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 	if (para->getBool("Run Skel WLOP"))
 	{
-		use_elliptical_neighbor = use_nearest_neighbor = use_tangent = L2 = use_confidence = false;
+		use_elliptical_neighbor = use_nearest_neighbor = use_tangent = L2 = use_confidence = need_normal_weight = false;
 	}
 
 	cout << "dual" << endl;
@@ -461,6 +468,11 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				w = exp(proj_dist2 * iradius16_proj);
 			}
 
+			if (need_normal_weight)
+			{
+				double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+				w *= normal_diff;
+			}
 
 			if (need_density)
 			{
@@ -1561,6 +1573,8 @@ void WLOP::runComputeConfidence()
 	double iradius16 = -4.0 / radius2;
 
 	double original_knn = para->getDouble("Original Confidence KNN");
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runRegularizeNormals()");
 
@@ -1571,13 +1585,19 @@ void WLOP::runComputeConfidence()
 		CVertex& v = samples->vert[i];
 
 		double sum_dist = 0;
+		double sum_weight = 0;
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
 			CVertex& t = original->vert[v.neighbors[j]];
-			sum_dist += GlobalFun::computeEulerDist(v.P(), t.P());
+			//double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+			double normal_diff = 1.0;
+
+
+			sum_dist += GlobalFun::computeEulerDist(v.P(), t.P()) * normal_diff;
+			sum_weight += normal_diff;
 		}
 
-		v.eigen_confidence = sum_dist / v.neighbors.size();
+		v.eigen_confidence = sum_dist / sum_weight;
 
 		v.nearest_neighbor_dist = v.eigen_confidence;
 		//outfile << v.nearest_neighbor_dist << endl;
@@ -3282,11 +3302,39 @@ void WLOP::runDetectKitePoitns()
 {
 	double sample_threshold = para->getDouble("Density Confidence Threshold");
 	double dual_sample_threshold = para->getDouble("Eigen Confidence Threshold");
+	double mutual_dist_threshold = para->getDouble("CGrid Radius") * para->getDouble("Mutual Distance Threshold");
+
+	////////////////////// computer Mutual Distance Threshold
+// 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+// 	GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+// 
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		//CVertex& dual_v = dual_samples->vert[i];
+// 		int idx = v.neighbors[0];
+// 		CVertex& dual_v = dual_samples->vert[idx];
+// 
+// 		int near_v_idx = dual_v.neighbors[0];
+// 		CVertex& near_v = samples->vert[near_v_idx];
+// 
+// 		double proj_dist = abs((v.P() - dual_v.P())*v.N());
+// 
+// 		v.eigen_confidence = proj_dist;
+// 	}
+// 	GlobalFun::normalizeConfidence(samples->vert, 0);
+// 
+// 	return;
+	//////////////////////
+	Timer time;
+	time.turn_on = false;
 
 	runComputeConfidence();
 
+	time.start("computeNearestNeighborDist()");
 	computeNearestNeighborDist();
 
+	time.start("max_original_dist");
 	double max_original_dist = 0.0;
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
@@ -3302,13 +3350,18 @@ void WLOP::runDetectKitePoitns()
 	}
 	cout << "max_original_dist  " << max_original_dist << endl;
 
+	time.start("computeBallNeighbors");
 
-
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 15, false, "WlopParaDlg::runRegularizeNormals()");
 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-
 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+	GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+
+
+	time.start("dual_samples");
+
 
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
@@ -3317,11 +3370,19 @@ void WLOP::runDetectKitePoitns()
 		int idx = v.neighbors[0];
 		CVertex& dual_v = dual_samples->vert[idx];
 
-		if (v.nearest_neighbor_dist > max_original_dist && dual_v.eigen_confidence > dual_sample_threshold)
-		{
-			v.is_boundary = true;
-			dual_v.is_boundary = true;
-		}
+ 		int near_v_idx = dual_v.neighbors[0];
+ 		CVertex& near_v = samples->vert[near_v_idx];
+
+		double proj_dist = abs((near_v.P() - dual_v.P())*near_v.N());
+
+
+ 		if (v.nearest_neighbor_dist > max_original_dist 
+ 		&& dual_v.eigen_confidence > dual_sample_threshold
+ 		&& proj_dist > mutual_dist_threshold)
+ 		{
+ 			v.is_boundary = true;
+ 			dual_v.is_boundary = true;
+ 		}
 	}
 
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius")*1.5, samples->bbox);
@@ -3394,6 +3455,42 @@ void WLOP::runDetectKitePoitns()
 
 void WLOP::runRegularizeNormals()
 {
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex dual_v2 = dual_samples->vert[i];
+
+		if (!v.is_boundary)
+		{
+			continue;
+		}
+
+		int neighbor_idx = v.neighbors[0];
+		//int neighbor_idx = i;
+		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+		Point3f diff = v.P() - dual_v.P();
+		double proj_dist = diff * dual_v.eigen_vector0;
+		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
+		Point3f dir = (v.P() - proj_p).Normalize();
+
+		if (dir*v.N() < 0)
+		{
+			v.N() = ((-dir + v.N()) / 2.0).Normalize();
+		}
+		else
+		{
+			v.N() = ((dir + v.N()) / 2.0).Normalize();
+		}
+	}
+
+	return;
+
+
 	if (use_kite_points)
 	{
 		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);

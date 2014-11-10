@@ -28,7 +28,9 @@ void Skeletonization::run()
 
   if (para->getBool("Run ALL Segment"))
   {
-    runAllSegment();
+    //runAllSegment();
+		reconnectSkeleton();
+
   }
 }
 
@@ -1344,7 +1346,7 @@ void Skeletonization::compareTwoCurvesEnds(Curve& c0, Curve& c1, double& min_dis
     return;
   }
 
-  if (c0.size() <= 3 || c1.size() <= 3)
+  if (c0.size() <= 1 || c1.size() <= 1)
   {
     return;
   }
@@ -2438,7 +2440,7 @@ void Skeletonization::segmentOneCurve(Curve& c)
   smoothCurve(c, para->getDouble("Branches Search Angle") / 1.5, 3);
   subdivisionCurve(c, para->getDouble("Curve Segment Length") * 0.1);
 
-  if (c.size() < 5)
+  if (c.size() < 3)
   {
     cout << "too short for segment!!" << endl;
     return;
@@ -2724,107 +2726,111 @@ void Skeletonization::subdivisionCurve(Curve& c, double stop_segment_length)
 
 void Skeletonization::reconnectSkeleton()
 {
+	skeleton->generateBranchSampleMap();
+
+	cout << "reconnectSkeleton" << endl;
+
   double nearby_dist2 = 1e-6;
   vector<Branch>& branches = skeleton->branches;
 
   // deal with self-eat problem
-  while(1)
-  {
-    bool have_erase = false;
-    for (int i = 0; i < branches.size(); i++)
-    {
-      Branch& branch = branches[i];
-      double head_tail_dist2 = GlobalFun::computeEulerDistSquare(branch.getHead(), branch.getTail());
-      if (head_tail_dist2 < nearby_dist2)
-      {
-        if (branch.getSize() < 8)
-        {
-          branches.erase(branches.begin()+i);
-          skeleton->generateBranchSampleMap();
-          have_erase = true;
-          break;
-        }
-        else
-        {
-          branch.curve.pop_back(); //maybe need more consideration
-        }
-      }
-    }
+//   while(1)
+//   {
+//     bool have_erase = false;
+//     for (int i = 0; i < branches.size(); i++)
+//     {
+//       Branch& branch = branches[i];
+//       double head_tail_dist2 = GlobalFun::computeEulerDistSquare(branch.getHead(), branch.getTail());
+//       if (head_tail_dist2 < nearby_dist2)
+//       {
+//         if (branch.getSize() < 8)
+//         {
+//           branches.erase(branches.begin()+i);
+//           skeleton->generateBranchSampleMap();
+//           have_erase = true;
+//           break;
+//         }
+//         else
+//         {
+//           branch.curve.pop_back(); //maybe need more consideration
+//         }
+//       }
+//     }
 
-    if (!have_erase)
-    {
-      break;
-    }
-  }
+//     if (!have_erase)
+//     {
+//       break;
+//     }
+//   }
 
   //break joint nodes
-  while(1)
-  {
-    int break_branch_id = -1;
-    int break_node_id = -1;
-
-    for (int i = 0; i < branches.size(); i++)
-    {
-      Branch& branch = branches[i];
-
-      Point3f& head_P = branch.getHead();
-      Point3f& tail_P = branch.getTail();
-
-      break_branch_id = -1;
-      break_node_id = -1;
-
-      for (int j = 0; j < branches.size(); j++)
-      {
-        Curve& curve1 = branches[j].curve;
-        if (j == i || curve1.size() < 2)
-        {
-          continue;
-        }
-
-        for (int k = 1; k < curve1.size()-1; k++)
-        {
-          Point3f p = curve1[k].P();
-          double dist_head2 = GlobalFun::computeEulerDistSquare(p, head_P);
-          double dist_tail2 = GlobalFun::computeEulerDistSquare(p, tail_P);
-
-          if (dist_tail2 < nearby_dist2 || dist_head2 < nearby_dist2)
-          {
-            break_branch_id = j;
-            break_node_id = k;
-            break;
-          }
-        }
-      }
-      if (break_branch_id >= 0)
-      {
-        break;
-      }
-
-    }
-
-    if (break_branch_id >= 0)
-    {
-      Branch& break_branch = branches[break_branch_id];
-      Curve& break_curve = break_branch.curve;
-
-      Curve::iterator break_iter = break_curve.begin() + break_node_id;
-      Curve::iterator end_iter = break_curve.end();
-      
-      Branch copy_branch;
-      Curve& copy_curve = copy_branch.curve;
-      copy_curve.resize(break_curve.size() - break_node_id);
-      std::copy(break_iter, end_iter, copy_curve.begin());
-      break_curve.erase(break_iter+1, end_iter);
-
-      skeleton->branches.push_back(copy_branch);
-      skeleton->generateBranchSampleMap();	
-    }
-    else
-    {
-      break;
-    }
-
-  }
+   while(1)
+   {
+     int break_branch_id = -1;
+     int break_node_id = -1;
+ 
+     for (int i = 0; i < branches.size(); i++)
+     {
+       Branch& branch = branches[i];
+ 
+       Point3f& head_P = branch.getHead();
+       Point3f& tail_P = branch.getTail();
+ 
+       break_branch_id = -1;
+       break_node_id = -1;
+ 
+       for (int j = 0; j < branches.size(); j++)
+       {
+         Curve& curve1 = branches[j].curve;
+         if (j == i || curve1.size() < 1)
+         {
+           continue;
+         }
+ 
+         for (int k = 1; k < curve1.size()-1; k++)
+         {
+           Point3f p = curve1[k].P();
+           double dist_head2 = GlobalFun::computeEulerDistSquare(p, head_P);
+           double dist_tail2 = GlobalFun::computeEulerDistSquare(p, tail_P);
+ 
+           if (dist_tail2 < nearby_dist2 || dist_head2 < nearby_dist2)
+           {
+             break_branch_id = j;
+             break_node_id = k;
+             break;
+           }
+         }
+       }
+       if (break_branch_id >= 0)
+       {
+         break;
+       }
+ 
+     }
+ 
+     if (break_branch_id >= 0)
+     {
+       Branch& break_branch = branches[break_branch_id];
+       Curve& break_curve = break_branch.curve;
+ 
+       Curve::iterator break_iter = break_curve.begin() + break_node_id;
+       Curve::iterator end_iter = break_curve.end();
+       
+       Branch copy_branch;
+       Curve& copy_curve = copy_branch.curve;
+       copy_curve.resize(break_curve.size() - break_node_id);
+       std::copy(break_iter, end_iter, copy_curve.begin());
+       break_curve.erase(break_iter+1, end_iter);
+ 
+       skeleton->branches.push_back(copy_branch);
+       skeleton->generateBranchSampleMap();	
+     }
+     else
+     {
+       break;
+     }
+ 
+   }
 
 
   //combine connected branches
@@ -2895,10 +2901,14 @@ void Skeletonization::reconnectSkeleton()
 
     if (have_new_combine)
     {
+			cout << "new combine" << endl;
+
       Branch& branch0 = skeleton->branches[combine_curve_id0];
       Branch& branch1 = skeleton->branches[combine_curve_id1];
 
       Branch new_branch = mergeTowBranches(branch0, branch1, UNKNOWN);
+
+			cout << "new branch size: " << new_branch.curve.size() << endl;
       branch0 = new_branch;
       skeleton->branches.erase(skeleton->branches.begin() + branch1.branch_id);
 
@@ -2906,6 +2916,7 @@ void Skeletonization::reconnectSkeleton()
     }
     else
     {
+			cout << "no new combine" << endl;
       break;
     }
 

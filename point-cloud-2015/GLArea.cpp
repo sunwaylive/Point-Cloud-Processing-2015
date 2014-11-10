@@ -435,7 +435,7 @@ void GLArea::initAfterOpenFile()
 
 void GLArea::initSetting()
 {
-  //dataMgr.recomputeQuad();
+  dataMgr.recomputeQuad();
   initView();
 	wlop.setFirstIterate();
 	skeletonization.setFirstIterate();
@@ -1787,6 +1787,18 @@ void GLArea::reorientPick()
 //     samples->vert[pickList[i]].N() *= -1;
 //   }
 
+	if (global_paraMgr.wLop.getBool("Use Kite Points"))
+	{
+		CMesh* samples = dataMgr.getCurrentSamples();
+
+		for (int i = 0; i < pickList.size(); i++)
+		{
+			samples->vert[pickList[i]].is_boundary = true;
+		}
+
+		return;
+	}
+
 
   CMesh* samples = dataMgr.getCurrentSamples();
 
@@ -1799,6 +1811,19 @@ void GLArea::reorientPick()
 void GLArea::cleanPick()
 {
   CMesh* samples = dataMgr.getCurrentSamples();
+
+	if (global_paraMgr.wLop.getBool("Use Kite Points"))
+	{
+		CMesh* samples = dataMgr.getCurrentSamples();
+
+		for (int i = 0; i < pickList.size(); i++)
+		{
+			samples->vert[pickList[i]].is_boundary = false;
+		}
+
+		return;
+	}
+
 
   for (int i = 0; i < pickList.size(); i++)
   {
@@ -1829,7 +1854,7 @@ void GLArea::removePickPoint()
 
 			CVertex &v = samples->vert[pickList[i]]; 
 			samples->vert.erase(samples->vert.begin() + v.m_index);
-      //dual_samples->vert.erase(dual_samples->vert.begin() + v.m_index);
+      dual_samples->vert.erase(dual_samples->vert.begin() + v.m_index);
 		}
 	}
 	else
@@ -1837,35 +1862,43 @@ void GLArea::removePickPoint()
 		for (int i = 0; i < pickList.size(); i+= 2)
 		{
 			samples->vert[pickList[i]].is_skel_ignore = true;
-      //dual_samples->vert[pickList[i]].is_skel_ignore = true;
+      dual_samples->vert[pickList[i]].is_skel_ignore = true;
 
 		}
 
 		vector<CVertex> save_sample_vert;
+		vector<CVertex> save_dual_sample_vert;
+
 		for (int i = 0; i < samples->vert.size(); i++)
 		{
 			CVertex& v = samples->vert[i];
+			CVertex& dual_v = dual_samples->vert[i];
+
 			if (!v.is_skel_ignore)
 			{
 				save_sample_vert.push_back(v);
+				save_dual_sample_vert.push_back(dual_v);
 			}
 		}
 
 		samples->vert.clear();
+		dual_samples->vert.clear();
+
 		for (int i = 0; i < save_sample_vert.size(); i++)
 		{
 			samples->vert.push_back(save_sample_vert[i]);
+			dual_samples->vert.push_back(save_dual_sample_vert[i]);
 		}
-
 	}
 
-
 	samples->vn = samples->vert.size();
+	dual_samples->vn = dual_samples->vert.size();
 
 	j = 0;
 	for(vi = samples->vert.begin(); vi != samples->vert.end(); ++vi, ++j)
 	{
 		vi->m_index = j;
+		dual_samples->vert[j].m_index = j;
 	}
 
 	cleanPickPoints();

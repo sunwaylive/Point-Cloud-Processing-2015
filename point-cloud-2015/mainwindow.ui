@@ -59,6 +59,7 @@
     <addaction name="actionImport_Image"/>
     <addaction name="actionSave_View"/>
     <addaction name="actionSwitch_Sample_DualSample"/>
+    <addaction name="actionAdd_Samples_To_Original"/>
    </widget>
    <widget class="QMenu" name="menuAlgorithom">
     <property name="title">
@@ -825,6 +826,11 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAdd_Samples_To_Original">
+   <property name="text">
+    <string>Add Samples To Original</string>
    </property>
   </action>
  </widget>

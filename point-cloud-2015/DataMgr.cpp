@@ -601,6 +601,7 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 	{
 		Point3f& p = mesh.vert[i].P();
 		p -= mid_point;
+		p *= 2.0;
 		mesh.bbox.Add(p);
 	}
 
@@ -648,6 +649,13 @@ Box3f DataMgr::normalizeAllMesh()
 			box.Add(samples.vert[i].P());
 		}
 	}
+	if (!dual_samples.vert.empty())
+	{
+		for (int i = 0; i < dual_samples.vert.size(); i++)
+		{
+			box.Add(dual_samples.vert[i].P());
+		}
+	}
 	if (!isOriginalEmpty())
 	{
 		for (int i = 0; i < original.vert.size(); i++)
@@ -656,6 +664,7 @@ Box3f DataMgr::normalizeAllMesh()
 		}
 		original.bbox =box;
 	}
+
 
 	samples.bbox = box;
 	dual_samples.bbox = box;

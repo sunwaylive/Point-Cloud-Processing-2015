@@ -145,6 +145,7 @@ void MainWindow::initConnect()
 	connect(ui.actionShow_Target, SIGNAL(toggled(bool)), this, SLOT(showTargets(bool)));
 
 	connect(ui.actionSpray_Erase, SIGNAL(triggered()), this, SLOT(sprayErasePick()));
+	connect(ui.actionAdd_Samples_To_Original, SIGNAL(triggered()), this, SLOT(addSamplesToOriginal()));
 
 	QTimer *timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), this->area, SLOT(update()));
@@ -933,3 +934,24 @@ void MainWindow::sprayErasePick()
 	area->updateGL();
 }
 
+void MainWindow::addSamplesToOriginal()
+{
+	CMesh* samples = area->dataMgr.getCurrentSamples();
+	CMesh* original = area->dataMgr.getCurrentOriginal();
+
+	samples->face.clear();
+	original->face.clear();
+
+	int idx = original->vert.back().m_index + 1;
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex t = samples->vert[i];
+		t.bIsOriginal = true;
+		t.m_index = idx++;
+
+		original->vert.push_back(t);
+		original->bbox.Add(t.P());
+	}
+	original->vn = original->vert.size();
+}

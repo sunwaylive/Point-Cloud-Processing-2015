@@ -382,6 +382,7 @@ void WlopParaDlg::copySamplesToDualSamples()
 	CMesh* samples = area->dataMgr.getCurrentSamples();
 	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
 
+	dual_samples->vert.resize(samples->vert.size());
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		dual_samples->vert[i] = samples->vert[i];

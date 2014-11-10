@@ -67,6 +67,8 @@ private slots:
 	
 	void sprayErasePick();
 
+	void addSamplesToOriginal();
+
 private slots:
 	void runWLop();
 
