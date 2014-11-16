@@ -412,7 +412,8 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
 {
   double width = para->getDouble("Sample Draw Width") * 0.4;
-  GLColor dnn_color = cOrange;
+  //GLColor dnn_color = cOrange;
+	GLColor dnn_color = cBlue;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
@@ -434,12 +435,17 @@ void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, 
       if( (*vi) > original->vert.size() || (*vi) < 0)
         break;
 
+// 			if (j < 20)
+// 			{
+// 				cout << "vi " << *vi << endl;
+// 			}
+
       CVertex& v2 = original->vert[*vi];
       Point3f p2 = v2.P();
 
       glPushMatrix();      
       glTranslatef(p2[0], p2[1], p2[2]);
-      glutSolidSphere(width, 10, 10);
+      glutSolidSphere(width * 2, 10, 10);
       glPopMatrix();
     }
   } 

@@ -383,7 +383,9 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	bool use_fixed_original = para->getBool("Run Skel WLOP");
 
 	//bool need_normal_weight = para->getBool("Need Compute Density");
-	bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
+	//bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
+	bool need_normal_weight = false;
+	bool need_anti_normal = para->getBool("Use Elliptical Original Neighbor");
 
 	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
@@ -511,7 +513,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 				average[i] += t.P() * w;
 // 			}
 // 			else
-				if (use_tangent /*&& !use_confidence*/)
+			if (use_tangent /*&& !use_confidence*/)
 			{
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
@@ -553,14 +555,14 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 			CVertex& t = samples->vert[v.neighbors[j]];
 			Point3f diff = v.P() - t.P();
 
-			Point3f diff2 = v.P() - t.P();;
+			//Point3f diff2 = v.P() - t.P();;
       if (use_tangent)
       {
-        diff = GlobalFun::getTangentVector2(diff, v.N());
-				diff2 = GlobalFun::getTangentVector(diff, v.N());
+        diff = GlobalFun::getTangentVector(diff, v.N());
+				//diff2 = GlobalFun::getTangentVector(diff, v.N());
       }
 
-			double dist2 = diff2.SquaredNorm();
+			double dist2 = diff.SquaredNorm();
 			double len = sqrt(dist2);
 			if(len <= 0.001 * radius) len = radius*0.001;
 
@@ -2151,6 +2153,18 @@ void WLOP::runComputeConfidence()
 
 void WLOP::runComputeInnerClusering()
 {
+
+	int knn = para->getDouble("Original Averaging KNN");
+
+	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, knn, false, "averaging KNN");
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		v.original_neighbors = v.neighbors;
+	}
+
+	return;
+
 	if (global_paraMgr.glarea.getBool("Show Dual Connection") && global_paraMgr.glarea.getBool("Show Samples"))
 	{
 		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius") * 0.5, dual_samples->bbox);
@@ -2663,13 +2677,25 @@ void WLOP::runSkelWlop()
 
     if (average_weight_sum[i] > 1e-20)
     {
-      v.P() = average[i] / average_weight_sum[i];
+			if (use_kite_points)
+			{
+				CVertex& sample_point = original->vert[i];
+				Point3f avg_point = average[i] / average_weight_sum[i];
+				double proj_dist = abs((avg_point - sample_point.P()) * sample_point.N());
+				Point3f new_point = sample_point.P() - sample_point.N() * proj_dist;
+				v.P() = new_point;
+			}
+			else
+			{
+				v.P() = average[i] / average_weight_sum[i];
+			}
+      //
 
     }
-    if (repulsion_weight_sum[i] > 1e-20 && mu >= 0)
-    {
-      v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
-    }
+//     if (repulsion_weight_sum[i] > 1e-20 && mu >= 0)
+//     {
+//       v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
+//     }
 
     if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
     {

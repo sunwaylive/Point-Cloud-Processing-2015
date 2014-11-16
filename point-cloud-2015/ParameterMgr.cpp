@@ -200,7 +200,7 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
   wLop.addParam(new RichBool("Need Sample Average", false));
-	wLop.addParam(new RichBool("Use Confidence", true));
+	wLop.addParam(new RichBool("Use Confidence", false));
 
 	wLop.addParam(new RichBool("Run Anisotropic LOP", false));
   wLop.addParam(new RichBool("Run Dual WLOP", false));
@@ -223,16 +223,16 @@ void ParameterMgr::initWLopParameter()
  
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
-	wLop.addParam(new RichBool("Need Similarity", true));
+	wLop.addParam(new RichBool("Need Similarity", false));
 
 
   wLop.addParam(new RichBool("Use Elliptical Original Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
-  wLop.addParam(new RichBool("Use Tangent Vector", true));
+  wLop.addParam(new RichBool("Use Tangent Vector", false));
 
 	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
-	wLop.addParam(new RichBool("Use Kite Points", true));
+	wLop.addParam(new RichBool("Use Kite Points", false));
 
 
 
@@ -256,7 +256,7 @@ void ParameterMgr::initSkeletonParameter()
 {
   /// 
   skeleton.addParam(new RichDouble("Repulsion Power", 1.0));
-  skeleton.addParam(new RichDouble("Average Power", 2.0));
+  skeleton.addParam(new RichDouble("Average Power", 1.0));
 
   /// 
   skeleton.addParam(new RichDouble("Num Of Iterate Time", 1));

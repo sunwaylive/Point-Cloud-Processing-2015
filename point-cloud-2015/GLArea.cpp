@@ -166,9 +166,13 @@ void GLArea::paintGL()
 		double normal_width = global_paraMgr.drawer.getDouble("Normal Line Width");
 		double dot_size = global_paraMgr.drawer.getDouble("Sample Dot Size");
 		double original_dot_size = global_paraMgr.drawer.getDouble("Original Dot Size");
+		double dual_dot_size = global_paraMgr.drawer.getDouble("Dual Sample Dot Size");
 
 		global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(normal_width * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
 		global_paraMgr.drawer.setValue("Sample Dot Size", DoubleValue(dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
+
+		global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(dual_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
+
 		global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
 	}
 
@@ -329,13 +333,20 @@ void GLArea::paintGL()
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
 	}
 
- 	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
- 	{
- 		Box3f box = dataMgr.getCurrentSamples()->bbox;
- 		glBoxWire(box);
- 
- 		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
- 	}
+//  	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
+//  	{
+//  		Box3f box = dataMgr.getCurrentSamples()->bbox;
+//  		glBoxWire(box);
+//  
+//  		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
+//  	}
+  	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box") ))
+  	{
+  		Box3f box = dataMgr.getCurrentSamples()->bbox;
+  		glBoxWire(box);
+  
+  		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
+  	}
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
@@ -355,11 +366,14 @@ void GLArea::paintGL()
     //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
 
 
-     if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor"))
+		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
      {
        //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
        //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
-       //glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+       
+			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+			glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentSamples(), dataMgr.getCurrentOriginal(), pickList);
+
      }
 
 
@@ -399,10 +413,14 @@ void GLArea::paintGL()
 		double normal_width = global_paraMgr.drawer.getDouble("Normal Line Width");
 		double dot_size = global_paraMgr.drawer.getDouble("Sample Dot Size");
 		double original_dot_size = global_paraMgr.drawer.getDouble("Original Dot Size");
+		double dual_dot_size = global_paraMgr.drawer.getDouble("Dual Sample Dot Size");
 
 		global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(normal_width / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
 		global_paraMgr.drawer.setValue("Sample Dot Size", DoubleValue(dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
 		global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
+
+		global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(dual_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
+
 	}
 
 	}
