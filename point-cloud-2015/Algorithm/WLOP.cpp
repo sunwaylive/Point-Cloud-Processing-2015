@@ -242,6 +242,12 @@ void WLOP::run()
 		runComputeCorrespondence();
 	}
 
+	if (para->getBool("Run Progressive Neighborhood"))
+	{
+		runProgressiveNeighborhood();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -486,6 +492,11 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				w = 1.0;
 			}
 
+// 			if (need_anti_normal)
+// 			{
+// 				w = 1.0;
+// 			}
+
 			if (use_fixed_original)
 			{
 				if (dual_samples->vert[t.m_index].is_fixed_sample)
@@ -518,13 +529,14 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
 			}
-			else
+// 			else if (need_anti_normal)
+// 			{
+// 			}
+			else 
 			{
 				average[i] += t.P() * w;
 			}
 			average_weight_sum[i] += w;
-
-
 
 		}
 	}
@@ -1206,6 +1218,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	bool need_similarity = para->getBool("Need Similarity");
 	bool use_tangent = para->getBool("Use Tangent Vector");
 	bool use_confidence = para->getBool("Use Confidence");
+	bool only_use_repulsiton = para->getBool("Only Use Repulsion");
 
 	double radius = para->getDouble("CGrid Radius");
 	double radius_threshold = radius * 0.6;
@@ -1215,7 +1228,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	vector<Point3f> new_pos(samples->vert.size());
 	for (int i = 0; i < new_pos.size(); i++)
 	{
-		new_pos[i] = samples->vert[i];
+		new_pos[i] = samples->vert[i].P();
 	}
 
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -1235,7 +1248,11 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 				CVertex& v = samples->vert[i];
 				c = v.P();
 
-				if (need_similarity)
+				if (only_use_repulsiton && repulsion_weight_sum[i] > 1e-20 && mu > 0)
+				{
+					new_pos[i] = v.P() + repulsion[i] * (mu / repulsion_weight_sum[i]);
+				}
+				else if (need_similarity)
 				{
 //  					if (average_weight_sum[i] < 1e-20)
 //  					{
@@ -4453,3 +4470,130 @@ void WLOP::removeSamplesFromOriginal()
 	original->vn = original->vert.size();
 }
 
+
+void WLOP::runProgressiveNeighborhood()
+{
+	double radius = para->getDouble("CGrid Radius");
+	double radius2 = radius * radius;
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+
+
+	int min_knn = para->getDouble("Progressive Min KNN");
+	int max_knn = para->getDouble("Progressive Max KNN");
+	int step_size = 1;
+	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, max_knn, false, "runProgressiveNeighborhood KNN");
+
+	bool use_tangent = para->getBool("Use Tangent Vector");
+
+	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+	if (pick_index < 0 || pick_index >= samples->vert.size())
+	{
+		int neighbor_num = (min_knn + max_knn) / 2;
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+
+			Point3f sum_pos = Point3f(0, 0, 0);
+			double sum_weight = 0;
+			double weight = 0.0;
+
+			for (int j = 0; j < neighbor_num; j++)
+			{
+				int original_neighbor_idx = v.neighbors[j];
+				CVertex& t = original->vert[original_neighbor_idx];
+
+				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+				weight = exp(dist2 * iradius16);
+
+				if (use_tangent)
+				{
+					Point3f diff = t.P() - v.P();
+					double proj_dist = diff * v.N();
+					Point3f proj_point = v.P() + v.N() * proj_dist;
+					sum_pos += proj_point * weight;
+				}
+				else
+				{
+					sum_pos += t.P() * weight;
+				}
+
+				sum_weight += weight;
+			}
+
+			Point3f avg_pos = sum_pos / sum_weight;
+			double dist = GlobalFun::computeEulerDist(v.P(), avg_pos);
+
+			v.eigen_confidence = dist;
+		}
+
+		GlobalFun::normalizeConfidence(samples->vert, 0.0);
+		GlobalFun::smoothConfidences(samples, radius);
+	}
+	else
+	{
+		vector<Point3f> tentative_position;
+
+		CVertex& v = samples->vert[pick_index];
+		for (int curr_knn = min_knn; curr_knn <= max_knn; curr_knn += step_size)
+		{
+			Point3f sum_pos = Point3f(0, 0, 0);
+			double sum_weight = 0;
+
+			if (v.neighbors.empty())
+			{
+				return;
+			}
+			v.original_neighbors = v.neighbors;
+
+			double weight = 0.0;
+			for (int i = 0; i < curr_knn; i++)
+			{
+				int original_neighbor_idx = v.neighbors[i];
+				CVertex& t = original->vert[original_neighbor_idx];
+
+				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+				weight = exp(dist2 * iradius16);
+
+				if (use_tangent)
+				{
+					Point3f diff = t.P() - v.P();
+					double proj_dist = diff * v.N();
+					Point3f proj_point = v.P() + v.N() * proj_dist;
+					sum_pos += proj_point * weight;
+				}
+				else
+				{
+					sum_pos += t.P() * weight;
+				}
+
+				sum_weight += weight;
+			}
+
+			Point3f avg_pos = sum_pos / sum_weight;
+			tentative_position.push_back(avg_pos);
+		}
+
+		ofstream out_error("fitting_error.txt");
+		for (int i = 0; i < tentative_position.size(); i++)
+		{
+			double dist = GlobalFun::computeEulerDist(v.P(), tentative_position[i]);
+
+			out_error << dist << endl;
+		}
+
+		dual_samples->vert.clear();
+		for (int i = 0; i < tentative_position.size(); i++)
+		{
+			CVertex new_v;
+			new_v.m_index = i;
+			new_v.P() = tentative_position[i];
+			new_v.is_dual_sample = true;
+
+			dual_samples->vert.push_back(new_v);
+		}
+		dual_samples->vn = dual_samples->vert.size();
+	}
+
+
+
+}

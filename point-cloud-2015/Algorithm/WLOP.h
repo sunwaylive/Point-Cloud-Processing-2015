@@ -52,6 +52,8 @@ public:
   void computeJointNeighborhood();
 	void runShowPickDistribution();
 
+	void runProgressiveNeighborhood();
+
 protected:
 	WLOP(){}
 

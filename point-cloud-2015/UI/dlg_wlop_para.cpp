@@ -136,6 +136,9 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->detect_kite_points, SIGNAL(clicked()), this, SLOT(applyDetectKitePoints()));
 
+
+	connect(ui->pushButton_progressive_neighborhood, SIGNAL(clicked()), this, SLOT(applyProgressiveNeighborhood()));
+
 }
 
 
@@ -624,4 +627,11 @@ void WlopParaDlg::applyShowPickDistribution()
 	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(false));
+}
+
+void WlopParaDlg::applyProgressiveNeighborhood()
+{
+	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(false));
 }

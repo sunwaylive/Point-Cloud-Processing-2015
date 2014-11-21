@@ -74,6 +74,8 @@ class WlopParaDlg : public QFrame
 		void applyComputeCorrespondence();
 		void applyShowPickDistribution();
 
+		void applyProgressiveNeighborhood();
+
 
 
 	private:

@@ -235,7 +235,6 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Use Kite Points", false));
 
 
-
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
   wLop.addParam(new RichBool("Run Normal Reform", false));
 
@@ -249,6 +248,13 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Density Confidence Threshold", 0.911));
 	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.97));
 	wLop.addParam(new RichDouble("Mutual Distance Threshold", 0.1));
+
+	wLop.addParam(new RichDouble("Progressive Min KNN", 5));
+	wLop.addParam(new RichDouble("Progressive Max KNN", 500));
+	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
+
+
+	wLop.addParam(new RichBool("Only Use Repulsion", true));
 
 }
 
