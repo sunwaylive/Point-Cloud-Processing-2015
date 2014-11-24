@@ -82,7 +82,7 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 		Point3f& p = vi->P();      
 		Point3f& normal = vi->N();
 
-    if(!(bCullFace /*&& !vi->is_dual_sample*/ /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
+    if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
 			{

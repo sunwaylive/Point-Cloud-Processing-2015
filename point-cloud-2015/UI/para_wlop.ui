@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -491,78 +491,6 @@
       <string>Dual Connection</string>
      </property>
     </widget>
-    <zorder>layoutWidget</zorder>
-    <zorder>skel_wlop</zorder>
-    <zorder>regularize_normals</zorder>
-    <zorder>wlop_apply</zorder>
-    <zorder>compute_distribution</zorder>
-    <zorder>wlop_projection</zorder>
-    <zorder>regularize_samples</zorder>
-    <zorder>compute_correspondence</zorder>
-    <zorder>detect_kite_points</zorder>
-    <zorder>inner_clustering</zorder>
-    <zorder>normal_reform</zorder>
-    <zorder>step_forward</zorder>
-    <zorder>dual_drag_wlop</zorder>
-    <zorder>show_pick_distribution</zorder>
-    <zorder>dual_wlop_apply</zorder>
-    <zorder>compute_confidence</zorder>
-    <zorder>anisotropic_lop_apply</zorder>
-    <zorder>dual_connection</zorder>
-    <zorder>normal_reform</zorder>
-    <zorder>layoutWidget</zorder>
-    <zorder>skel_wlop</zorder>
-    <zorder>regularize_normals</zorder>
-    <zorder>wlop_apply</zorder>
-    <zorder>compute_distribution</zorder>
-    <zorder>wlop_projection</zorder>
-    <zorder>regularize_samples</zorder>
-    <zorder>compute_correspondence</zorder>
-    <zorder>detect_kite_points</zorder>
-    <zorder>inner_clustering</zorder>
-    <zorder>step_forward</zorder>
-    <zorder>dual_drag_wlop</zorder>
-    <zorder>show_pick_distribution</zorder>
-    <zorder>dual_wlop_apply</zorder>
-    <zorder>compute_confidence</zorder>
-    <zorder>anisotropic_lop_apply</zorder>
-    <zorder>dual_connection</zorder>
-    <zorder>normal_reform</zorder>
-    <zorder>layoutWidget</zorder>
-    <zorder>skel_wlop</zorder>
-    <zorder>regularize_normals</zorder>
-    <zorder>wlop_apply</zorder>
-    <zorder>compute_distribution</zorder>
-    <zorder>wlop_projection</zorder>
-    <zorder>regularize_samples</zorder>
-    <zorder>compute_correspondence</zorder>
-    <zorder>detect_kite_points</zorder>
-    <zorder>inner_clustering</zorder>
-    <zorder>step_forward</zorder>
-    <zorder>dual_drag_wlop</zorder>
-    <zorder>show_pick_distribution</zorder>
-    <zorder>dual_wlop_apply</zorder>
-    <zorder>compute_confidence</zorder>
-    <zorder>anisotropic_lop_apply</zorder>
-    <zorder>dual_connection</zorder>
-    <zorder>normal_reform</zorder>
-    <zorder>layoutWidget</zorder>
-    <zorder>skel_wlop</zorder>
-    <zorder>regularize_normals</zorder>
-    <zorder>wlop_apply</zorder>
-    <zorder>compute_distribution</zorder>
-    <zorder>wlop_projection</zorder>
-    <zorder>regularize_samples</zorder>
-    <zorder>compute_correspondence</zorder>
-    <zorder>detect_kite_points</zorder>
-    <zorder>inner_clustering</zorder>
-    <zorder>step_forward</zorder>
-    <zorder>dual_drag_wlop</zorder>
-    <zorder>show_pick_distribution</zorder>
-    <zorder>dual_wlop_apply</zorder>
-    <zorder>compute_confidence</zorder>
-    <zorder>anisotropic_lop_apply</zorder>
-    <zorder>dual_connection</zorder>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">

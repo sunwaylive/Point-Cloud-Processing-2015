@@ -397,6 +397,17 @@ void WlopParaDlg::copySamplesToDualSamples()
 void WlopParaDlg::applyDualConnection()
 {
 	copySamplesToDualSamples();
+
+// 	double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius") *0.5;
+// 
+// 	CMesh* dual_samples2 = area->dataMgr.getCurrentDualSamples();
+// 	for (int i = 0; i < dual_samples2->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples2->vert[i];
+// 		dual_v.P() -= dual_v.N() * temp_radius;
+// 	}
+
+
 	return;
 
 
