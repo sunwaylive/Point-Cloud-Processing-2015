@@ -1823,6 +1823,7 @@ void GLArea::reorientPick()
   for (int i = 0; i < pickList.size(); i++)
   {
     samples->vert[pickList[i]].is_fixed_sample = true;
+		samples->vert[pickList[i]].is_skel_branch = true;
   }
 }
 
@@ -1846,6 +1847,7 @@ void GLArea::cleanPick()
   for (int i = 0; i < pickList.size(); i++)
   {
     samples->vert[pickList[i]].is_fixed_sample = false;
+		samples->vert[pickList[i]].is_skel_branch = false;
   }
 }
 

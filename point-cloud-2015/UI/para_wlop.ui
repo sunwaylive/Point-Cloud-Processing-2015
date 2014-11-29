@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -500,13 +500,13 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>270</y>
+       <y>120</y>
        <width>151</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>Progressive Neighborhood</string>
+      <string>Optimize Neighborhood</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_9">
@@ -577,6 +577,32 @@
      </property>
      <property name="singleStep">
       <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="inner_points_classification">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>400</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Inner points classification</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_ellipsoid_fitting">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>170</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ellipsoid Fitting</string>
      </property>
     </widget>
    </widget>

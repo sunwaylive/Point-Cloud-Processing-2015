@@ -240,11 +240,24 @@ void WLOP::run()
 	if (para->getBool("Run Compute Correspondence"))
 	{
 		runComputeCorrespondence();
+		return;
 	}
 
 	if (para->getBool("Run Progressive Neighborhood"))
 	{
 		runProgressiveNeighborhood();
+		return;
+	}
+
+	if (para->getBool("Run Inner Points Classification"))
+	{
+		innerpointsClassification();
+		return;
+	}
+
+	if (para->getBool("Run Ellipsoid Fitting"))
+	{
+		runEllipsoidFitting();
 		return;
 	}
 
@@ -4639,8 +4652,11 @@ void WLOP::runProgressiveNeighborhood()
 	bool use_tangent = para->getBool("Use Tangent Vector");
 
 	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+	cout << "pick index:  " << pick_index << endl;
 	if (pick_index < 0 || pick_index >= samples->vert.size())
 	{
+		
+
 		int neighbor_num = (min_knn + max_knn) / 2;
 		for (int i = 0; i < samples->vert.size(); i++)
 		{
@@ -4654,6 +4670,8 @@ void WLOP::runProgressiveNeighborhood()
 			{
 				int original_neighbor_idx = v.neighbors[j];
 				CVertex& t = original->vert[original_neighbor_idx];
+
+				
 
 				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
 				weight = exp(dist2 * iradius16);
@@ -4681,10 +4699,14 @@ void WLOP::runProgressiveNeighborhood()
 
 		GlobalFun::normalizeConfidence(samples->vert, 0.0);
 		GlobalFun::smoothConfidences(samples, radius);
+
 	}
 	else
 	{
 		vector<Point3f> tentative_position;
+
+		cout << "show picked points" << endl;
+		ofstream pick_out("pick_neighbor.txt");
 
 		CVertex& v = samples->vert[pick_index];
 		for (int curr_knn = min_knn; curr_knn <= max_knn; curr_knn += step_size)
@@ -4703,6 +4725,11 @@ void WLOP::runProgressiveNeighborhood()
 			{
 				int original_neighbor_idx = v.neighbors[i];
 				CVertex& t = original->vert[original_neighbor_idx];
+
+				if (curr_knn == 400)
+				{
+					pick_out << t.P().X() << "	" << t.P().Y() << "	" << t.P().Z() << endl;
+				}
 
 				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
 				weight = exp(dist2 * iradius16);
@@ -4725,6 +4752,8 @@ void WLOP::runProgressiveNeighborhood()
 			Point3f avg_pos = sum_pos / sum_weight;
 			tentative_position.push_back(avg_pos);
 		}
+		pick_out.close();
+
 
 		ofstream out_error("fitting_error.txt");
 		for (int i = 0; i < tentative_position.size(); i++)
@@ -4733,6 +4762,7 @@ void WLOP::runProgressiveNeighborhood()
 
 			out_error << dist << endl;
 		}
+		
 
 // 		dual_samples->vert.clear();
 // 		for (int i = 0; i < tentative_position.size(); i++)
@@ -4748,5 +4778,150 @@ void WLOP::runProgressiveNeighborhood()
 	}
 
 
+
+}
+
+
+
+
+
+void WLOP::innerpointsClassification()
+{
+	Timer time;
+	time.start("Samples Initial");
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenIgnoreBranchedPoints(dual_samples);
+	time.end();
+
+
+	//eigenConfidenceSmoothing
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = dual_samples->vert[i];
+		v.eigen_confidence = 1 - v.eigen_confidence;
+	}
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = dual_samples->vert[i];
+		double sum = v.eigen_confidence;
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			sum += dual_samples->vert[v.neighbors[j]].eigen_confidence;
+		}
+		v.eigen_confidence = sum / (v.neighbors.size() + 1);
+	}
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = dual_samples->vert[i];
+		v.eigen_confidence = 1 - v.eigen_confidence;
+
+		if (v.eigen_confidence < 0)
+		{
+			v.eigen_confidence = 0.5;
+		}
+	}
+	//eigenConfidenceSmoothing end
+
+	double dist_threshold = para->getDouble("CGrid Radius") * 0.25;
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+		CVertex& v = samples->vert[i];
+
+		Point3f diff = v.P() - dual_v.P();
+		double proj_dist = abs(diff * v.N());
+
+		if (!dual_v.isSample_Moving())
+		{
+			continue;
+		}
+
+		double eigen_psi = dual_v.eigen_confidence;
+		double eigen_threshold = global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold");
+
+		if (eigen_psi > eigen_threshold && proj_dist > dist_threshold)
+		{
+			dual_v.is_fixed_sample = true;
+			dual_v.is_skel_branch = true;
+		}
+		else
+		{
+			dual_v.is_fixed_sample = false;
+			dual_v.is_skel_branch = false;
+		}
+	}
+
+
+	// smoothing
+	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius")/**1.5*/, samples->bbox);
+	GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 20, false, "WlopParaDlg::inner classification()");
+	double radius = para->getDouble("CGrid Radius");/**1.5;*/
+	double radius2 = radius * radius;
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+
+	vector<bool> vote_results(samples->vert.size());
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = dual_samples->vert[i];
+
+		double sum_vote = 0.0;
+		double sum_weight = 0.0;
+
+		if (v.neighbors.empty())
+		{
+			vote_results[i] = false;
+			continue;
+		}
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = dual_samples->vert[v.neighbors[j]];
+			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+			double weight = exp(dist2 * iradius16);
+
+			if (t.is_fixed_sample)
+			{
+				sum_vote += 1.0 * weight;
+			}
+			sum_weight += weight;
+		}
+
+		double vote = sum_vote / sum_weight;
+
+
+		if (vote > 0.5)
+		{
+			vote_results[i] = true;
+			v.eigen_confidence = 0.00001;
+		}
+		else
+		{
+			vote_results[i] = false;
+		}
+	}
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+
+		if (vote_results[i])
+		{
+			dual_v.is_fixed_sample = true;
+			dual_v.is_skel_branch = true;
+		}
+		else
+		{
+			dual_v.is_fixed_sample = false;
+			dual_v.is_skel_branch = false;
+		}
+	
+	}
+}
+
+
+void WLOP::runEllipsoidFitting()
+{
 
 }

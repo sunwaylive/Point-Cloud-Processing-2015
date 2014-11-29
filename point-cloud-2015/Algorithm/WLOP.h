@@ -41,6 +41,9 @@ public:
 
 	void runComputeDistribution();
 
+	void runEllipsoidFitting();
+
+
 	void runComputeCorrespondence();
 	vector<SphereSlots> computeDistributions(CMesh* samples, CMesh* dual_samples);
 
@@ -90,6 +93,7 @@ private:
 	void addSamplesToOriginalTemporary();
 	void removeSamplesFromOriginal();
 
+	void innerpointsClassification();
 
 private:
 	RichParameterSet* para;

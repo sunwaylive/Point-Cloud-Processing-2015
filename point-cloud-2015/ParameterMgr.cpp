@@ -218,9 +218,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Show Pick Distribution", false));
 	wLop.addParam(new RichBool("Run Compute Correspondence", false));
 	wLop.addParam(new RichBool("Run Detect Kite Points", false));
+	wLop.addParam(new RichBool("Run Inner Points Classification", false));
 
 
- 
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
 	wLop.addParam(new RichBool("Need Similarity", false));
@@ -233,6 +233,8 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
 	wLop.addParam(new RichBool("Use Kite Points", false));
+
+
 
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
@@ -253,8 +255,10 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Progressive Max KNN", 500));
 	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
 
+	wLop.addParam(new RichBool("Run Ellipsoid Fitting", false));
 
-	wLop.addParam(new RichBool("Only Use Repulsion", true));
+
+	wLop.addParam(new RichBool("Only Use Repulsion", false));
 
 }
 

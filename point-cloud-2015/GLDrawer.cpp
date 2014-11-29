@@ -132,10 +132,17 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return original_color;
 	}
 
-  if (v.is_dual_sample || v.is_fixed_sample)
+	if (v.is_dual_sample && (v.is_skel_branch || v.is_fixed_sample))
+	{
+		return cGreen;
+	}
+
+  if (v.is_dual_sample || v.is_fixed_sample )
   {
     return feature_color;
   }
+
+
 
 	if (bUseConfidenceColor)
 	{

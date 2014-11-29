@@ -76,6 +76,11 @@ class WlopParaDlg : public QFrame
 
 		void applyProgressiveNeighborhood();
 
+		void applyInnerPointsClassification();
+
+		void applyEllipsoidFitting();
+
+
 
 
 	private:

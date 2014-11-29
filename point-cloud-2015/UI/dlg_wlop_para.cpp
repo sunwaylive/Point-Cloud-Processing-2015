@@ -138,6 +138,9 @@ void WlopParaDlg::initConnects()
 
 
 	connect(ui->pushButton_progressive_neighborhood, SIGNAL(clicked()), this, SLOT(applyProgressiveNeighborhood()));
+	connect(ui->pushButton_ellipsoid_fitting, SIGNAL(clicked()), this, SLOT(applyEllipsoidFitting()));
+
+	connect(ui->inner_points_classification, SIGNAL(clicked()), this, SLOT(applyInnerPointsClassification()));
 
 }
 
@@ -645,4 +648,18 @@ void WlopParaDlg::applyProgressiveNeighborhood()
 	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(false));
+}
+
+void WlopParaDlg::applyInnerPointsClassification()
+{
+	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(false));
+}
+
+void WlopParaDlg::applyEllipsoidFitting()
+{
+	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
 }
