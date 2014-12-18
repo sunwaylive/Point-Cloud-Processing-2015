@@ -517,7 +517,8 @@ void MainWindow::saveSkel()
 
 	if (global_paraMgr.glarea.getBool("Show Skeleton"))
 	{
-		area->dataMgr.saveTargetSkeletonAsSkel(file);
+		//area->dataMgr.saveTargetSkeletonAsSkel(file);
+		area->dataMgr.saveSkeletonAsSkel(file);
 	}
 	else
 	{

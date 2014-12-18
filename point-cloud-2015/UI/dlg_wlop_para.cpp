@@ -32,6 +32,20 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+
+	if (!connect(ui->increasing_step_size, SIGNAL(valueChanged(double)), this, SLOT(get_increasing_step_size(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
+	if (!connect(ui->local_neighbor_size, SIGNAL(valueChanged(double)), this, SLOT(get_local_neighbor_size(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
+	if (!connect(ui->local_angle_threshold, SIGNAL(valueChanged(double)), this, SLOT(get_local_angle_threshold(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
+
 	//if(!connect(ui->rep_pow,SIGNAL(valueChanged(double)),this,SLOT(getRepPow(double))))
 	//{
 	//	cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -126,6 +140,7 @@ void WlopParaDlg::initConnects()
   connect(ui->regularize_normals,SIGNAL(clicked()),this,SLOT(applyRegularizeNormals()));
 
   connect(ui->wlop_projection,SIGNAL(clicked()),this,SLOT(applyProjection()));
+	connect(ui->mat_lop, SIGNAL(clicked()), this, SLOT(applyMatLOP()));
 
 	connect(ui->compute_confidence, SIGNAL(clicked()), this, SLOT(applyComputeConfidence()));
 	connect(ui->compute_distribution, SIGNAL(clicked()), this, SLOT(applyComputeDistribution()));
@@ -142,6 +157,15 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->inner_points_classification, SIGNAL(clicked()), this, SLOT(applyInnerPointsClassification()));
 
+
+	connect(ui->pushButton_search_neighborhood, SIGNAL(clicked()), this, SLOT(applySearchNeighborhood()));
+	connect(ui->pushButton_smooth_neighborhood, SIGNAL(clicked()), this, SLOT(applySmoothNeighborhood()));
+	connect(ui->pushButton_regularize_inner_points, SIGNAL(clicked()), this, SLOT(applyInnerPointsRegularization()));
+
+	connect(ui->move_backward, SIGNAL(clicked()), this, SLOT(applyMoveBackward()));
+	connect(ui->self_WLOP, SIGNAL(clicked()), this, SLOT(applySelfWLOP()));
+	connect(ui->normal_smoothing, SIGNAL(clicked()), this, SLOT(applyNormalSmoothing()));
+
 }
 
 
@@ -155,6 +179,10 @@ bool WlopParaDlg::initWidgets()
   ui->sample_average_mu3->setValue(m_paras->wLop.getDouble("Dual Mu3"));
 	ui->original_averaging_KNN->setValue(m_paras->wLop.getDouble("Original Averaging KNN"));
 	ui->dual_radius->setValue(m_paras->wLop.getDouble("Dual Radius"));
+
+	ui->increasing_step_size->setValue(m_paras->wLop.getDouble("Increasing Step Size"));
+	ui->local_neighbor_size->setValue(m_paras->wLop.getDouble("Local Neighbor Size"));
+	ui->local_angle_threshold->setValue(m_paras->wLop.getDouble("Local Angle Threshold"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -253,6 +281,24 @@ void WlopParaDlg::getDualRadius(double _val)
 {
 	m_paras->wLop.setValue("Dual Radius", DoubleValue(_val));
 }
+
+
+void WlopParaDlg::get_increasing_step_size(double _val)
+{
+	m_paras->wLop.setValue("Increasing Step Size", DoubleValue(_val));
+}
+
+void WlopParaDlg::get_local_neighbor_size(double _val)
+{
+	m_paras->wLop.setValue("Local Neighbor Size", DoubleValue(_val));
+}
+
+void WlopParaDlg::get_local_angle_threshold(double _val)
+{
+	m_paras->wLop.setValue("Local Angle Threshold", DoubleValue(_val));
+}
+
+
 
 void WlopParaDlg::isDensity(bool _val)
 {
@@ -391,8 +437,20 @@ void WlopParaDlg::copySamplesToDualSamples()
 	dual_samples->vert.resize(samples->vert.size());
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
+		samples->vert[i].is_dual_sample = false;
+		samples->vert[i].m_index = i;
+
+		if (i < 20)
+		{
+			cout << samples->vert[i].skel_radius << endl;
+		}
+		//samples->vert[i].skel_radius = -1;
+
+
 		dual_samples->vert[i] = samples->vert[i];
 		dual_samples->vert[i].is_dual_sample = true;
+		//dual_samples->vert[i].skel_radius = -1;
+
 	}
 
 }
@@ -400,6 +458,19 @@ void WlopParaDlg::copySamplesToDualSamples()
 void WlopParaDlg::applyDualConnection()
 {
 	copySamplesToDualSamples();
+
+	CMesh* samples = area->dataMgr.getCurrentSamples();
+	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+		//v.eigen_confidence = 0.0;
+		//dual_v.eigen_confidence = 0.0;
+		//v.skel_radius = 0.0;
+		//dual_v.skel_radius = 0.0;
+	}
 
 // 	double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius") *0.5;
 // 
@@ -414,8 +485,8 @@ void WlopParaDlg::applyDualConnection()
 	return;
 
 
-  CMesh* samples = area->dataMgr.getCurrentSamples();
-  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+//   CMesh* samples = area->dataMgr.getCurrentSamples();
+//   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
 
   GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::applyDualConnection()");
   //GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
@@ -507,6 +578,25 @@ void WlopParaDlg::applyDualConnection()
 	 //calculation_thread.setArea(area);
 	 //calculation_thread.start();
 	 
+ }
+
+ void WlopParaDlg::applyMatLOP()
+ {
+	 m_paras->wLop.setValue("Run MAT LOP", BoolValue(true));
+	 area->runWlop();
+	 m_paras->wLop.setValue("Run MAT LOP", BoolValue(false));
+
+	 CMesh* samples = area->dataMgr.getCurrentSamples();
+
+// 	 for (int i = 0; i < samples->vert.size(); i++)
+// 	 {
+// 		 CVertex& v = samples->vert[i];
+// 
+// 		 if (i < 50)
+// 		 {
+// 			 cout << "t t: " << v.eigen_confidence << endl;
+// 		 }
+// 	 }
  }
 
 void WlopParaDlg::applyAnisotropicLop()
@@ -663,3 +753,56 @@ void WlopParaDlg::applyEllipsoidFitting()
 	area->runWlop();
 	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
 }
+
+
+void WlopParaDlg::applyInnerPointsRegularization()
+{
+	m_paras->wLop.setValue("Run Inner Points Regularization", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Inner Points Regularization", BoolValue(false));
+}
+
+void WlopParaDlg::applySearchNeighborhood()
+{
+	m_paras->wLop.setValue("Run Search Neighborhood", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Search Neighborhood", BoolValue(false));
+}
+
+void WlopParaDlg::applySmoothNeighborhood()
+{
+	m_paras->wLop.setValue("Run Smooth Neighborhood", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Smooth Neighborhood", BoolValue(false));
+}
+
+void WlopParaDlg::applyMoveBackward()
+{
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+}
+
+void WlopParaDlg::applySelfWLOP()
+{
+	m_paras->wLop.setValue("Run Self WLOP", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Self WLOP", BoolValue(false));
+}
+
+void WlopParaDlg::applyNormalSmoothing()
+{
+// 	area->runNormalSmoothing();
+// 	area->dataMgr.recomputeQuad();
+// 	area->updateGL();
+
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+
+	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
+	area->runWlop();
+ 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
+}
+
+

@@ -371,6 +371,7 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 	double radius = para->getDouble("CGrid Radius");
 	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
 	GlobalFun::computeBilateralConfidence(&original, radius, sigma);
+	cout << "GlobalFun::computeBilateralConfidence" << endl;
 
 	int want_sample_num = para->getDouble("Down Sample Num");
 
@@ -382,48 +383,48 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 	clearCMesh(samples);
 	samples.vn = want_sample_num;
 
-
  	vector<int> nCard = GlobalFun::GetRandomCards(original.vert.size());
 
 	int inserted_number = 0;
 	int i = 0;
-	while (want_sample_num > inserted_number)
-	{
-		if (i >= nCard.size())
-		{
-			break;
-		}
+ 	while (want_sample_num > inserted_number)
+ 	{
+ 		if (i >= nCard.size())
+ 		{
+ 			break;
+ 		}
+ 
+ 		int index = nCard[i++];
+ 
+ 		CVertex& v = original.vert[index];
+ 		double probability = 1 - v.eigen_confidence;
+		//double probability = v.eigen_confidence;
 
-		int index = nCard[i++];
+ 		double r = (rand() % 1000) * 0.001;
+ 
+ 		if (r < probability)
+ 		{
+ 			samples.vert.push_back(v);
+ 			samples.bbox.Add(v.P());
+ 
+ 			inserted_number++;
+ 		}
+ 	}
 
-		CVertex& v = original.vert[index];
-		double probability = 1 - v.eigen_confidence;
-
-		double r = (rand() % 1000) * 0.001;
-
-		if (r < probability)
-		{
-			samples.vert.push_back(v);
-			samples.bbox.Add(v.P());
-
-			inserted_number++;
-		}
-	}
-
-//  	for (int i = 0; i < samples.vn; i++)
-//  	{
-//  		int index = nCard[i]; //could be not random!
-//  
-//  		if (!use_random_downsample)
-//  		{
-//  			index = i;
-//  		}
-//  
-//  		CVertex& v = original.vert[index];
-//  		v.dual_index = i;
-//  		samples.vert.push_back(v);
-//  		samples.bbox.Add(v.P());
-//  	}
+//   	for (int i = 0; i < samples.vn; i++)
+//   	{
+//   		int index = nCard[i]; //could be not random!
+//   
+//   		if (!use_random_downsample)
+//   		{
+//   			index = i;
+//   		}
+//   
+//   		CVertex& v = original.vert[index];
+//   		v.dual_index = i;
+//   		samples.vert.push_back(v);
+//   		samples.bbox.Add(v.P());
+//   	}
  
  	CMesh::VertexIterator vi;
  	for (vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)
@@ -1045,6 +1046,16 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   }
   strStream << endl;
 
+	strStream << "skel_radius " << samples.vert.size() << endl;
+	for (int i = 0; i < samples.vert.size(); i++)
+	{
+		CVertex& v = samples.vert[i];
+		strStream << samples.vert[i].skel_radius << endl;
+
+	}
+	strStream << endl;
+
+
 
 	outfile.write( strStream.str().c_str(), strStream.str().size() ); 
 	outfile.close();
@@ -1311,6 +1322,8 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 	sem >> str;
 	if (str == "Skel_isVirtual")
 	{
+		cout << "load Skel_isVirtual" << endl;
+
 		sem >> num;
 		bool temp;
 		for (int i = 0; i < skeleton.branches.size(); i++)
@@ -1326,6 +1339,8 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 	sem >> str;
 	if (str == "Corresponding_sample_index")
 	{
+		cout << "load Corresponding_sample_index" << endl;
+
 		sem >> num;
 		int temp;
 		for (int i = 0; i < skeleton.branches.size(); i++)
@@ -1341,6 +1356,8 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 	sem >> str;
 	if (str == "DSN")
 	{
+		cout << "load DSN" << endl;
+
 		sem >> num;
 		for (int i = 0; i < num; i++)
 		{
@@ -1350,10 +1367,10 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 			v.m_index = i;
 			sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
 			sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
-			target_dual_samples.vert.push_back(v);
-			target_dual_samples.bbox.Add(v.P());
+// 			target_dual_samples.vert.push_back(v);
+// 			target_dual_samples.bbox.Add(v.P());
 		}
-		target_dual_samples.vn = target_dual_samples.vert.size();
+		//target_dual_samples.vn = target_dual_samples.vert.size();
 	}
 
 	if (!sem.eof())
@@ -1361,6 +1378,8 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 		sem >> str;
 		if (str == "dual_corresponding_index")
 		{
+			cout << "load dual_corresponding_index" << endl;
+
 			sem >> num;
 			for (int i = 0; i < num; i++)
 			{
@@ -1370,6 +1389,34 @@ void DataMgr::loadTargetSkeletonFromSkel(QString fileName)
 			}
 		}
 	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "skel_radius")
+		{
+			cout << "load skel_radius" << endl;
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				int radius;
+				sem >> radius;
+				dual_samples.vert[i].skel_radius = radius;
+				samples.vert[i].skel_radius = radius;
+
+				if (i < 20)
+				{
+					cout << "skel_radius: " << radius;
+				}
+				//if (radius > 0)
+				//{
+
+				//}
+			}
+		}
+	}
+
+	
 
 	for (int i = 0; i < target_samples.vert.size(); i++)
 	{
@@ -1640,6 +1687,8 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 	sem >> str;
 	if (str == "Skel_isVirtual")
 	{
+		cout << "load Skel_isVirtual" << endl;
+
 		sem >> num;
 		bool temp;
 		for (int i = 0; i < skeleton.branches.size(); i++)
@@ -1652,58 +1701,108 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 		}
 	}
 
-  sem >> str;
-  if (str == "Corresponding_sample_index")
-  {
-    sem >> num;
-    int temp;
-    for (int i = 0; i < skeleton.branches.size(); i++)
-    {
-      for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
-      {
-        sem >> temp;
-        skeleton.branches[i].curve[j].m_index = temp;
-      }
-    }
-  }
-  
-  sem >> str;
-  if (str == "DSN")
-  {
-    sem >> num;
-    for (int i = 0; i < num; i++)
-    {
-      CVertex v;
-      v.bIsOriginal = false;
-      v.is_dual_sample = true;
-      v.m_index = i;
-      sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
-      sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
-      dual_samples.vert.push_back(v);
-      dual_samples.bbox.Add(v.P());
-    }
-    dual_samples.vn = dual_samples.vert.size();
-  }
+	sem >> str;
+	if (str == "Corresponding_sample_index")
+	{
+		
 
-  if (!sem.eof())
-  {
-    sem >> str;
-    if (str == "dual_corresponding_index")
-    {
-      sem >> num;
-      for (int i = 0; i < num; i++)
-      {
-        int index;
-        sem >> index;
-        dual_samples.vert[i].dual_index = index;
-      }
-    }
-  }
+		sem >> num;
 
-  for (int i = 0; i < samples.vert.size(); i++)
-  {
-    samples.vert[i].N().Normalize();
-  }
+		cout << "load Corresponding_sample_index " << num <<endl;
+
+		if (num > 1)
+		{
+
+			int temp;
+			for (int i = 0; i < skeleton.branches.size(); i++)
+			{
+				for (int j = 0; j < skeleton.branches[i].curve.size(); j++)
+				{
+					sem >> temp;
+					skeleton.branches[i].curve[j].m_index = temp;
+				}
+			}
+		}
+
+	}
+
+	sem >> str;
+	if (str == "DSN")
+	{
+		cout << "load DSN" << endl;
+
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			CVertex v;
+			v.bIsOriginal = false;
+			v.is_dual_sample = true;
+			v.m_index = i;
+			sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+			sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+			dual_samples.vert.push_back(v);
+			dual_samples.bbox.Add(v.P());
+		}
+		dual_samples.vn = dual_samples.vert.size();
+	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "dual_corresponding_index")
+		{
+			cout << "load dual_corresponding_index" << endl;
+
+			sem >> num;
+			for (int i = 0; i < num; i++)
+			{
+				int index;
+				sem >> index;
+				dual_samples.vert[i].dual_index = index;
+			}
+		}
+	}
+
+	if (!sem.eof())
+	{
+		sem >> str;
+		if (str == "skel_radius")
+		{
+			sem >> num;
+			cout << "load skel_radius !!! " << num << endl;
+
+			for (int i = 0; i < num; i++)
+			{
+				float sk_radius;
+				sem >> sk_radius;
+
+				//cout << num << "  @@@@" << sk_radius << endl;
+
+				//dual_samples.vert[i].skel_radius = sk_radius;
+				samples.vert[i].skel_radius = sk_radius;
+
+				//cout << num << "  %%%% " << sk_radius << endl;
+
+				if (i < 20)
+				{
+					cout << num << "  skel_radius: " << sk_radius;
+				}
+				//if (radius > 0)
+				//{
+
+				//}
+			}
+		}
+	}
+
+ 	clearCMesh(target_dual_samples);
+ 	clearCMesh(target_samples);
+
+	cout << original.vert.size() << " "
+		<< samples.vert.size() << " "
+		<< dual_samples.vert.size() << " "
+		<< target_samples.vert.size() << " "
+		<< target_dual_samples.vert.size() << " " << endl;
 
 	skeleton.generateBranchSampleMap();
 }
@@ -1740,7 +1839,7 @@ void DataMgr::switchSampleDualSample()
    for (int i = 0; i < dual_samples.vert.size(); i++)
    {
      CVertex& v = dual_samples.vert[i];
-      v.is_dual_sample = true;
+     v.is_dual_sample = true;
 //      v.is_fixed_sample = false;
 
    }

@@ -197,6 +197,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 	wLop.addParam(new RichDouble("Dual Radius", 0.33));
 
+	wLop.addParam(new RichDouble("Increasing Step Size", 0.005));
+	wLop.addParam(new RichDouble("Local Neighbor Size", 0.015));
+	wLop.addParam(new RichDouble("Local Angle Threshold", 55));
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
   wLop.addParam(new RichBool("Need Sample Average", false));
@@ -219,6 +222,15 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Compute Correspondence", false));
 	wLop.addParam(new RichBool("Run Detect Kite Points", false));
 	wLop.addParam(new RichBool("Run Inner Points Classification", false));
+
+
+	wLop.addParam(new RichBool("Run Search Neighborhood", false));
+	wLop.addParam(new RichBool("Run Smooth Neighborhood", false));
+	wLop.addParam(new RichBool("Run Inner Points Regularization", false));
+
+	wLop.addParam(new RichBool("Run Move Backward", false));
+	wLop.addParam(new RichBool("Run Self WLOP", false));
+	wLop.addParam(new RichBool("Run Normal Smoothing", false));
 
 
   wLop.addParam(new RichBool("Original Combine Sample", false));
@@ -251,11 +263,12 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.97));
 	wLop.addParam(new RichDouble("Mutual Distance Threshold", 0.1));
 
-	wLop.addParam(new RichDouble("Progressive Min KNN", 5));
-	wLop.addParam(new RichDouble("Progressive Max KNN", 500));
+	wLop.addParam(new RichDouble("Progressive Min KNN", 20));
+	wLop.addParam(new RichDouble("Progressive Max KNN", 2000));
 	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
 
 	wLop.addParam(new RichBool("Run Ellipsoid Fitting", false));
+	wLop.addParam(new RichBool("Run MAT LOP", false));
 
 
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
@@ -360,7 +373,7 @@ void ParameterMgr::initNormalSmootherParameter()
 {
 	norSmooth.addParam(new RichString("Algorithm Name", "NormalSmooth") );
 
-	norSmooth.addParam(new RichInt("PCA KNN", 13));
+	norSmooth.addParam(new RichInt("PCA KNN", 28));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
 	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 19));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));

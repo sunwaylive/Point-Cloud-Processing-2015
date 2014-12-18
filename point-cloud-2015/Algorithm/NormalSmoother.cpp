@@ -149,6 +149,7 @@ void NormalSmoother::runNormalSmooth()
 		if (normal_weight_sum[i] > 1e-6)
 		{
 			v.N() = normal_sum[i] / normal_weight_sum[i];
+			v.N().Normalize();
 		}
 	}
 }

@@ -49,7 +49,7 @@ class GLDrawer
 public:
 	GLDrawer(RichParameterSet* _para);
 	~GLDrawer(void);
-	typedef enum {DOT, QUADE, CIRCLE, NORMAL, SPHERE}DrawType;
+	typedef enum { DOT, QUADE, CIRCLE, NORMAL, SPHERE, TRAJECTORY}DrawType;
 
 	void setViewPoint(const Point3f& view){ view_point = view; }
 	void draw(DrawType type, CMesh* mesh);

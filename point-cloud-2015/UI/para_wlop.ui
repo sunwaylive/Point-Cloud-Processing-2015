@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -500,7 +500,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>120</y>
+       <y>90</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -538,7 +538,7 @@
     <widget class="QDoubleSpinBox" name="progressive_min_knn">
      <property name="geometry">
       <rect>
-       <x>178</x>
+       <x>130</x>
        <y>20</y>
        <width>151</width>
        <height>20</height>
@@ -563,7 +563,7 @@
     <widget class="QDoubleSpinBox" name="progressive_max_knn">
      <property name="geometry">
       <rect>
-       <x>178</x>
+       <x>130</x>
        <y>50</y>
        <width>151</width>
        <height>20</height>
@@ -582,8 +582,8 @@
     <widget class="QPushButton" name="inner_points_classification">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>400</y>
+       <x>80</x>
+       <y>250</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -596,13 +596,211 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>170</y>
+       <y>140</y>
        <width>151</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Ellipsoid Fitting</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="mat_lop">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>190</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MAT LOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_search_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>680</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Search Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_smooth_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>720</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Smooth  Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_regularize_inner_points">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>760</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Regularize Inner Points</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="local_neighbor_size">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>460</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>32</x>
+       <y>460</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Local Neighbor Size</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="increasing_step_size">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>430</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>32</x>
+       <y>430</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Increasing Step Size</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>490</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Local Angle Threshold</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="local_angle_threshold">
+     <property name="geometry">
+      <rect>
+       <x>168</x>
+       <y>490</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Page</string>
+    </attribute>
+    <widget class="QPushButton" name="self_WLOP">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>70</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Self WLOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_backward">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move Backward</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="normal_smoothing">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>120</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Normal smoothing</string>
      </property>
     </widget>
    </widget>

@@ -36,6 +36,11 @@ class WlopParaDlg : public QFrame
 		void getOriginalAverageKNN(double _val);
 		void getDualRadius(double _val);
 
+		void get_increasing_step_size(double _val);
+		void get_local_neighbor_size(double _val);
+		void get_local_angle_threshold(double _val);
+
+
 		void isDensity(bool _val);
 		void isPca(bool _val);
     void needSampleAverage(bool _val);
@@ -56,6 +61,7 @@ class WlopParaDlg : public QFrame
 		void applyAnisotropicLop();
     void applyStepForward();
     void applyDualConnection();
+		void applyMatLOP();
 
 		void copySamplesToDualSamples();
 
@@ -81,7 +87,13 @@ class WlopParaDlg : public QFrame
 		void applyEllipsoidFitting();
 
 
+		void applyInnerPointsRegularization();
+		void applySearchNeighborhood();
+		void applySmoothNeighborhood();
 
+		void applyMoveBackward();
+		void applySelfWLOP();
+		void applyNormalSmoothing();
 
 	private:
 		Ui::para_wlop * ui;

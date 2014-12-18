@@ -1058,7 +1058,7 @@ vector<double> GlobalFun::smoothConfidences(CMesh *mesh, double radius)
 		v.eigen_confidence += sum_confidence / weight_sum;
 	}
 
-	normalizeConfidence(mesh->vert, 0.0);
+	//normalizeConfidence(mesh->vert, 0.0);
 
 	vector<double> confidences(mesh->vert.size());
 	for (int i = 0; i < mesh->vert.size(); i++)

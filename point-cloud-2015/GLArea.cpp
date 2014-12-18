@@ -307,6 +307,22 @@ void GLArea::paintGL()
 			if(!dataMgr.isOriginalEmpty())
 			  glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
+
+
+	}
+
+	if (para->getBool("Show Skeleton"))
+	{
+		CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+
+		for (int i = 1; i < dual_samples->vert.size(); i++)
+		{
+			Point3f previous_position = dual_samples->vert[i-1].P();
+			Point3f current_position = dual_samples->vert[i].P();
+
+			glDrawer.glDrawLine(previous_position, current_position, cBlue, 1);
+
+		}
 	}
 
  	if(para->getBool("Show Original"))
@@ -1092,7 +1108,19 @@ void GLArea::runWlop()
 		updateGL();
     emit needUpdateStatus();
 	}
-  
+
+// 	CMesh* samples = dataMgr.getCurrentSamples();
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 
+// 		if (i < 50)
+// 		{
+// 			cout << "e e: " << v.eigen_confidence << endl;
+// 		}
+// 	}
+
 	//cout << "wloppppppppppppppppppppppppppppp 2" << endl;
 
   if (is_break)

@@ -40,7 +40,6 @@ public:
 
 
 	void runComputeDistribution();
-
 	void runEllipsoidFitting();
 
 
@@ -89,11 +88,22 @@ private:
 
 	void runComputeHoleConfidence();
 
+	void runMatLOP();
+
 
 	void addSamplesToOriginalTemporary();
 	void removeSamplesFromOriginal();
 
 	void innerpointsClassification();
+
+
+	void runInnerPointsRegularization();
+	void runSearchNeighborhood();
+	void runSmoothNeighborhood();
+
+	void runMoveBackward();
+	void runSelfWLOP();
+	void runNormalSmoothing();
 
 private:
 	RichParameterSet* para;

@@ -122,6 +122,15 @@ bool GLDrawer::isCanSee(const Point3f& pos, const Point3f& normal)
 
 GLColor GLDrawer::getColorByType(const CVertex& v)
 {
+// 	if (bUseConfidenceColor)
+// 	{
+// 		if (v.m_index < 10 && !v.is_dual_sample && !v.bIsOriginal)
+// 		{
+// 			cout << v.eigen_confidence << endl;
+// 		}
+// 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+// 	}
+
 	if (v.is_boundary && !bUseConfidenceColor)
    {
      return cBlue;
@@ -132,22 +141,22 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return original_color;
 	}
 
-	if (v.is_dual_sample && (v.is_skel_branch || v.is_fixed_sample))
+	if (v.is_dual_sample && (v.is_skel_branch || v.is_fixed_sample) /*&& bUseConfidenceColor*/)
 	{
 		return cGreen;
 	}
 
-  if (v.is_dual_sample || v.is_fixed_sample )
+  if (v.is_dual_sample /*|| v.is_fixed_sample*/ )
   {
     return feature_color;
   }
 
 
+ 	if (bUseConfidenceColor)
+ 	{
+ 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+ 	}
 
-	if (bUseConfidenceColor)
-	{
-		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
-	}
 
 	if (bUseIndividualColor)
 	{
