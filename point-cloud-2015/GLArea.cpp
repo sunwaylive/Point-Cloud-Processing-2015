@@ -71,10 +71,10 @@ void GLArea::initializeGL()
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 	
-	//glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT );
-	//glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	glColorMaterial(GL_FRONT, GL_AMBIENT);
-	glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	//glColorMaterial(GL_FRONT, GL_AMBIENT);
+	//glColorMaterial(GL_FRONT, GL_DIFFUSE);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
 	glDisable(GL_BLEND);

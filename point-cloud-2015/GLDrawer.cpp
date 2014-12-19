@@ -84,6 +84,32 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 
 		CVertex temp_v = (*vi);
 
+		if (type == CIRCLE)
+		{
+			if (!(bCullFace /*&& !vi->is_dual_sample*/ /*&& !vi->bIsOriginal*/) )
+			{
+				if (isCanSee(p, normal))
+				{
+					drawCircle(*vi, false);
+				}
+				else
+				{
+					temp_v.N() = vi->N() * -1;
+					temp_v.P() = vi->P() + vi->N() * -1e-5;
+					drawCircle(temp_v, true);
+				}
+
+				/*drawCircle(*vi, false);*/
+			}
+			else
+			{
+				if (isCanSee(p, normal))
+				{
+					drawCircle(*vi, false);
+				}
+			}
+		}
+
     if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
@@ -91,16 +117,13 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 			case DOT:
 				drawDot(*vi);
 				break;
-			case CIRCLE:
-				drawCircle(*vi, false);
+// 			case CIRCLE:
+// 				drawCircle(*vi, false);
+// 				
+// 				temp_v.N() = vi->N() * -1;
+// 				temp_v.P() = vi->P() + vi->N() * -1e-5;
+// 				drawCircle(temp_v, true);
 				
-				temp_v.N() = vi->N() * -1;
-				temp_v.P() = vi->P() + vi->N() * -1e-5;
-				drawCircle(temp_v, true);
-				
-// 				vi->N() *= -1;
-// 				vi->P += vi->N() * 1e-5;
-
 
 				break;
 			case QUADE:
@@ -301,7 +324,7 @@ void GLDrawer::drawCircle(const CVertex& v, bool is_back)
 		glColor4f(color.r, color.g, color.b, 1);
 	}
 
-	int nn = 30;
+	int nn = 25;
 	for (int i = 0; i < nn; i++)
 	{
 		float tt1, tt2;
