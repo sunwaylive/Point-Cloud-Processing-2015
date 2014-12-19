@@ -784,46 +784,46 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
   double angle_cos = v0 * v1;
   if (fabs(angle_cos-1.0) < epsilon)
   {
-    cout << "watch out this angle: if (fabs(angle_cos-1.0) < epsilon)" << endl;
-    cout << "return angle 0.0" << endl;
+//     cout << "watch out this angle: if (fabs(angle_cos-1.0) < epsilon)" << endl;
+//     cout << "return angle 0.0" << endl;
     return 0.0;
   }
   else if(fabs(angle_cos+1.0) < epsilon)
   {
-    cout << "watch out this angle else if(fabs(angle_cos+1.0) < epsilon)" << endl;
+    //cout << "watch out this angle else if(fabs(angle_cos+1.0) < epsilon)" << endl;
 
     return 180;
   }
 
 	if (isTwoPoint3fTheSame(v0, v1))
 	{
-    cout << "watch out this angle if (isTwoPoint3fTheSame(v0, v1))" << endl;
+   // cout << "watch out this angle if (isTwoPoint3fTheSame(v0, v1))" << endl;
 
 		return 0;
 	}
 
 	if (isTwoPoint3fOpposite(v0, v1))
 	{
-    cout << "watch out this angle if (isTwoPoint3fOpposite(v0, v1))" << endl;
+    //cout << "watch out this angle if (isTwoPoint3fOpposite(v0, v1))" << endl;
 
 		return 180;
 	}
 
 	if (angle_cos > 1)
 	{
-    cout << "watch out this angle if (angle_cos > 1)" << endl;
+   // cout << "watch out this angle if (angle_cos > 1)" << endl;
 
 		angle_cos = 0.99;
 	}
 	if (angle_cos < -1)
 	{
-    cout << "watch out this angle if (angle_cos < -1)" << endl;
+   // cout << "watch out this angle if (angle_cos < -1)" << endl;
 
 		angle_cos = -0.99;
 	}
 	if (angle_cos > 0 && angle_cos < 1e-8)
 	{
-    cout << "watch out this angle if (angle_cos > 0 && angle_cos < 1e-8)" << endl;
+  //  cout << "watch out this angle if (angle_cos > 0 && angle_cos < 1e-8)" << endl;
 
 		return 90;
 	}
@@ -832,7 +832,7 @@ double GlobalFun::computeRealAngleOfTwoVertor(Point3f v0, Point3f v1)
 
 	if (angle < 0 || angle > 180)
 	{
-    cout << "watch out this angle iif (angle < 0 || angle > 180)" << endl;
+  //  cout << "watch out this angle iif (angle < 0 || angle > 180)" << endl;
 
 		//cout << "compute angle wrong!!" << endl;
 		//system("Pause");

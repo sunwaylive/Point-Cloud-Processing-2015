@@ -75,7 +75,7 @@ public:
 
 	void drawDot(const CVertex& v);
 	void drawSphere(const CVertex& v);
-	void drawCircle(const CVertex& v);
+	void drawCircle(const CVertex& v, bool is_back);
 	void drawQuade(const CVertex& v);
 	void drawNormal(const CVertex& v);
 

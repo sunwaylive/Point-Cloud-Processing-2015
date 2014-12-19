@@ -83,6 +83,24 @@ void NormalParaDlg::reorientateNormal()
 	}
 
 	CMesh* samples = area->dataMgr.getCurrentSamples();
+	if (global_paraMgr.glarea.getBool("Show Samples"))
+	{
+		samples = area->dataMgr.getCurrentSamples();
+	}
+	else if (global_paraMgr.glarea.getBool("Show Dual Samples"))
+	{
+		samples = area->dataMgr.getCurrentDualSamples();
+	}
+	else if (global_paraMgr.glarea.getBool("Show Original")
+		&& !area->dataMgr.isOriginalEmpty())
+	{
+		samples = area->dataMgr.getCurrentOriginal();
+	}
+	else
+	{
+		samples = area->dataMgr.getCurrentSamples();
+	}
+	
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		samples->vert[i].N() *= -1;
@@ -161,10 +179,24 @@ void NormalParaDlg::applyPCANormal()
     //vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(samples->vert.begin(), samples->vert.end(), knn, -1);
     cout << "new normal estimation: " << endl;
 
+		vector<Point3f> remember_normal(samples->vert.size());
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			remember_normal[i] = samples->vert[i].N();
+		}
      vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
      pca_para.fittingAdjNum = knn;
  
      vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+
+		 for (int i = 0; i < samples->vert.size(); i++)
+		 {
+			 CVertex& v = samples->vert[i];
+			 if (v.N() * remember_normal[i] < 0)
+			 {
+				 v.N() *= -1;
+			 }
+		 }
 	}
 	area->dataMgr.recomputeQuad();
 	area->updateGL();

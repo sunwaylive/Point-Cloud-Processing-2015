@@ -95,6 +95,10 @@ class WlopParaDlg : public QFrame
 		void applySelfWLOP();
 		void applyNormalSmoothing();
 
+		void applySelfPCA();
+		void applySelfPorjection();
+
+
 	private:
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;

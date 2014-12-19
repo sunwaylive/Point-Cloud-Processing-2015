@@ -6,6 +6,7 @@
 
 //#include <CGAL/wlop_simplify_and_regularize_point_set_test_AABB_tree.h>
 //#include <CGAL/tags.h>
+#include "Algorithm/pointcloud_normal.h"
 
 using namespace std;
 using namespace vcg;
@@ -104,6 +105,8 @@ private:
 	void runMoveBackward();
 	void runSelfWLOP();
 	void runNormalSmoothing();
+	void runSelfPCA();
+	void runSelfProjection();
 
 private:
 	RichParameterSet* para;

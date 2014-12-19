@@ -350,6 +350,7 @@ void Skeletonization::computeAverageTerm(CMesh* samples, CMesh* original)
 
 		for (int j = 0; j < v.original_neighbors.size(); j++)
 		{
+
 			CVertex& t = original->vert[v.original_neighbors[j]];
 
 			Point3f diff = v.P() - t.P();

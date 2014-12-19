@@ -82,6 +82,8 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 		Point3f& p = vi->P();      
 		Point3f& normal = vi->N();
 
+		CVertex temp_v = (*vi);
+
     if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
@@ -90,7 +92,16 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 				drawDot(*vi);
 				break;
 			case CIRCLE:
-				drawCircle(*vi);
+				drawCircle(*vi, false);
+				
+				temp_v.N() = vi->N() * -1;
+				temp_v.P() = vi->P() + vi->N() * -1e-5;
+				drawCircle(temp_v, true);
+				
+// 				vi->N() *= -1;
+// 				vi->P += vi->N() * 1e-5;
+
+
 				break;
 			case QUADE:
 				drawQuade(*vi);
@@ -141,7 +152,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return original_color;
 	}
 
-	if (v.is_dual_sample && (v.is_skel_branch || v.is_fixed_sample) /*&& bUseConfidenceColor*/)
+	if (v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
 	{
 		return cGreen;
 	}
@@ -252,7 +263,7 @@ void GLDrawer::drawSphere(const CVertex& v)
 	glDrawSphere(p, color, radius, 20);
 }
 
-void GLDrawer::drawCircle(const CVertex& v)
+void GLDrawer::drawCircle(const CVertex& v, bool is_back)
 {
 	double radius = sample_draw_width;
 	if (v.bIsOriginal)
@@ -280,7 +291,15 @@ void GLDrawer::drawCircle(const CVertex& v)
 
 	glNormal3f(normal[0], normal[1], normal[2]);
 	glBegin(GL_POLYGON);
-	glColor4f(color.r, color.g, color.b, 1);
+
+	if (is_back)
+	{
+		glColor4f(cBlack.r, cBlack.g, cBlack.b, 1);
+	}
+	else
+	{
+		glColor4f(color.r, color.g, color.b, 1);
+	}
 
 	int nn = 30;
 	for (int i = 0; i < nn; i++)
@@ -470,7 +489,7 @@ void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, 
 
 void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
-  double width = para->getDouble("Sample Draw Width") * 1.2;
+  double width = para->getDouble("Sample Draw Width") * 2.6;
   //GLColor dnn_color = para->getColor("Pick Point DNN Color");
   GLColor dnn_color = cBlue;
 
@@ -486,6 +505,10 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
     CVertex &v = samples->vert[i];
     Point3f &p = v.P();  
 
+		if (v.neighbors.empty())
+		{
+			continue;
+		}
     //cout << "Neighbor number: " << v.neighbors.size() << endl;
 
     vector<int>::iterator vi = v.neighbors.begin();

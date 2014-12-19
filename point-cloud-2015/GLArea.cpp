@@ -56,18 +56,25 @@ void GLArea::initializeGL()
 	glShadeModel(GL_FLAT);
 
 	//glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST ); 
-	GLfloat mat_ambient[4] = {0.1745, 0.01175, 0.01175,1.0}; 
-	GLfloat mat_diffuse[4] = {0.61424, 0.04136, 0.04136, 1.0 };
-	GLfloat mat_specular[] = {0.727811, 0.626959, 0.626959, 1.0 };
+ 	GLfloat mat_ambient[4] = {0.1745, 0.01175, 0.01175,1.0}; 
+ 	GLfloat mat_diffuse[4] = {0.61424, 0.04136, 0.04136, 1.0 };
+ 	GLfloat mat_specular[] = {0.727811, 0.626959, 0.626959, 1.0 };
+
+	//GLfloat mat_ambient[4] = { 0.1745, 0.51175, 0.51175, 1.0 };
+	//GLfloat mat_diffuse[4] = { 0.61424, 0.54136, 0.54136, 1.0 };
+	//GLfloat mat_specular[] = { 0.727811, 0.626959, 0.626959, 1.0 };
+
 	GLfloat shininess = 0.6*128;
 
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse); 
 	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 	glMaterialf(GL_FRONT, GL_SHININESS, shininess);
-
-	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT );
-	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	
+	//glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT );
+	//glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	glColorMaterial(GL_FRONT, GL_AMBIENT);
+	glColorMaterial(GL_FRONT, GL_DIFFUSE);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
 	glDisable(GL_BLEND);
@@ -384,11 +391,11 @@ void GLArea::paintGL()
 
 		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
      {
-       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
-			glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentSamples(), dataMgr.getCurrentOriginal(), pickList);
+			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentSamples(), dataMgr.getCurrentOriginal(), pickList);
 
      }
 
@@ -1098,10 +1105,10 @@ void GLArea::runWlop()
 			saveSnapshot();
 		}
 
-		int sleep_time = 100;
-		QTime dieTime = QTime::currentTime().addMSecs(sleep_time);
-		while (QTime::currentTime() < dieTime)
-			QCoreApplication::processEvents(QEventLoop::AllEvents, sleep_time);
+// 		int sleep_time = 100;
+// 		QTime dieTime = QTime::currentTime().addMSecs(sleep_time);
+// 		while (QTime::currentTime() < dieTime)
+// 			QCoreApplication::processEvents(QEventLoop::AllEvents, sleep_time);
 
 		updateUI();
 		update();
@@ -1664,7 +1671,7 @@ void GLArea::wheelEvent(QWheelEvent *e)
 			global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(size_temp * change));
       global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(size_temp * change));
 
-			initSetting();
+			//initSetting();
 			break;
 
 		default:

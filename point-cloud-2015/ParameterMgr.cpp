@@ -67,23 +67,23 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichBool("Show Normal", false) );
 	
-	glarea.addParam(new RichBool("Show Samples", true) );
+	glarea.addParam(new RichBool("Show Samples", false) );
 	glarea.addParam(new RichBool("Show Samples Quad", false) );
 	glarea.addParam(new RichBool("Show Samples Dot", true) );
 	glarea.addParam(new RichBool("Show Samples Circle", false) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
-  glarea.addParam(new RichBool("Show Dual Samples", false) );
+  glarea.addParam(new RichBool("Show Dual Samples", true) );
   glarea.addParam(new RichBool("Show Dual Samples Quad", false));
-  glarea.addParam(new RichBool("Show Dual Samples Dot", true));
-  glarea.addParam(new RichBool("Show Dual Samples Circle", false));
+  glarea.addParam(new RichBool("Show Dual Samples Dot", false));
+  glarea.addParam(new RichBool("Show Dual Samples Circle", true));
   glarea.addParam(new RichBool("Show Dual Samples Sphere", false));
 
   glarea.addParam(new RichBool("Show Dual Connection", false) );
   glarea.addParam(new RichBool("Pick Dual Point", false) );
 
 
-	glarea.addParam(new RichBool("Show Original", true) );
+	glarea.addParam(new RichBool("Show Original", false) );
 	glarea.addParam(new RichBool("Show Original Quad", false) );
 	glarea.addParam(new RichBool("Show Original Dot", true) );
 	glarea.addParam(new RichBool("Show Original Circle", false) );
@@ -155,9 +155,9 @@ void ParameterMgr::initDrawerParameter()
   drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
 
 
-	drawer.addParam(new RichDouble("Original Draw Width", 0.0015));
+	drawer.addParam(new RichDouble("Original Draw Width", 0.0010));
 	drawer.addParam(new RichDouble("Sample Draw Width", 0.001));
-	drawer.addParam(new RichDouble("Dual Sample Draw Width", 0.015));
+	drawer.addParam(new RichDouble("Dual Sample Draw Width", 0.010));
 
 	drawer.addParam(new RichDouble("Sample Dot Size", 6));
 	drawer.addParam(new RichDouble("Dual Sample Dot Size", 6));
@@ -191,15 +191,15 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("H Gaussian Para", 4));
 	wLop.addParam(new RichDouble("Repulsion Power", 1.0));
 	wLop.addParam(new RichDouble("Average Power", 2.0));
-	wLop.addParam(new RichBool("Need Compute Density", true));
+	wLop.addParam(new RichBool("Need Compute Density", false));
 	wLop.addParam(new RichBool("Need Compute PCA", false));
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 	wLop.addParam(new RichDouble("Dual Radius", 0.33));
 
 	wLop.addParam(new RichDouble("Increasing Step Size", 0.005));
-	wLop.addParam(new RichDouble("Local Neighbor Size", 0.015));
-	wLop.addParam(new RichDouble("Local Angle Threshold", 55));
+	wLop.addParam(new RichDouble("Local Neighbor Size", 0.020));
+	wLop.addParam(new RichDouble("Local Angle Threshold", 45));
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
   wLop.addParam(new RichBool("Need Sample Average", false));
@@ -232,6 +232,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Self WLOP", false));
 	wLop.addParam(new RichBool("Run Normal Smoothing", false));
 
+	wLop.addParam(new RichBool("Run Self PCA", false));
+	wLop.addParam(new RichBool("Run Self Projection", false));
+
 
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
@@ -242,10 +245,11 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Use Adaptive Sample Neighbor", false));
   wLop.addParam(new RichBool("Use Adaptive Mu", false));
   wLop.addParam(new RichBool("Use Tangent Vector", false));
-
-	wLop.addParam(new RichBool("Use Original Averaging KNN", true));
+	
+	wLop.addParam(new RichBool("Use Original Averaging KNN", false));
 	wLop.addParam(new RichBool("Use Kite Points", false));
 
+	wLop.addParam(new RichDouble("Sefl KNN", 15));
 
 
 
@@ -373,9 +377,9 @@ void ParameterMgr::initNormalSmootherParameter()
 {
 	norSmooth.addParam(new RichString("Algorithm Name", "NormalSmooth") );
 
-	norSmooth.addParam(new RichInt("PCA KNN", 28));
+	norSmooth.addParam(new RichInt("PCA KNN", 15));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 19));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 88));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 

@@ -166,6 +166,9 @@ void WlopParaDlg::initConnects()
 	connect(ui->self_WLOP, SIGNAL(clicked()), this, SLOT(applySelfWLOP()));
 	connect(ui->normal_smoothing, SIGNAL(clicked()), this, SLOT(applyNormalSmoothing()));
 
+	connect(ui->self_PCA, SIGNAL(clicked()), this, SLOT(applySelfPCA()));
+	connect(ui->self_projection, SIGNAL(clicked()), this, SLOT(applySelfPorjection()));
+
 }
 
 
@@ -785,6 +788,24 @@ void WlopParaDlg::applyMoveBackward()
 
 void WlopParaDlg::applySelfWLOP()
 {
+  	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+  	area->runWlop();
+  	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+ 
+    	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
+    	area->runWlop();
+    	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
+
+// 		m_paras->wLop.setValue("Run Self PCA", BoolValue(true));
+// 		area->runWlop();
+// 		m_paras->wLop.setValue("Run Self PCA", BoolValue(false));
+// 
+//   	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
+//   	area->runWlop();
+//   	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
+
+
+
 	m_paras->wLop.setValue("Run Self WLOP", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Self WLOP", BoolValue(false));
@@ -796,13 +817,35 @@ void WlopParaDlg::applyNormalSmoothing()
 // 	area->dataMgr.recomputeQuad();
 // 	area->updateGL();
 
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+ 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+ 	area->runWlop();
+ 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 
 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
 	area->runWlop();
  	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
+}
+
+void WlopParaDlg::applySelfPCA()
+{
+// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+
+	m_paras->wLop.setValue("Run Self PCA", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Self PCA", BoolValue(false));
+}
+
+void WlopParaDlg::applySelfPorjection()
+{
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+
+	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
 }
 
 
