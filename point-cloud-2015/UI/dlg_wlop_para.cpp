@@ -13,6 +13,8 @@ WlopParaDlg::WlopParaDlg(QWidget *p, ParameterMgr * _paras, GLArea * _area) : QF
 		 return ;
 	}
 
+	run_backward_first = false;
+
 	initConnects();
 }
 
@@ -119,7 +121,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
-
+	if (!connect(ui->run_backward_first, SIGNAL(clicked(bool)), this, SLOT(useBackwardFirst(bool))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -226,6 +231,7 @@ bool WlopParaDlg::initWidgets()
 
 	state = m_paras->wLop.getBool("Use Kite Points") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->Use_kite_points->setCheckState(state);
+
 
 	update();
 	repaint();
@@ -369,6 +375,11 @@ void WlopParaDlg::useOriginalKNN(bool _val)
 void WlopParaDlg::useKitePoints(bool _val)
 {
 	m_paras->wLop.setValue("Use Kite Points", BoolValue(_val));
+}
+
+void WlopParaDlg::useBackwardFirst(bool _val)
+{
+	run_backward_first = _val;
 }
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
@@ -788,13 +799,17 @@ void WlopParaDlg::applyMoveBackward()
 
 void WlopParaDlg::applySelfWLOP()
 {
-  	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
-  	area->runWlop();
-  	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	if (run_backward_first)
+	{
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+		area->runWlop();
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	}
+
  
-    	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
-    	area->runWlop();
-    	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
+//     	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
+//     	area->runWlop();
+//     	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
 
 // 		m_paras->wLop.setValue("Run Self PCA", BoolValue(true));
 // 		area->runWlop();
@@ -813,13 +828,12 @@ void WlopParaDlg::applySelfWLOP()
 
 void WlopParaDlg::applyNormalSmoothing()
 {
-// 	area->runNormalSmoothing();
-// 	area->dataMgr.recomputeQuad();
-// 	area->updateGL();
-
- 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
- 	area->runWlop();
- 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	if (run_backward_first)
+	{
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+		area->runWlop();
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	}
 
 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
 	area->runWlop();
@@ -828,9 +842,12 @@ void WlopParaDlg::applyNormalSmoothing()
 
 void WlopParaDlg::applySelfPCA()
 {
-// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
-// 	area->runWlop();
-// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	if (run_backward_first)
+	{
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+		area->runWlop();
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	}
 
 	m_paras->wLop.setValue("Run Self PCA", BoolValue(true));
 	area->runWlop();
@@ -839,9 +856,12 @@ void WlopParaDlg::applySelfPCA()
 
 void WlopParaDlg::applySelfPorjection()
 {
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	if (run_backward_first)
+	{
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+		area->runWlop();
+		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	}
 
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
 	area->runWlop();

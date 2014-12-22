@@ -829,6 +829,19 @@
       <string>Self Projection</string>
      </property>
     </widget>
+    <widget class="QCheckBox" name="run_backward_first">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>260</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Run Backward First</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

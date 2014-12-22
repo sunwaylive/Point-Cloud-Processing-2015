@@ -167,7 +167,8 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 	if (v.is_boundary && !bUseConfidenceColor)
    {
-     return cBlue;
+     //return cBlue;
+		return cOrange;
    }
 
 	if (v.bIsOriginal)

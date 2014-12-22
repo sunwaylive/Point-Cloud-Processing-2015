@@ -5616,6 +5616,29 @@ void WLOP::runMoveBackward()
 		real_step_size[i] *= step_size;
 	}
 
+	// bi-laplician end
+ 	vector<double> real_step_size2(samples->vert.size(), 0.0);
+ 
+ 	for (int i = 0; i < samples->vert.size(); i++)
+ 	{
+ 		CVertex& dual_v = dual_samples->vert[i];
+ 		CVertex& v = samples->vert[i];
+ 
+ 		for (int j = 0; j < v.neighbors.size(); j++)
+ 		{
+ 			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+ 
+ 			real_step_size2[i] += real_step_size[i];
+ 		}
+ 
+ 		real_step_size2[i] /= v.neighbors.size();
+ 	}
+ 	for (int i = 0; i < samples->vert.size(); i++)
+ 	{
+ 		real_step_size[i] = real_step_size2[i];
+ 	}
+	// bi-laplician end
+
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
@@ -5650,9 +5673,10 @@ void WLOP::runMoveBackward()
 			continue;
 		}
 
-		if ((real_step_size[i] / step_size) < 0.4)
+		if ((real_step_size[i] / step_size) < 0.3)
 		{
 			dual_v.is_fixed_sample = true;
+			dual_v.is_boundary = true;
 			continue;
 		}
 
@@ -5929,10 +5953,10 @@ void WLOP::runNormalSmoothing()
 		CVertex& dual_v = dual_samples->vert[i];
 		CVertex& v = samples->vert[i];
 
-//   		if (dual_v.is_fixed_sample)
-//   		{
-//   			continue;
-//   		}
+   		if (dual_v.is_fixed_sample)
+   		{
+   			continue;
+   		}
 
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
@@ -5971,10 +5995,10 @@ void WLOP::runNormalSmoothing()
 	{
 		CVertex& dual_v = dual_samples->vert[i];
 
-//   		if (dual_v.is_fixed_sample)
-//   		{
-//   			continue;
-//   		}
+   	if (dual_v.is_fixed_sample)
+   	{
+   		continue;
+   	}
 
 		if (normal_weight_sum[i] > 1e-6)
 		{
@@ -6004,8 +6028,8 @@ void WLOP::runSelfPCA()
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		normals_save[i] = dual_samples->vert[i].N();
-
-		dual_samples->vert[i].is_fixed_sample = true;
+		dual_samples->vert[i].neighbors = samples->vert[i].neighbors;
+		//dual_samples->vert[i].is_fixed_sample = true;
 	}
 
 	

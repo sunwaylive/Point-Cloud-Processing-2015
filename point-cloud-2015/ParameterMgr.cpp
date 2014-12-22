@@ -113,7 +113,7 @@ void ParameterMgr::initGlareaParameter()
 
 
 	glarea.addParam(new RichPoint3f("Light Position", vcg::Point3f(-4.0, -4.0, -4.0)));
-	glarea.addParam(new RichColor("Light Ambient Color", QColor(85, 85, 85)));
+	glarea.addParam(new RichColor("Light Ambient Color", QColor(22, 22, 22)));
 	glarea.addParam(new RichColor("Light Diffuse Color", QColor(164, 241, 101)));
 	glarea.addParam(new RichColor("Light Specular Color", QColor(255, 255, 255)));
 
@@ -197,8 +197,8 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 	wLop.addParam(new RichDouble("Dual Radius", 0.33));
 
-	wLop.addParam(new RichDouble("Increasing Step Size", 0.005));
-	wLop.addParam(new RichDouble("Local Neighbor Size", 0.020));
+	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
+	wLop.addParam(new RichDouble("Local Neighbor Size", 0.040));
 	wLop.addParam(new RichDouble("Local Angle Threshold", 45));
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
@@ -379,7 +379,7 @@ void ParameterMgr::initNormalSmootherParameter()
 
 	norSmooth.addParam(new RichInt("PCA KNN", 15));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
-	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 88));
+	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 90));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
 	norSmooth.addParam(new RichBool("Run Init Samples Using Normal", false));
 
