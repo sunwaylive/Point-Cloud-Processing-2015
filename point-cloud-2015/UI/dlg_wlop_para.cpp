@@ -804,6 +804,10 @@ void WlopParaDlg::applySelfWLOP()
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
 		area->runWlop();
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+
+		m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
+		area->runWlop();
+		m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
 	}
 
  

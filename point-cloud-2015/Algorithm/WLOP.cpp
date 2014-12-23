@@ -1616,11 +1616,19 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 		else
 		{
 
-			if (use_self_wlop && v.is_fixed_sample)
-			{
-				new_pos[i] = v.P();
-			}
-			else
+// 			if (use_self_wlop && v.is_fixed_sample)
+// 			{
+// 				new_pos[i] = v.P();
+// 			}
+// 			else
+ 			if (use_self_wlop)
+ 			{
+ 				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+ 				{
+ 					new_pos[i] = v.P() + repulsion[i] * (mu / repulsion_weight_sum[i]);
+ 				}
+ 			}
+ 			else
 			{
 				if (average_weight_sum[i] > 1e-20)
 				{
@@ -5649,7 +5657,7 @@ void WLOP::runMoveBackward()
 		{
 			continue;
 		}
-
+		
 // 		if (i < 20)
 // 		{
 // 			cout << real_step_size[i] << endl;
@@ -5713,16 +5721,43 @@ void WLOP::runMoveBackward()
 		}
 	}
 
-
-	for (int i = 0; i < samples->vert.size(); i++)
+	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+	// smooth neighbor
+	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
-		CVertex& v = samples->vert[i];
 		CVertex& dual_v = dual_samples->vert[i];
+		CVertex& v = samples->vert[i];
 
-		v.skel_radius = dual_v.skel_radius;
-		v.eigen_confidence = dual_v.skel_radius;
-		dual_v.eigen_confidence = dual_v.skel_radius;
+		double number_of_fixed = 0;
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+			if (dual_t.is_fixed_sample)
+			{
+				number_of_fixed += 1.0;
+			}
+		}
+
+		if (number_of_fixed > v.neighbors.size() * 0.5)
+		{
+			dual_v.is_fixed_sample = true;
+		}
+		else
+		{
+			dual_v.is_fixed_sample = false;
+		}
 	}
+
+
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 
+// 		v.skel_radius = dual_v.skel_radius;
+// 		v.eigen_confidence = dual_v.skel_radius;
+// 		dual_v.eigen_confidence = dual_v.skel_radius;
+// 	}
 
 	// 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
 	// 
@@ -6073,6 +6108,99 @@ void WLOP::runSelfPCA()
 
 }
 
+//void WLOP::runSelfProjection()
+//{
+//	cout << "Normal smoothing" << endl;
+//
+//	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+//	double radius = para->getDouble("CGrid Radius");
+//
+//	double radius2 = radius * radius;
+//	double iradius16 = -4 / radius2;
+//	int knn = para->getDouble("Sefl KNN");
+//
+//	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+//	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+//	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+//
+//	vector<Point3f> normal_sum;
+//	vector<double> normal_weight_sum;
+//	vector<double> proj_dist;
+//
+//	normal_sum.assign(dual_samples->vert.size(), Point3f(0., 0., 0.));
+//	normal_weight_sum.assign(dual_samples->vert.size(), 0);
+//	proj_dist.assign(dual_samples->vert.size(), 0);
+//
+//
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//		CVertex& v = samples->vert[i];
+//
+// 		if (dual_v.is_fixed_sample)
+// 		{
+// 			continue;
+// 		}
+//
+//		for (int j = 0; j < v.neighbors.size(); j++)
+//		{
+//			int neighbor_idx = v.neighbors[j];
+//			if (neighbor_idx < 0 || neighbor_idx >= dual_samples->vert.size())
+//			{
+//				cout << "bad index " << neighbor_idx << endl;
+//				continue;
+//			}
+//			CVertex& dual_t = dual_samples->vert[neighbor_idx];
+//
+//			Point3f diff = dual_v.P() - dual_t.P();
+//			double project_dist = dual_t.N() *(diff);
+//			double dist2 = diff.SquaredNorm();
+//
+//			double weight;
+//
+//			Point3f vm(dual_v.N());
+//			Point3f tm(dual_t.N());
+//			Point3f d = vm - tm;
+//			double psi = exp(-pow(1 - vm*tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
+//			double theta = exp(dist2*iradius16);
+//			weight = psi * theta;
+//			weight = max(weight, 1e-10);
+//
+//			normal_weight_sum[i] += weight;
+//			normal_sum[i] += tm * weight;
+//			proj_dist[i] += project_dist * weight;
+//
+//			//cout << "1" << endl;
+//
+//		}
+//	}
+//
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//
+//		if (dual_v.is_fixed_sample)
+//  		{
+//  			continue;
+//  		}
+//
+//		if (normal_weight_sum[i] > 1e-6)
+//		{
+//			//cout << "2" << endl;
+//			dual_v.N() = normal_sum[i] / normal_weight_sum[i];
+//			dual_v.N().Normalize();
+//			dual_v.P() -= dual_v.N() * (proj_dist[i] / normal_weight_sum[i]);
+//		}
+//	}
+//
+//
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		dual_samples->vert[i].recompute_m_render();
+//	}
+//}
+
+
 void WLOP::runSelfProjection()
 {
 	cout << "Normal smoothing" << endl;
@@ -6102,10 +6230,10 @@ void WLOP::runSelfProjection()
 		CVertex& dual_v = dual_samples->vert[i];
 		CVertex& v = samples->vert[i];
 
- 		if (dual_v.is_fixed_sample)
- 		{
- 			continue;
- 		}
+		if (dual_v.is_fixed_sample)
+		{
+			continue;
+		}
 
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
@@ -6145,9 +6273,9 @@ void WLOP::runSelfProjection()
 		CVertex& dual_v = dual_samples->vert[i];
 
 		if (dual_v.is_fixed_sample)
-  		{
-  			continue;
-  		}
+		{
+			continue;
+		}
 
 		if (normal_weight_sum[i] > 1e-6)
 		{
@@ -6162,5 +6290,75 @@ void WLOP::runSelfProjection()
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		dual_samples->vert[i].recompute_m_render();
+	}
+}
+
+
+void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
+	                                  vector<CVertex>& target,
+	                                  vector< vector<double>>& neighbor_weights,
+	                                  double radius,
+	                                  double sigma,
+																		WeightType type)
+{
+
+	vector< vector<int>> neighbors_indexes;
+	for (int i = 0; i < samples.size(); i++)
+	{
+		CVertex& v = samples[i];
+
+		vector<int> neighbor_indexes = v.neighbors;
+		neighbors_indexes.push_back(neighbor_indexes);
+	}
+
+	compute_neighbor_weights(samples, target, neighbors_indexes, neighbor_weights, radius, sigma);
+}
+
+void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
+	                                  vector<CVertex>& target,
+	                                  vector< vector<int>>& neighbors_indexes,
+																		vector< vector<double>>& neighbors_weights,
+	                                  double radius,
+	                                  double sigma,
+																		WeightType type)
+{
+
+	double radius2 = radius * radius;
+	double iradius16 = -4 / radius2;
+
+	neighbors_weights.clear();
+
+	for (int i = 0; i < samples.size(); i++)
+	{
+		CVertex& v = samples[i];
+
+		vector<double> neighbor_weights(neighbors_indexes[i].size());
+		for (int j = 0; j < neighbors_indexes[i].size(); j++)
+		{
+			int neighbor_index = neighbors_indexes[i][j];
+			CVertex& t = target[j];
+
+			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+			double dist_weight = exp(dist2*iradius16);
+			double normal_weight = exp(-pow(1 - v.N()*t.N(), 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
+
+			if (type == Bilateral)
+			{
+				neighbor_weights[j] = dist_weight * normal_weight;
+			}
+			else if (type == DistanceDiff)
+			{
+				neighbor_weights[j] = dist_weight;
+			}
+			else if (type == NormalDiff)
+			{
+				neighbor_weights[j] = dist_weight;
+			}
+			else
+			{
+				neighbor_weights[j] = 1.0;
+			}
+		}
+		neighbors_weights.push_back(neighbor_weights);
 	}
 }

@@ -108,6 +108,7 @@ private:
 	void runSelfPCA();
 	void runSelfProjection();
 
+
 private:
 	RichParameterSet* para;
 
@@ -153,4 +154,29 @@ private:
 	bool use_closest_dual;
 	int added_sample_num;
 	bool use_kite_points;
+
+public:
+	typedef enum { Bilateral, DistanceDiff, NormalDiff, Constant}WeightType;
+	vector< vector<double>> neighbor_weights;
+	vector< vector<int>> const_surface_neighbors;
+
+	void computeConstNeighborhoodUsingKNN(int knn);
+	void computeConstNeighborhoodUsingRadius(double radius);
+
+
+	void compute_neighbor_weights(vector<CVertex>& samples, 
+		                            vector<CVertex>& target,
+																vector< vector<double>>& neighbors_weights,
+																double radius,
+																double sigma,
+																WeightType type = Bilateral);
+
+	void compute_neighbor_weights(vector<CVertex>& samples,
+		                            vector<CVertex>& target,
+		                            vector< vector<int>>& neighbors_indexes,
+																vector< vector<double>>& neighbors_weights,
+		                            double radius,
+		                            double sigma,
+																WeightType type = Bilateral);
+
 };
