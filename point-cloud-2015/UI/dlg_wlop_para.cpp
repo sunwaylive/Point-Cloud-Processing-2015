@@ -174,6 +174,7 @@ void WlopParaDlg::initConnects()
 	connect(ui->self_PCA, SIGNAL(clicked()), this, SLOT(applySelfPCA()));
 	connect(ui->self_projection, SIGNAL(clicked()), this, SLOT(applySelfPorjection()));
 
+	connect(ui->compute_initial_neighborhood, SIGNAL(clicked()), this, SLOT(applyComputeInitialNeighborhood()));
 }
 
 
@@ -872,4 +873,10 @@ void WlopParaDlg::applySelfPorjection()
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
 }
 
+void WlopParaDlg::applyComputeInitialNeighborhood()
+{
+ 	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(true));
+ 	area->runWlop();
+ 	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(false));
+}
 

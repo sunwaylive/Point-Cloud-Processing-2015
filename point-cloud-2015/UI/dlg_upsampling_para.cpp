@@ -114,7 +114,7 @@ void UpsamplingParaDlg::runPointsExtrapolation()
   m_paras->upsampling.setValue("Run Points Extrapolation", BoolValue(true));
   area->runUpsampling();
   m_paras->upsampling.setValue("Run Points Extrapolation", BoolValue(false));
-  area->dataMgr.recomputeQuad();
+  area->dataMgr.recomputeQuad();javascript:;
   area->updateGL();
 }
 

@@ -100,6 +100,8 @@ class WlopParaDlg : public QFrame
 		void applySelfPCA();
 		void applySelfPorjection();
 
+		void applyComputeInitialNeighborhood();
+
 
 	private:
 		bool run_backward_first;
