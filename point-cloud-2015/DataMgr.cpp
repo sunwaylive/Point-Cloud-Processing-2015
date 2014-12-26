@@ -387,44 +387,44 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 
 	int inserted_number = 0;
 	int i = 0;
- 	while (want_sample_num > inserted_number)
- 	{
- 		if (i >= nCard.size())
- 		{
- 			break;
- 		}
- 
- 		int index = nCard[i++];
- 
- 		CVertex& v = original.vert[index];
- 		double probability = 1 - v.eigen_confidence;
-		//double probability = v.eigen_confidence;
+//  	while (want_sample_num > inserted_number)
+//  	{
+//  		if (i >= nCard.size())
+//  		{
+//  			break;
+//  		}
+//  
+//  		int index = nCard[i++];
+//  
+//  		CVertex& v = original.vert[index];
+//  		double probability = 1 - v.eigen_confidence;
+// 		//double probability = v.eigen_confidence;
+// 
+//  		double r = (rand() % 1000) * 0.001;
+//  
+//  		if (r < probability)
+//  		{
+//  			samples.vert.push_back(v);
+//  			samples.bbox.Add(v.P());
+//  
+//  			inserted_number++;
+//  		}
+//  	}
 
- 		double r = (rand() % 1000) * 0.001;
- 
- 		if (r < probability)
- 		{
- 			samples.vert.push_back(v);
- 			samples.bbox.Add(v.P());
- 
- 			inserted_number++;
- 		}
- 	}
-
-//   	for (int i = 0; i < samples.vn; i++)
-//   	{
-//   		int index = nCard[i]; //could be not random!
-//   
-//   		if (!use_random_downsample)
-//   		{
-//   			index = i;
-//   		}
-//   
-//   		CVertex& v = original.vert[index];
-//   		v.dual_index = i;
-//   		samples.vert.push_back(v);
-//   		samples.bbox.Add(v.P());
-//   	}
+   	for (int i = 0; i < samples.vn; i++)
+   	{
+   		int index = nCard[i]; //could be not random!
+   
+   		if (!use_random_downsample)
+   		{
+   			index = i;
+   		}
+   
+   		CVertex& v = original.vert[index];
+   		v.dual_index = i;
+   		samples.vert.push_back(v);
+   		samples.bbox.Add(v.P());
+   	}
  
  	CMesh::VertexIterator vi;
  	for (vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)

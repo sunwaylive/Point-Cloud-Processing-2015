@@ -338,6 +338,12 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Run Compute Initial Neighborhood"))
+	{
+		computeInitialNeighborSize();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -466,6 +472,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 {
 	double average_power = para->getDouble("Average Power");
 	bool need_density = para->getBool("Need Compute Density");
+	bool use_self_wlop = para->getBool("Run Self WLOP");
 
 //	bool use_elliptical_neighbor = para->getBool("Use Elliptical Original Neighbor");
 	bool use_elliptical_neighbor = false;
@@ -579,7 +586,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				w *= original_density[t.m_index];
 			}
 
-			if (L2)
+			if (L2 || use_self_wlop)
 			{
 				w = 1.0;
 			}
@@ -1160,6 +1167,11 @@ void WLOP::computeDensity(bool isOriginal, double radius)
 	}
 	else
 	{
+// 		if (para->getBool("Run Skel WLOP"))
+// 		{
+// 			cout << "density for Skel WLOP Sample" << endl;
+// 			mesh = dual_samples;
+// 		}
 		mesh = samples;
 	}
 
@@ -1621,14 +1633,14 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 // 				new_pos[i] = v.P();
 // 			}
 // 			else
- 			if (use_self_wlop)
- 			{
- 				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
- 				{
- 					new_pos[i] = v.P() + repulsion[i] * (mu / repulsion_weight_sum[i]);
- 				}
- 			}
- 			else
+//   			if (use_self_wlop)
+//   			{
+//   				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+//   				{
+//   					new_pos[i] = v.P() + repulsion[i] * (0.1 / repulsion_weight_sum[i]);
+//   				}
+//   			}
+//   			else
 			{
 				if (average_weight_sum[i] > 1e-20)
 				{
@@ -5162,7 +5174,7 @@ void WLOP::runMatLOP()
 	double curr_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
 
 	double stop_angle_threshold = para->getDouble("Local Angle Threshold");
-	double stop_neighbor_size = para->getDouble("Local Neighbor Size");
+	double stop_neighbor_size = para->getDouble("Local Neighbor Size For Inner Points");
 
 	Timer time;
 
@@ -5575,13 +5587,24 @@ void WLOP::runSmoothNeighborhood()
 }
 
 
+void WLOP::computeConstNeighborhoodUsingKNN(int knn)
+{
+	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+	cout << "end knn" << endl;
+}
+
+void WLOP::computeConstNeighborhoodUsingRadius(double radius)
+{
+	GlobalFun::computeBallNeighbors(samples, NULL, radius, box);
+}
+
 void WLOP::runMoveBackward()
 {
 	cout << "runSkelWlop" << endl;
 	double curr_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
 
 	double stop_angle_threshold = para->getDouble("Local Angle Threshold");
-	double stop_neighbor_size = para->getDouble("Local Neighbor Size");
+	double stop_neighbor_size = para->getDouble("Local Neighbor Size For Inner Points");
 	double step_size = para->getDouble("Increasing Step Size");
 	Timer time;
 
@@ -5592,9 +5615,11 @@ void WLOP::runMoveBackward()
 	vector<Point3f> remember_normal(dual_samples->vert.size());
 
 	// compute move step
-	int knn = para->getDouble("Sefl KNN");
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
-	cout << "end knn" << endl;
+	//int knn = para->getDouble("Sefl KNN");
+	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+	//cout << "end knn" << endl;
+	double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+	computeConstNeighborhoodUsingRadius(local_radius);
 
 	vector<double> real_step_size(samples->vert.size(), 0.0);
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -5625,43 +5650,39 @@ void WLOP::runMoveBackward()
 	}
 
 	// bi-laplician end
- 	vector<double> real_step_size2(samples->vert.size(), 0.0);
- 
- 	for (int i = 0; i < samples->vert.size(); i++)
- 	{
- 		CVertex& dual_v = dual_samples->vert[i];
- 		CVertex& v = samples->vert[i];
- 
- 		for (int j = 0; j < v.neighbors.size(); j++)
- 		{
- 			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
- 
- 			real_step_size2[i] += real_step_size[i];
- 		}
- 
- 		real_step_size2[i] /= v.neighbors.size();
- 	}
- 	for (int i = 0; i < samples->vert.size(); i++)
- 	{
- 		real_step_size[i] = real_step_size2[i];
- 	}
+	vector<double> real_step_size2(samples->vert.size(), 0.0);
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+		CVertex& v = samples->vert[i];
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+
+			real_step_size2[i] += real_step_size[i];
+		}
+
+		real_step_size2[i] /= v.neighbors.size();
+	}
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		real_step_size[i] = real_step_size2[i];
+	}
 	// bi-laplician end
 
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
-// 		remember_position[i] = dual_v.P();
-// 		remember_normal[i] = dual_v.N();
+		// 		remember_position[i] = dual_v.P();
+		// 		remember_normal[i] = dual_v.N();
 
 		if (dual_v.is_fixed_sample)
 		{
 			continue;
 		}
-		
-// 		if (i < 20)
-// 		{
-// 			cout << real_step_size[i] << endl;
-// 		}
+
 		dual_v.P() -= dual_v.N() * real_step_size[i];
 	}
 
@@ -5711,8 +5732,8 @@ void WLOP::runMoveBackward()
 		{
 			dual_v.is_fixed_sample = true;
 
-// 			dual_v.P() = remember_position[i];
-// 			dual_v.N() = remember_normal[i];
+			// 			dual_v.P() = remember_position[i];
+			// 			dual_v.N() = remember_normal[i];
 
 			if (dual_v.skel_radius < 1e-15)
 			{
@@ -5721,7 +5742,9 @@ void WLOP::runMoveBackward()
 		}
 	}
 
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+	computeConstNeighborhoodUsingRadius(local_radius);
+
 	// smooth neighbor
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
@@ -5749,30 +5772,8 @@ void WLOP::runMoveBackward()
 	}
 
 
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 		CVertex& dual_v = dual_samples->vert[i];
-// 
-// 		v.skel_radius = dual_v.skel_radius;
-// 		v.eigen_confidence = dual_v.skel_radius;
-// 		dual_v.eigen_confidence = dual_v.skel_radius;
-// 	}
-
-	// 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
-	// 
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 
-// 		if (i < 150)
-// 		{
-// 			cout << "inside  " << v.eigen_confidence << endl;
-// 		}
-// 	}
-
 	if (para->getBool("Need Compute PCA"))
-	//if (true)
+		//if (true)
 	{
 		cout << "Compute PCA  " << endl;
 		dual_samples->vn = dual_samples->vert.size();
@@ -5810,6 +5811,237 @@ void WLOP::runMoveBackward()
 	}
 }
 
+//void WLOP::runMoveBackward()
+//{
+//	cout << "runSkelWlop" << endl;
+//	double curr_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+//
+//	double stop_angle_threshold = para->getDouble("Local Angle Threshold");
+//	double stop_neighbor_size = para->getDouble("Local Neighbor Size For Inner Points");
+//	double step_size = para->getDouble("Increasing Step Size");
+//	Timer time;
+//
+//	initVertexes(true);
+//
+//
+//	vector<Point3f> remember_position(dual_samples->vert.size());
+//	vector<Point3f> remember_normal(dual_samples->vert.size());
+//
+//	// compute move step
+//	int knn = para->getDouble("Sefl KNN");
+//	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+//	cout << "end knn" << endl;
+//
+//	vector<double> real_step_size(samples->vert.size(), 0.0);
+//	for (int i = 0; i < samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//		CVertex& v = samples->vert[i];
+//
+//		for (int j = 0; j < v.neighbors.size(); j++)
+//		{
+//			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+//
+//			if (dual_t.is_fixed_sample)
+//			{
+//				real_step_size[i] += 0.0;
+//			}
+//			else
+//			{
+//				real_step_size[i] += 1.0;
+//			}
+//		}
+//
+//		real_step_size[i] /= v.neighbors.size();
+//	}
+//
+//	for (int i = 0; i < samples->vert.size(); i++)
+//	{
+//		real_step_size[i] *= step_size;
+//	}
+//
+//	// bi-laplician end
+//  	vector<double> real_step_size2(samples->vert.size(), 0.0);
+//  
+//  	for (int i = 0; i < samples->vert.size(); i++)
+//  	{
+//  		CVertex& dual_v = dual_samples->vert[i];
+//  		CVertex& v = samples->vert[i];
+//  
+//  		for (int j = 0; j < v.neighbors.size(); j++)
+//  		{
+//  			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+//  
+//  			real_step_size2[i] += real_step_size[i];
+//  		}
+//  
+//  		real_step_size2[i] /= v.neighbors.size();
+//  	}
+//  	for (int i = 0; i < samples->vert.size(); i++)
+//  	{
+//  		real_step_size[i] = real_step_size2[i];
+//  	}
+//	// bi-laplician end
+//
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//// 		remember_position[i] = dual_v.P();
+//// 		remember_normal[i] = dual_v.N();
+//
+//		if (dual_v.is_fixed_sample)
+//		{
+//			continue;
+//		}
+//		
+//		dual_v.P() -= dual_v.N() * real_step_size[i];
+//	}
+//
+//
+//	time.start("Sample neighbor");
+//	GlobalFun::computeBallNeighbors(dual_samples, NULL,
+//		stop_neighbor_size, box);
+//	time.end();
+//
+//
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//
+//		if (dual_v.is_fixed_sample)
+//		{
+//			continue;
+//		}
+//
+//		if ((real_step_size[i] / step_size) < 0.3)
+//		{
+//			dual_v.is_fixed_sample = true;
+//			dual_v.is_boundary = true;
+//			continue;
+//		}
+//
+//		bool keep_going = true;
+//
+//		for (int j = 0; j < dual_v.neighbors.size(); j++)
+//		{
+//			CVertex& t = dual_samples->vert[dual_v.neighbors[j]];
+//
+//			double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), t.N());
+//
+//			if (angle > stop_angle_threshold)
+//			{
+//				keep_going = false;
+//				break;
+//			}
+//		}
+//
+//		if (keep_going)
+//		{
+//			dual_v.is_fixed_sample = false;
+//		}
+//		else
+//		{
+//			dual_v.is_fixed_sample = true;
+//
+//// 			dual_v.P() = remember_position[i];
+//// 			dual_v.N() = remember_normal[i];
+//
+//			if (dual_v.skel_radius < 1e-15)
+//			{
+//				dual_v.skel_radius = curr_radius;
+//			}
+//		}
+//	}
+//
+//	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
+//	// smooth neighbor
+//	for (int i = 0; i < dual_samples->vert.size(); i++)
+//	{
+//		CVertex& dual_v = dual_samples->vert[i];
+//		CVertex& v = samples->vert[i];
+//
+//		double number_of_fixed = 0;
+//		for (int j = 0; j < v.neighbors.size(); j++)
+//		{
+//			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+//			if (dual_t.is_fixed_sample)
+//			{
+//				number_of_fixed += 1.0;
+//			}
+//		}
+//
+//		if (number_of_fixed > v.neighbors.size() * 0.5)
+//		{
+//			dual_v.is_fixed_sample = true;
+//		}
+//		else
+//		{
+//			dual_v.is_fixed_sample = false;
+//		}
+//	}
+//
+//
+//// 	for (int i = 0; i < samples->vert.size(); i++)
+//// 	{
+//// 		CVertex& v = samples->vert[i];
+//// 		CVertex& dual_v = dual_samples->vert[i];
+//// 
+//// 		v.skel_radius = dual_v.skel_radius;
+//// 		v.eigen_confidence = dual_v.skel_radius;
+//// 		dual_v.eigen_confidence = dual_v.skel_radius;
+//// 	}
+//
+//	// 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
+//	// 
+//// 	for (int i = 0; i < samples->vert.size(); i++)
+//// 	{
+//// 		CVertex& v = samples->vert[i];
+//// 
+//// 		if (i < 150)
+//// 		{
+//// 			cout << "inside  " << v.eigen_confidence << endl;
+//// 		}
+//// 	}
+//
+//	if (para->getBool("Need Compute PCA"))
+//	//if (true)
+//	{
+//		cout << "Compute PCA  " << endl;
+//		dual_samples->vn = dual_samples->vert.size();
+//		CVertex v;
+//		mesh_temp.assign(samples->vn, v);
+//		cout << "Compute PCA" << endl;
+//		for (int i = 0; i < dual_samples->vn; i++)
+//		{
+//			mesh_temp[i].P() = dual_samples->vert[i].P();
+//		}
+//
+//		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+//		vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
+//
+//		for (int i = 0; i < dual_samples->vn; i++)
+//		{
+//			Point3f& new_normal = mesh_temp[i].N();
+//			CVertex& v = dual_samples->vert[i];
+//
+//			if (v.is_fixed_sample)
+//			{
+//				continue;
+//			}
+//
+//			if (v.N() * new_normal > 0)
+//			{
+//				v.N() = new_normal;
+//			}
+//			else
+//			{
+//				v.N() = -new_normal;
+//			}
+//			v.recompute_m_render();
+//		}
+//	}
+//}
+
 void WLOP::runSelfWLOP()
 {
 	use_adaptive_mu = para->getBool("Use Adaptive Mu");
@@ -5817,29 +6049,37 @@ void WLOP::runSelfWLOP()
 	bool use_tangent = para->getBool("Use Tangent Vector");
 
 	Timer time;
-	original = dual_samples;
+	original = samples;
 
 	initVertexes(true);
 
 
 	time.start("Sample Sample Neighbor Tree");
 	int knn = para->getDouble("Sefl KNN");
-// 	GlobalFun::computeBallNeighbors(samples, NULL,
-// 		para->getDouble("CGrid Radius"), samples->bbox);
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+
+ 	GlobalFun::computeBallNeighbors(dual_samples, NULL,
+		para->getDouble("CGrid Radius"), dual_samples->bbox);
+
+//	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
 
 	time.end();
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		dual_v.neighbors = v.neighbors;
+// 		dual_v.original_neighbors = v.neighbors;
+// 	}
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
 		CVertex& dual_v = dual_samples->vert[i];
-		dual_v.neighbors = v.neighbors;
-		dual_v.original_neighbors = v.neighbors;
+
+		dual_v.original_neighbors = dual_v.neighbors;
 	}
 
-
 	time.start("Compute Average Term");
-	computeAverageTerm(dual_samples, dual_samples);
+	computeAverageTerm(dual_samples, samples);
 	time.end();
 
 
@@ -5968,11 +6208,13 @@ void WLOP::runNormalSmoothing()
 
 	double radius2 = radius * radius;
 	double iradius16 = -4 / radius2;
-	int knn = para->getDouble("Sefl KNN");
-
-	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+// 	int knn = para->getDouble("Sefl KNN");
+// 
+// 	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+// 	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+// 	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+	double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+	computeConstNeighborhoodUsingRadius(local_radius);
 
 	vector<Point3f> normal_sum;
 	vector<double> normal_weight_sum;
@@ -6054,9 +6296,10 @@ void WLOP::runNormalSmoothing()
 
 void WLOP::runSelfPCA()
 {
-	int knn = para->getDouble("Sefl KNN");
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
-
+// 	int knn = para->getDouble("Sefl KNN");
+// 	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+	double radius = para->getDouble("Local Neighbor Size For Surface Points");
+	computeConstNeighborhoodUsingRadius(radius);
 
 
 	vector<Point3f> normals_save(dual_samples->vert.size());
@@ -6210,11 +6453,13 @@ void WLOP::runSelfProjection()
 
 	double radius2 = radius * radius;
 	double iradius16 = -4 / radius2;
-	int knn = para->getDouble("Sefl KNN");
+	//int knn = para->getDouble("Sefl KNN");
 
 	//GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
 	//GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runNormalSmoothing()");
+	double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+	computeConstNeighborhoodUsingRadius(local_radius);
 
 	vector<Point3f> normal_sum;
 	vector<double> normal_weight_sum;
@@ -6262,9 +6507,6 @@ void WLOP::runSelfProjection()
 			normal_weight_sum[i] += weight;
 			normal_sum[i] += tm * weight;
 			proj_dist[i] += project_dist * weight;
-
-			//cout << "1" << endl;
-
 		}
 	}
 
@@ -6361,4 +6603,36 @@ void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
 		}
 		neighbors_weights.push_back(neighbor_weights);
 	}
+}
+
+void WLOP::computeInitialNeighborSize()
+{
+	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 1, false, "WlopParaDlg::computeInitialNeighborSize()");
+
+	double sum_dist = 0;
+	double sum_n = 0;
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		if (v.neighbors.empty())
+		{
+			continue;
+		}
+		sum_n++;
+		CVertex& t = samples->vert[v.neighbors[0]];
+
+		double dist = GlobalFun::computeEulerDist(v.P(), t.P());
+		sum_dist += dist;
+	}
+	double average_dist = sum_dist / sum_n;
+
+	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 2.0));
+	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
+	
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 2.5));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 3.5));
+	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.25));
+
+
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 }

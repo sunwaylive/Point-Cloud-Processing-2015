@@ -81,6 +81,12 @@ void Upsampler::run()
   if (para->getBool("Use Constant Threshold"))
   {
     radius = para->getDouble("CGrid Radius");
+		double current_radius = radius;
+		if (abs(old_radius - current_radius) > 1e-10 || b_first)
+		{
+			recomputeAllNeighbors();
+			old_radius = current_radius;
+		}
     clearAllThresholdFlag();
     runConstantUpsampling();
     return;
@@ -443,6 +449,11 @@ void Upsampler::runConstantUpsampling()
         continue;
       }
 
+			if (i < 5)
+			{
+				cout << "neighbor size: " << v.neighbors.size() << endl;;
+			}
+
       int firstVertInex = v.m_index;
       int secondVertIndx = -1;
       double bestDist = findMaxMidpoint(v, secondVertIndx);
@@ -490,9 +501,16 @@ void Upsampler::runConstantUpsampling()
       if(wd != 0.0)
         pv.P() = pv.P() + pv.N() * (d / wd);
 
+			pv.is_fixed_sample = true;
+
       // update new vertex's neighbors
       pv.neighbors.clear();
       getNewPointNeighbors(pv, setNewVertexNeighors, true);
+
+			// new 2014-12-23
+ 			computeNewVertexProjDist_Again(pv);
+ 			if (wd != 0.0)
+ 				pv.P() = pv.P() + pv.N() * (d / wd);
     }
 
     if(abandonCounter == samples->vert.size() || loopCounter > MAX_LOOP)
@@ -617,6 +635,7 @@ void Upsampler::pointsExtrapoaltion()
 
 void Upsampler::insertPointsByThreshold()
 {
+	cout << "insertPointsByThreshold" << endl;
   int abandonCounter = 0;
   int loopCounter = 0;
   double addCounter = 0;
@@ -648,9 +667,14 @@ void Upsampler::insertPointsByThreshold()
         continue;
       }
 
+			if (i < 15)
+			{
+				cout << "neighbor size: " << v.neighbors.size();
+			}
+
       if(is_abandon_by_threshold[v.m_index])
       {
-        abandonCounter ++;
+        abandonCounter++;
         continue;
       }
 
@@ -829,11 +853,111 @@ void Upsampler::projectOneCVertex(CVertex& v)
 }
 
 //our new sigma
+//void Upsampler::computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV)
+//{
+//	const int NORMAL_NUM = 2;
+//	double radius2 = radius * radius;
+//	double radius16 =   -4 / (radius2);
+//	Point3f & p = v.P();
+//	//Point3f vm(v.N());
+//
+//
+//	// 0:first, 1:second
+//	vector<double> projDist(NORMAL_NUM, 0.0);
+//	vector<double> sumW(NORMAL_NUM, 0.0);
+//	vector<Point3f> v_normals;
+//
+//	vector<Point3f> grad_f(NORMAL_NUM, Point3f(0., 0., 0.));
+//
+//	v_normals.push_back(samples->vert[firstV].N());
+//	v_normals.push_back(samples->vert[secV].N());
+//
+//	for(int i = 0; i < v.neighbors.size(); i++)
+//	{
+//		CVertex & t =  samples->vert[v.neighbors[i]];
+//		Point3f & q = t.P();
+//
+//		Point3f tm(t.N());
+//		double theta_1 = exp( (q - p).SquaredNorm() * radius16);
+//
+//		for(int j = 0; j < NORMAL_NUM; j++)
+//		{
+//			double psi = exp(-pow(1- v_normals[j] * tm, 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
+//
+//			double diff_proj_vt = (p - q) * tm;
+//			double weight = psi * theta_1;
+//
+//			projDist[j] +=  weight * diff_proj_vt;
+//			sumW[j] += weight;
+//			grad_f[j] +=  tm * weight;
+//		}
+//	}
+//
+//	double min_dist = 10000.0;
+//	int min_index = 0;
+//	for(int i = 0; i < NORMAL_NUM; i++)
+//	{
+//		double dist = abs((projDist[i] / sumW[i]));
+//		if(dist < min_dist)
+//		{
+//			min_dist = dist;
+//			min_index = i;
+//		}
+//	}
+//
+//	d = -projDist[min_index] / sumW[min_index];
+//	wd = 1.0;
+//
+//	v.N() = (grad_f[min_index] / sumW[min_index]).Normalize();
+//}
+
+
+void Upsampler::computeNewVertexProjDist_Again(CVertex & v)
+{
+	const int NORMAL_NUM = 2;
+	double radius2 = radius * radius;
+	double radius16 = -4 / (radius2);
+	Point3f & p = v.P();
+
+	double projDist(0.0);
+	double sumW(0.0);
+	Point3f v_normals = v.N();
+
+	Point3f grad_f(Point3f(0., 0., 0.));
+
+	for (int i = 0; i < v.neighbors.size(); i++)
+	{
+		CVertex & t = samples->vert[v.neighbors[i]];
+		Point3f & q = t.P();
+
+		Point3f tm(t.N());
+		double theta_1 = exp((q - p).SquaredNorm() * radius16);
+
+		for (int j = 0; j < NORMAL_NUM; j++)
+		{
+			double psi = exp(-pow(1 - v_normals * tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
+
+			double diff_proj_vt = (p - q) * tm;
+			double weight = psi * theta_1;
+
+			projDist += weight * diff_proj_vt;
+			sumW += weight;
+			grad_f += tm * weight;
+		}
+	}
+
+	d = -projDist/ sumW;
+	wd = 1.0;
+
+	v.N() = (grad_f / sumW).Normalize();
+}
+
+
 void Upsampler::computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV)
 {
 	const int NORMAL_NUM = 2;
 	double radius2 = radius * radius;
-	double radius16 =   -4 / (radius2);
+	double radius16 = -4 / (radius2);
 	Point3f & p = v.P();
 	//Point3f vm(v.N());
 
@@ -848,33 +972,33 @@ void Upsampler::computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV
 	v_normals.push_back(samples->vert[firstV].N());
 	v_normals.push_back(samples->vert[secV].N());
 
-	for(int i = 0; i < v.neighbors.size(); i++)
+	for (int i = 0; i < v.neighbors.size(); i++)
 	{
-		CVertex & t =  samples->vert[v.neighbors[i]];
+		CVertex & t = samples->vert[v.neighbors[i]];
 		Point3f & q = t.P();
 
 		Point3f tm(t.N());
-		double theta_1 = exp( (q - p).SquaredNorm() * radius16);
+		double theta_1 = exp((q - p).SquaredNorm() * radius16);
 
-		for(int j = 0; j < NORMAL_NUM; j++)
+		for (int j = 0; j < NORMAL_NUM; j++)
 		{
-			double psi = exp(-pow(1- v_normals[j] * tm, 2)/pow(max(1e-8,1-cos(sigma/180.0*3.1415926)), 2));
+			double psi = exp(-pow(1 - v_normals[j] * tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
 
 			double diff_proj_vt = (p - q) * tm;
 			double weight = psi * theta_1;
 
-			projDist[j] +=  weight * diff_proj_vt;
+			projDist[j] += weight * diff_proj_vt;
 			sumW[j] += weight;
-			grad_f[j] +=  tm * weight;
+			grad_f[j] += tm * weight;
 		}
 	}
 
 	double min_dist = 10000.0;
 	int min_index = 0;
-	for(int i = 0; i < NORMAL_NUM; i++)
+	for (int i = 0; i < NORMAL_NUM; i++)
 	{
 		double dist = abs((projDist[i] / sumW[i]));
-		if(dist < min_dist)
+		if (dist < min_dist)
 		{
 			min_dist = dist;
 			min_index = i;
@@ -886,8 +1010,6 @@ void Upsampler::computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV
 
 	v.N() = (grad_f[min_index] / sumW[min_index]).Normalize();
 }
-
-
 
 
 

@@ -113,7 +113,7 @@ void ParameterMgr::initGlareaParameter()
 
 
 	glarea.addParam(new RichPoint3f("Light Position", vcg::Point3f(-4.0, -4.0, -4.0)));
-	glarea.addParam(new RichColor("Light Ambient Color", QColor(22, 22, 22)));
+	glarea.addParam(new RichColor("Light Ambient Color", QColor(44, 44, 44)));
 	glarea.addParam(new RichColor("Light Diffuse Color", QColor(164, 241, 101)));
 	glarea.addParam(new RichColor("Light Specular Color", QColor(255, 255, 255)));
 
@@ -198,7 +198,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Dual Radius", 0.33));
 
 	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
-	wLop.addParam(new RichDouble("Local Neighbor Size", 0.040));
+	wLop.addParam(new RichDouble("Local Neighbor Size For Inner Points", 0.040));
+	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.060));
+
 	wLop.addParam(new RichDouble("Local Angle Threshold", 45));
 
   wLop.addParam(new RichDouble("Dual Mu3", 0.35));
@@ -274,6 +276,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Ellipsoid Fitting", false));
 	wLop.addParam(new RichBool("Run MAT LOP", false));
 
+	wLop.addParam(new RichBool("Run Compute Initial Neighborhood", false));
 
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
 

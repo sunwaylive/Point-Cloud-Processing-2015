@@ -30,6 +30,7 @@ public:
   int getIterateNum(){ return nTimeIterated; }
 	double getErrorX(){ return error_x; }
 
+	void computeInitialNeighborSize();
   void computeInitialSampleNeighbor();
 	void computeNearestNeighborDist();
 	
@@ -107,6 +108,9 @@ private:
 	void runNormalSmoothing();
 	void runSelfPCA();
 	void runSelfProjection();
+
+
+
 
 
 private:

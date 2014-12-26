@@ -176,6 +176,11 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return original_color;
 	}
 
+	if (!v.is_dual_sample && v.is_fixed_sample)
+	{
+		return cBlue;
+	}
+
 	if (v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
 	{
 		return cGreen;
@@ -470,9 +475,9 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 
 void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
 {
-  double width = para->getDouble("Sample Draw Width") * 0.4;
+  double width = para->getDouble("Sample Draw Width") * 1.9;
   //GLColor dnn_color = cOrange;
-	GLColor dnn_color = cBlue;
+	GLColor dnn_color = cBlack;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
@@ -515,7 +520,7 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
   double width = para->getDouble("Sample Draw Width") * 2.6;
   //GLColor dnn_color = para->getColor("Pick Point DNN Color");
-  GLColor dnn_color = cBlue;
+	GLColor dnn_color = cBlack;
 
   glColor3f(dnn_color.r, dnn_color.g, dnn_color.b);
 
@@ -523,7 +528,7 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
   {
     int i = pickList[ii];
 
-    if(i < 0 )
+    if(i < 0 || i >= samples->vert.size())
       continue;
 
     CVertex &v = samples->vert[i];

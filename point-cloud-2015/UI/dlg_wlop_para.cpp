@@ -190,7 +190,7 @@ bool WlopParaDlg::initWidgets()
 	ui->dual_radius->setValue(m_paras->wLop.getDouble("Dual Radius"));
 
 	ui->increasing_step_size->setValue(m_paras->wLop.getDouble("Increasing Step Size"));
-	ui->local_neighbor_size->setValue(m_paras->wLop.getDouble("Local Neighbor Size"));
+	ui->local_neighbor_size->setValue(m_paras->wLop.getDouble("Local Neighbor Size For Inner Points"));
 	ui->local_angle_threshold->setValue(m_paras->wLop.getDouble("Local Angle Threshold"));
 
 	
@@ -300,7 +300,7 @@ void WlopParaDlg::get_increasing_step_size(double _val)
 
 void WlopParaDlg::get_local_neighbor_size(double _val)
 {
-	m_paras->wLop.setValue("Local Neighbor Size", DoubleValue(_val));
+	m_paras->wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(_val));
 }
 
 void WlopParaDlg::get_local_angle_threshold(double _val)

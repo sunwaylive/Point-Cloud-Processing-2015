@@ -47,6 +47,8 @@ private:
 
 	void computeNewVertexNormAvgMethod(CVertex & v, int firstV, int secV);
 	void computeNewVertexProjDist_Sigma(CVertex & v, int firstV, int secV);
+	void computeNewVertexProjDist_Again(CVertex & v);
+
 	void computeEigenVerctorForRendering();
 
   void removeOneNeighbor(vector<int>& neighbors, int remove_idx);

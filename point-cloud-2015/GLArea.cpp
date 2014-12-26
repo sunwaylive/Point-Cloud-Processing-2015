@@ -314,8 +314,6 @@ void GLArea::paintGL()
 			if(!dataMgr.isOriginalEmpty())
 			  glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
-
-
 	}
 
 	if (para->getBool("Show Skeleton"))
@@ -391,10 +389,12 @@ void GLArea::paintGL()
 
 		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
      {
-       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
+			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentSamples(), pickList);
+
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentSamples(), dataMgr.getCurrentOriginal(), pickList);
 
      }
@@ -406,7 +406,6 @@ void GLArea::paintGL()
 //     }
 
 	}
-
 
 
 	if (isDragging && para->getBool("Multiply Pick Point"))
