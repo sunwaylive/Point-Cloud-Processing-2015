@@ -11,7 +11,7 @@
 
 #include "ParameterMgr.h"
 #include "calculationthread.h"
-
+#include "Algorithm/pointcloud_normal.h"
 using namespace std;
 
 class WlopParaDlg : public QFrame
@@ -101,7 +101,7 @@ class WlopParaDlg : public QFrame
 		void applySelfPorjection();
 
 		void applyComputeInitialNeighborhood();
-
+		void oneKEY();
 
 	private:
 		bool run_backward_first;

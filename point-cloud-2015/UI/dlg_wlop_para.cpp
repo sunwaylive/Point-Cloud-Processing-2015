@@ -174,6 +174,8 @@ void WlopParaDlg::initConnects()
 	connect(ui->self_PCA, SIGNAL(clicked()), this, SLOT(applySelfPCA()));
 	connect(ui->self_projection, SIGNAL(clicked()), this, SLOT(applySelfPorjection()));
 
+	connect(ui->one_key, SIGNAL(clicked()), this, SLOT(oneKEY()));
+
 	connect(ui->compute_initial_neighborhood, SIGNAL(clicked()), this, SLOT(applyComputeInitialNeighborhood()));
 }
 
@@ -453,6 +455,8 @@ void WlopParaDlg::copySamplesToDualSamples()
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		samples->vert[i].is_dual_sample = false;
+		samples->vert[i].is_fixed_sample = false;
+
 		samples->vert[i].m_index = i;
 
 		if (i < 20)
@@ -880,3 +884,31 @@ void WlopParaDlg::applyComputeInitialNeighborhood()
  	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(false));
 }
 
+void WlopParaDlg::oneKEY()
+{
+	applyComputeConfidence();
+	
+
+	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+	CMesh* samples;
+	samples = area->dataMgr.getCurrentSamples();
+	vector<Point3f> remember_normal(samples->vert.size());
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		remember_normal[i] = samples->vert[i].N();
+	}
+	vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+	pca_para.fittingAdjNum = knn;
+	vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		if (v.N() * remember_normal[i] < 0)
+		{
+			v.N() *= -1;
+		}
+	}
+
+	applyRegularizeNormals();
+	applyWlop();
+}

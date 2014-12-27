@@ -240,8 +240,8 @@ void WLOP::run()
 
 	if (para->getBool("Run Compute Confidence"))
 	{
-		//runComputeConfidence();
-		runComputeHoleConfidence();
+		runComputeConfidence();
+		//runComputeHoleConfidence();
 		return;
 	}
 
@@ -1081,6 +1081,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		if (v.neighbors.size() < 3)
 		{
+			
 			continue;
 		}
 
@@ -1576,7 +1577,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							new_pos[i] = avg_point;
 						}
-						else if (v.eigen_confidence < 0.1)
+						else if (v.eigen_confidence < 0.6)
 						{
 							new_pos[i] = sim_point;
 						}
@@ -3855,12 +3856,18 @@ void WLOP::runRegularizeNormals()
 
 	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 
+	bool use_confidence = para->getBool("Use Confidence");
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
 		CVertex dual_v2 = dual_samples->vert[i];
 
-		if (!v.is_boundary)
+// 		if (!v.is_boundary)
+// 		{
+// 			continue;
+// 		}
+		if (use_confidence && v.eigen_confidence > 0.9)
 		{
 			continue;
 		}
