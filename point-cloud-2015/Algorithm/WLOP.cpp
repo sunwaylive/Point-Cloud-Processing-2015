@@ -43,11 +43,11 @@ void WLOP::setInput(DataMgr* pData)
 		if (para->getBool("Run Skel WLOP") /*|| para->getBool("Run MAT LOP")*/)
     {
 			_samples = pData->getCurrentDualSamples();
-
-			if (global_paraMgr.glarea.getBool("Show Samples") || !global_paraMgr.glarea.getBool("Show Original"))
-			{
-				_original = pData->getCurrentSamples();
-			}
+			_original = pData->getCurrentSamples();
+// 			if (global_paraMgr.glarea.getBool("Show Samples") || !global_paraMgr.glarea.getBool("Show Original"))
+// 			{
+// 				_original = pData->getCurrentSamples();
+// 			}
     }
     //_original = pData->getCurrentDualSamples();
 
@@ -1013,6 +1013,8 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 	}
 
+	//double radius = para->getDouble("CGrid Radius");
+
 // 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
 // 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
@@ -1023,7 +1025,12 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double iradius16 = -4.0 / radius2;
 	double iradius16_perpend = -4.0 / radius2;
 
-	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double length_threshold_dist = radius * 0.3;
+	double length_threshold_dist2 = length_threshold_dist * length_threshold_dist;
+	double iradius16_length = -4.0 / length_threshold_dist2;
+
+	//double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double sigma = 45;
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	bool use_confidence = para->getBool("Use Confidence");
@@ -1095,16 +1102,26 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 // 			Point3f diff = t.P() - dual_t.P();
 // 			double proj_dist = abs(diff * t.N());
 
-			float dist2 = (v.P() - t.P()).SquaredNorm();
-			float dist_diff = exp(dist2 * iradius16);
+			double dist2 = (v.P() - t.P()).SquaredNorm();
+			double dist_diff = exp(dist2 * iradius16);
+
+			double length_dist = abs(v.skel_radius - t.skel_radius);
+			if (length_dist > length_threshold_dist)
+			{
+				continue;
+			}
+// 
+// 			double length_dist = v.skel_radius - t.skel_radius;
+// 			double length_dist2 = length_dist *length_dist;
+// 			double length_diff = exp(dist2 * iradius16_length);
 
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
-			weight = direction_diff * dist_diff;
+			weight = direction_diff * dist_diff /** length_diff*/;
 
 
-			if (use_confidence)
+			if (use_confidence && t.eigen_confidence > 1e-5)
 			{
 				weight *= (t.eigen_confidence * t.eigen_confidence);
 			}
@@ -1113,7 +1130,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 			sum_weight += weight;
 		}
 
-		if (!v.neighbors.empty())
+		if (!v.neighbors.empty() && sum_weight > 1e-5)
 		{
 			new_radiuses[i] = sum_radius / sum_weight;
 		}
@@ -1142,6 +1159,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		Point3f forward_v = backward_v + v.N() * new_radiuses[i];
 
 		samples_similarity[i] = forward_v;
+
 // 		Point3f diff = v.P() - dual_v.P();
 // 		double proj_dist = diff * dual_v.eigen_vector0;
 // 		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
@@ -1481,6 +1499,9 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	bool use_self_wlop = para->getBool("Run Self WLOP");
 
 	double radius = para->getDouble("CGrid Radius"); 
+
+	double save_threshold_dist = radius * 0.25;
+
 //	double mu = para->getDouble("Repulsion Mu");
 	double radius_threshold = radius * 0.6;
 	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
@@ -1529,12 +1550,6 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 				}
 				else if (need_similarity)
 				{
-//  					if (average_weight_sum[i] < 1e-20)
-//  					{
-//  						//cout << "no neighbor??" << endl;
-//  						continue;
-//  					}
- 
 					if (use_kite_points)
 					{
 						if (v.is_boundary)
@@ -1570,6 +1585,29 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						Point3f avg_point = average[i] / average_weight_sum[i];
 						Point3f sim_point = samples_similarity[i];
 
+						double dist_avg = GlobalFun::computeEulerDist(v.P(), avg_point);
+						if (dist_avg > save_threshold_dist)
+						{
+							avg_point = v.P();
+							v.is_skel_virtual = true;
+						}
+						else
+						{
+							v.is_skel_virtual = false;
+						}
+						
+						double dist_sim = GlobalFun::computeEulerDist(v.P(), sim_point);
+						if (dist_sim > save_threshold_dist)
+						{
+							sim_point = v.P();
+							v.is_skel_branch = true;
+
+						}
+						else
+						{
+							v.is_skel_branch = false;
+						}
+
 
 						double dist = GlobalFun::computeEulerDist(avg_point, sim_point);
 
@@ -1577,7 +1615,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							new_pos[i] = avg_point;
 						}
-						else if (v.eigen_confidence < 0.6)
+						else if (v.eigen_confidence < 0.4)
 						{
 							new_pos[i] = sim_point;
 						}
@@ -5656,7 +5694,7 @@ void WLOP::runMoveBackward()
 		real_step_size[i] *= step_size;
 	}
 
-	// bi-laplician end
+	// bi-laplician begin
 	vector<double> real_step_size2(samples->vert.size(), 0.0);
 
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -5709,7 +5747,7 @@ void WLOP::runMoveBackward()
 			continue;
 		}
 
-		if ((real_step_size[i] / step_size) < 0.3)
+		if ((real_step_size[i] / step_size) < 0.7)
 		{
 			dual_v.is_fixed_sample = true;
 			dual_v.is_boundary = true;
@@ -5768,7 +5806,7 @@ void WLOP::runMoveBackward()
 			}
 		}
 
-		if (number_of_fixed > v.neighbors.size() * 0.5)
+		if (number_of_fixed > v.neighbors.size() * 0.45)
 		{
 			dual_v.is_fixed_sample = true;
 		}
@@ -6251,15 +6289,22 @@ void WLOP::runNormalSmoothing()
 				continue;
 			}
 			CVertex& dual_t = dual_samples->vert[neighbor_idx];
+			CVertex& t = samples->vert[neighbor_idx];
 
-			Point3f diff = dual_v.P() - dual_t.P();
-			double project_dist = dual_t.N() *(diff);
+			//Point3f diff = dual_v.P() - dual_t.P();
+			Point3f diff = v.P() - t.P();
+
+			//double project_dist = dual_t.N() *(diff);
+			double project_dist = t.N() *(diff);
+
 			double dist2 = diff.SquaredNorm();
 
 			double weight;
 
-			Point3f vm(dual_v.N());
-			Point3f tm(dual_t.N());
+// 			Point3f vm(dual_v.N());
+// 			Point3f tm(dual_t.N());
+			Point3f vm(v.N());
+			Point3f tm(t.N());
 			Point3f d = vm - tm;
 			double psi = exp(-pow(1 - vm*tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
 			double theta = exp(dist2*iradius16);
@@ -6496,15 +6541,20 @@ void WLOP::runSelfProjection()
 				continue;
 			}
 			CVertex& dual_t = dual_samples->vert[neighbor_idx];
+			CVertex& t = samples->vert[neighbor_idx];
 
-			Point3f diff = dual_v.P() - dual_t.P();
-			double project_dist = dual_t.N() *(diff);
+ 			Point3f diff = dual_v.P() - dual_t.P();
+ 			double project_dist = dual_t.N() *(diff);
+// 			Point3f diff = v.P() - t.P();
+// 			double project_dist = t.N() *(diff);
 			double dist2 = diff.SquaredNorm();
 
 			double weight;
 
-			Point3f vm(dual_v.N());
-			Point3f tm(dual_t.N());
+ 			Point3f vm(dual_v.N());
+ 			Point3f tm(dual_t.N());
+// 			Point3f vm(v.N());
+// 			Point3f tm(t.N());
 			Point3f d = vm - tm;
 			double psi = exp(-pow(1 - vm*tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
 			double theta = exp(dist2*iradius16);
@@ -6637,7 +6687,7 @@ void WLOP::computeInitialNeighborSize()
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
 	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 2.5));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 3.5));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 5.0));
 	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.25));
 
 

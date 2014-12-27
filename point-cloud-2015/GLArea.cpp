@@ -389,7 +389,7 @@ void GLArea::paintGL()
 
 		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
      {
-      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
+      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
       glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
@@ -1670,7 +1670,12 @@ void GLArea::wheelEvent(QWheelEvent *e)
 			global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(size_temp * change));
       global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(size_temp * change));
 
-			//initSetting();
+			//nitSetting();
+			initView();
+			wlop.setFirstIterate();
+			skeletonization.setFirstIterate();
+			emit needUpdateStatus();
+
 			break;
 
 		default:

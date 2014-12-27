@@ -847,6 +847,8 @@ void WlopParaDlg::applyNormalSmoothing()
 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
 	area->runWlop();
  	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
+
+
 }
 
 void WlopParaDlg::applySelfPCA()
@@ -875,6 +877,8 @@ void WlopParaDlg::applySelfPorjection()
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
+
+
 }
 
 void WlopParaDlg::applyComputeInitialNeighborhood()
@@ -886,6 +890,14 @@ void WlopParaDlg::applyComputeInitialNeighborhood()
 
 void WlopParaDlg::oneKEY()
 {
+	m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
+	m_paras->wLop.setValue("Need Similarity", BoolValue(true));
+	m_paras->wLop.setValue("Use Confidence", BoolValue(true));
+	m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
+	m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
+
+	
+
 	applyComputeConfidence();
 	
 
