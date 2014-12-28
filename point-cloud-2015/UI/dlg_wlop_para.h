@@ -38,6 +38,10 @@ class WlopParaDlg : public QFrame
 
 		void get_increasing_step_size(double _val);
 		void get_local_neighbor_size(double _val);
+
+		void get_local_neighbor_size_for_surface_points(double _val);
+		void get_cooling_parameter(double _val);
+
 		void get_local_angle_threshold(double _val);
 
 

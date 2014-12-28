@@ -48,6 +48,15 @@ void WlopParaDlg::initConnects()
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
 
+	if (!connect(ui->local_neighbor_size_surface_point, SIGNAL(valueChanged(double)), this, SLOT(get_local_neighbor_size_for_surface_points(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}	
+	if (!connect(ui->cooling_parameter, SIGNAL(valueChanged(double)), this, SLOT(get_cooling_parameter(double))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
+
 	//if(!connect(ui->rep_pow,SIGNAL(valueChanged(double)),this,SLOT(getRepPow(double))))
 	//{
 	//	cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -194,6 +203,8 @@ bool WlopParaDlg::initWidgets()
 	ui->increasing_step_size->setValue(m_paras->wLop.getDouble("Increasing Step Size"));
 	ui->local_neighbor_size->setValue(m_paras->wLop.getDouble("Local Neighbor Size For Inner Points"));
 	ui->local_angle_threshold->setValue(m_paras->wLop.getDouble("Local Angle Threshold"));
+	ui->local_neighbor_size_surface_point->setValue(m_paras->wLop.getDouble("Local Neighbor Size For Surface Points"));
+	ui->cooling_parameter->setValue(m_paras->wLop.getDouble("Inner Points Cooling Parameter"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -303,6 +314,16 @@ void WlopParaDlg::get_increasing_step_size(double _val)
 void WlopParaDlg::get_local_neighbor_size(double _val)
 {
 	m_paras->wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(_val));
+}
+
+void WlopParaDlg::get_local_neighbor_size_for_surface_points(double _val)
+{
+	m_paras->wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(_val));
+}
+
+void WlopParaDlg::get_cooling_parameter(double _val)
+{
+	m_paras->wLop.setValue("Inner Points Cooling Parameter", DoubleValue(_val));
 }
 
 void WlopParaDlg::get_local_angle_threshold(double _val)

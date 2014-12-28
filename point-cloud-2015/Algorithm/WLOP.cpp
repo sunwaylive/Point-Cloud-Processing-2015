@@ -1590,6 +1590,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							avg_point = v.P();
 							v.is_skel_virtual = true;
+							//continue;
 						}
 						else
 						{
@@ -1601,6 +1602,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							sim_point = v.P();
 							v.is_skel_branch = true;
+							//continue;
 
 						}
 						else
@@ -3905,10 +3907,20 @@ void WLOP::runRegularizeNormals()
 // 		{
 // 			continue;
 // 		}
-		if (use_confidence && v.eigen_confidence > 0.9)
+
+		if (i < 10)
+		{
+			cout << "runRegularizeNormals() confidence: " << v.eigen_confidence << "  " << dual_v2.eigen_confidence << endl;
+		}
+
+		if (use_confidence && v.eigen_confidence > 0.8)
 		{
 			continue;
 		}
+//  		if (dual_v2.eigen_confidence < 0.93)
+//  		{
+//  			continue;
+//  		}
 
 		int neighbor_idx = v.neighbors[0];
 		//int neighbor_idx = i;
@@ -5651,6 +5663,7 @@ void WLOP::runMoveBackward()
 	double stop_angle_threshold = para->getDouble("Local Angle Threshold");
 	double stop_neighbor_size = para->getDouble("Local Neighbor Size For Inner Points");
 	double step_size = para->getDouble("Increasing Step Size");
+	double cooling_parameter = para->getDouble("Inner Points Cooling Parameter");
 	Timer time;
 
 	initVertexes(true);
@@ -6686,8 +6699,8 @@ void WLOP::computeInitialNeighborSize()
 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 2.0));
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 2.5));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 5.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 1.5));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 3.0));
 	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.25));
 
 

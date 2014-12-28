@@ -164,14 +164,16 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 		}
 // 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
 // 	}
-	if (v.is_skel_branch)
-	{
-		return cBlue;
-	}
-	if (v.is_skel_virtual)
-	{
-		return cGreen;
-	}
+
+
+// 	if (v.is_skel_branch)
+// 	{
+// 		return cBlue;
+// 	}
+// 	if (v.is_skel_virtual)
+// 	{
+// 		return cGreen;
+// 	}
 
 
 	if (v.is_boundary && !bUseConfidenceColor)
