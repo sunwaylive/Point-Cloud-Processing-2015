@@ -40,6 +40,7 @@ public:
 
 	CMesh* getCurrentSamples();
   CMesh* getCurrentDualSamples();
+	CMesh* getCurrentSkelPoints();
 	CMesh* getCurrentTargetSamples();
 	CMesh* getCurrentTargetDualSamples();
 
@@ -77,6 +78,7 @@ public:
 	CMesh original;
 	CMesh samples;
   CMesh dual_samples;
+	CMesh skel_points;
 
 	CMesh target_samples;
 	CMesh target_dual_samples;

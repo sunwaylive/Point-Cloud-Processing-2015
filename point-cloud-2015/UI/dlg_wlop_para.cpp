@@ -186,6 +186,10 @@ void WlopParaDlg::initConnects()
 	connect(ui->one_key, SIGNAL(clicked()), this, SLOT(oneKEY()));
 
 	connect(ui->compute_initial_neighborhood, SIGNAL(clicked()), this, SLOT(applyComputeInitialNeighborhood()));
+
+	connect(ui->move_sample_2, SIGNAL(clicked()), this, SLOT(applyMoveSample()));
+	connect(ui->move_skel, SIGNAL(clicked()), this, SLOT(applyMoveSkel()));
+
 }
 
 
@@ -908,6 +912,21 @@ void WlopParaDlg::applyComputeInitialNeighborhood()
  	area->runWlop();
  	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(false));
 }
+
+void WlopParaDlg::applyMoveSample()
+{
+	m_paras->wLop.setValue("Run Move Sample", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Move Sample", BoolValue(false));
+}
+
+void WlopParaDlg::applyMoveSkel()
+{
+	m_paras->wLop.setValue("Run Move Skel", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Move Skel", BoolValue(false));
+}
+
 
 void WlopParaDlg::oneKEY()
 {

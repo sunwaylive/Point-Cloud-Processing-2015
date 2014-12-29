@@ -109,6 +109,9 @@ private:
 	void runSelfPCA();
 	void runSelfProjection();
 
+	void runMoveSample();
+	void runMoeveSkel();
+
 
 
 

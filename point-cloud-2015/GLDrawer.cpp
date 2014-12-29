@@ -50,7 +50,7 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	{
 		curr_pick_indx = pickList[0];
 	}
-
+	
 
 }
 
@@ -110,7 +110,7 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 			}
 		}
 
-    if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
+    if(!(bCullFace /*&& !vi->is_dual_sample*/ /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
 			{

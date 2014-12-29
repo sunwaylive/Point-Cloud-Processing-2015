@@ -104,6 +104,10 @@ class WlopParaDlg : public QFrame
 		void applySelfPCA();
 		void applySelfPorjection();
 
+		void applyMoveSample();
+		void applyMoveSkel();
+
+
 		void applyComputeInitialNeighborhood();
 		void oneKEY();
 

@@ -281,6 +281,24 @@ CMesh* DataMgr::getCurrentDualSamples()
   return & dual_samples;
 }
 
+CMesh* DataMgr::getCurrentSkelPoints()
+{
+	if (&skel_points == NULL)
+	{
+		//cout << "DataMgr::getCurrentSamples samples = NULL!!" <<endl;
+		return NULL;
+	}
+
+	if (skel_points.vert.empty())
+	{
+		//cout << "DataMgr::getCurrentSamples samples.vert.empty()!!" <<endl;
+		//return NULL;
+		return &skel_points;
+	}
+
+	return &skel_points;
+}
+
 CMesh* DataMgr::getCurrentOriginal()
 {
   if(&original == NULL)

@@ -279,6 +279,10 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichBool("Run Compute Initial Neighborhood", false));
 
+	wLop.addParam(new RichBool("Run Move Sample", false));
+	wLop.addParam(new RichBool("Run Move Skel", false));
+
+
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
 
 }
@@ -330,7 +334,7 @@ void ParameterMgr::initSkeletonParameter()
 
 	//step1
 	skeleton.addParam(new RichDouble("Combine Too Close Threshold", 0.01));
-	skeleton.addParam(new RichDouble("Sigma KNN", 6));//this one is hard to determine, should be small for narrow region, but will lead to unnecessary small branches
+	skeleton.addParam(new RichDouble("Sigma KNN", 66));//this one is hard to determine, should be small for narrow region, but will lead to unnecessary small branches
 	skeleton.addParam(new RichDouble("Eigen Feature Identification Threshold", 0.901));
 
 	//step2

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>357</width>
-    <height>859</height>
+    <height>957</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,11 +19,11 @@
      <x>10</x>
      <y>10</y>
      <width>341</width>
-     <height>831</height>
+     <height>931</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -489,6 +489,32 @@
      </property>
      <property name="text">
       <string>One Key</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_sample_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>810</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move Sample</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="move_skel">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>810</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move Skel</string>
      </property>
     </widget>
    </widget>

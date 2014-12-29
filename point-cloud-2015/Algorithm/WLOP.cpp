@@ -344,6 +344,18 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Run Move Sample"))
+	{
+		runMoveSample();
+		return;
+	}
+
+	if (para->getBool("Run Move Skel"))
+	{
+		runMoeveSkel();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -5192,36 +5204,122 @@ void WLOP::innerpointsClassification()
 	}
 }
 
+void WLOP::runMoveSample()
+{
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+
+		Point3f diff = v.P() - dual_v.P();
+// 		double proj_dist = diff * dual_v.eigen_vector0;
+// 		v.P() -= dual_v.eigen_vector0 * proj_dist;
+
+
+		 		double proj_dist = diff * dual_v.N();
+		 		v.P() = dual_v.P() + dual_v.N() * proj_dist;
+
+// 		double proj_dist = diff * dual_v.eigen_vector0;
+// 		//dual_v.N() = dual_v.eigen_vector0;
+// 		dual_v.P() += dual_v.eigen_vector0 * proj_dist;
+	}
+
+}
+
+void WLOP::runMoeveSkel()
+{
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+
+		Point3f diff = v.P() - dual_v.P();
+		//double proj_dist = diff * dual_v.eigen_vector0;
+		//v.P() -= dual_v.eigen_vector0 * proj_dist;
+
+
+		// 		double proj_dist = diff * dual_v.N();
+		// 		v.P() = dual_v.P() + dual_v.N() * proj_dist;
+
+		double proj_dist = diff * dual_v.eigen_vector0;
+		//dual_v.N() = dual_v.eigen_vector0;
+		dual_v.P() += dual_v.eigen_vector0 * proj_dist;
+
+		Point3f new_dir = (v.P() - dual_v.P()).Normalize();
+		dual_v.N() = new_dir;
+	}
+
+}
 
 void WLOP::runEllipsoidFitting()
 {
-	double radius = para->getDouble("CGrid Radius");
-	double radius2 = radius * radius;
-	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-	int min_knn = para->getDouble("Progressive Min KNN");
-	int max_knn = 400;
-	int step_size = 1;
-	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, max_knn, false, "runProgressiveNeighborhood KNN");
-
-	bool use_tangent = para->getBool("Use Tangent Vector");
-
-	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
-	cout << "pick index:  " << pick_index << endl;
-	if (pick_index < 0 || pick_index >= samples->vert.size())
+	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
 
+		Point3f diff = v.P() - dual_v.P();
+		//double proj_dist = diff * dual_v.eigen_vector0;
+		//v.P() -= dual_v.eigen_vector0 * proj_dist;
+
+
+// 		double proj_dist = diff * dual_v.N();
+// 		v.P() = dual_v.P() + dual_v.N() * proj_dist;
+
+		double proj_dist = diff * dual_v.eigen_vector0;
+		//dual_v.N() = dual_v.eigen_vector0;
+		dual_v.P() += dual_v.eigen_vector0 * proj_dist;
 	}
-	else
-	{
-		vector<Point3f> tentative_position;
 
-		cout << "show picked points" << endl;
-		ofstream pick_out("pick_neighbor.txt");
 
-		CVertex& v = samples->vert[pick_index];
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 
+// 		Point3f dir = (v.P() - dual_v.P()).Normalize();
+// 		dual_v.N() = dir;
+// 	}
 
-	}
+
+
+
+// 	double radius = para->getDouble("CGrid Radius");
+// 	double radius2 = radius * radius;
+// 	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+// 
+// 	int min_knn = para->getDouble("Progressive Min KNN");
+// 	int max_knn = 400;
+// 	int step_size = 1;
+// 	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, max_knn, false, "runProgressiveNeighborhood KNN");
+// 
+// 	bool use_tangent = para->getBool("Use Tangent Vector");
+// 
+// 	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");
+// 	cout << "pick index:  " << pick_index << endl;
+// 	if (pick_index < 0 || pick_index >= samples->vert.size())
+// 	{
+// 
+// 	}
+// 	else
+// 	{
+// 		vector<Point3f> tentative_position;
+// 
+// 		cout << "show picked points" << endl;
+// 		ofstream pick_out("pick_neighbor.txt");
+// 
+// 		CVertex& v = samples->vert[pick_index];
+// 
+// 	}
 }
 
 
