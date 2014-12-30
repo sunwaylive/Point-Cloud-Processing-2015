@@ -1,6 +1,6 @@
 #pragma once
 #include "gl/glew.h"
-
+#include <wrap/gl/trimesh.h>
 //切换32-64位，只需要更换dll，以及选择正确的QT版本并重新编译，这两个个步骤
 
 
@@ -13,7 +13,7 @@
 #include <QtWidgets/QColorDialog>
 #include <QString>
 
-#include <wrap/gl/trimesh.h>
+
 #include <wrap/gui/trackball.h>
 #include <vcg\space\point3.h>
 #include <wrap/io_trimesh/import.h>
@@ -148,7 +148,7 @@ private: // For snapshot
 	Point3f rotate_normal;
 	Point3f rotate_pos;
 
-	//vcg::GlTrimesh<CMesh> glw;
+	vcg::GlTrimesh<CMesh> glw;
 
 public:
 	void saveSnapshot();
