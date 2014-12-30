@@ -298,6 +298,34 @@ void GLArea::paintGL()
 		glDrawer.drawDualSampleRelations(dataMgr.getCurrentTargetSamples(), dataMgr.getCurrentTargetDualSamples());
 	}
 
+	if (para->getBool("Show Eigen Directions"))
+	{
+		//glDrawer.drawEigenDirections(dataMgr.getCurrentDualSamples());
+
+		CVertex v;
+		if (!pickList.empty() && pickList[0] >= 0)
+		{
+			int id = pickList[0];
+			if (id >= 0 && id < dataMgr.getCurrentDualSamples()->vert.size())
+			{
+				v = dataMgr.getCurrentDualSamples()->vert[id];
+			}
+			else
+			{
+				v = dataMgr.getCurrentDualSamples()->vert[0];
+			}
+		}
+		else
+		{
+			v = dataMgr.getCurrentDualSamples()->vert[0];
+		}
+		glDrawer.drawEigenDirectionsOfone(v);
+
+// 		glw.m = dataMgr.getCurrentEllipsoid();
+// 		glw.Draw(GLW::DMSmooth, GLW::CMPerMesh, GLW::TMNone);
+
+	}
+
 
 	if (para->getBool("Show Normal")) 
 	{
@@ -390,7 +418,7 @@ void GLArea::paintGL()
 		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
      {
       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentSamples(), pickList);
@@ -663,7 +691,11 @@ void GLArea::drawNeighborhoodRadius()
 
   CMesh* samples = dataMgr.getCurrentSamples();
 
-  if (para->getBool("Show All Radius") && samples->vn < 1000)
+	CMesh* ellipsoid = dataMgr.getCurrentEllipsoid();
+	if (para->getBool("Show Eigen Directions") && !ellipsoid->vert.empty())
+	{
+	}
+  else if (para->getBool("Show All Radius") && samples->vn < 1000)
   {
     for(int i = 0; i < samples->vert.size(); i++)
     {

@@ -112,7 +112,7 @@ private:
 	void runMoveSample();
 	void runMoeveSkel();
 
-
+	void runComputeEigenDirections();
 
 
 

@@ -158,7 +158,8 @@ void DataMgr::loadXYZN(QString fileName)
   }
 
  // mesh.vert.erase(mesh.vert.end()-1);
-  samples.vert.pop_back();
+  //samples.vert.pop_back();
+	samples.vert.erase(samples.vert.end() - 1);
   samples.vn = samples.vert.size();
 
   infile.close();
@@ -314,6 +315,23 @@ CMesh* DataMgr::getCurrentOriginal()
 	}
 
 	return & original;
+}
+
+CMesh* DataMgr::getCurrentEllipsoid()
+{
+	if (&ellipsoid_mesh == NULL)
+	{
+		//cout << "DataMgr::getCurrentOriginal() samples = NULL!!" <<endl;
+		return NULL;
+	}
+
+	if (ellipsoid_mesh.vert.empty())
+	{
+		//cout << "DataMgr::getCurrentOriginal() original.vert.empty()!!" <<endl;
+		return &ellipsoid_mesh;
+	}
+
+	return &ellipsoid_mesh;
 }
 
 Skeleton* DataMgr::getCurrentSkeleton()

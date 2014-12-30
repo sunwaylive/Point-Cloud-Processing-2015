@@ -1,5 +1,6 @@
 
 #pragma once
+
 #include <vcg/simplex/vertex/base.h>
 #include <vcg/simplex/vertex/component_ocf.h>
 #include <vcg/simplex/edge/base.h>
@@ -34,11 +35,17 @@ using namespace vcg;
 class CVertex;
 class CFace;
 
-class CUsedTypes: public vcg::UsedTypes< vcg::Use<CVertex>::AsVertexType,
-	vcg::Use<CFace>::AsFaceType>{};
+//class CUsedTypes: public vcg::UsedTypes< vcg::Use<CVertex>::AsVertexType, vcg::Use<CFace>::AsFaceType>{};
+class CEdge;
+class CUsedTypes : public vcg::UsedTypes < vcg::Use<CVertex>::AsVertexType, vcg::Use<CEdge>::AsEdgeType, vcg::Use<CFace>::AsFaceType > {};
 
-
-class CVertex : public vcg::Vertex<CUsedTypes, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b, vcg::vertex::BitFlags> 
+class CVertex : public vcg::Vertex<CUsedTypes, vcg::vertex::InfoOcf, vcg::vertex::Coord3f, vcg::vertex::Normal3f, vcg::vertex::Color4b, vcg::vertex::BitFlags,
+	vcg::vertex::VFAdjOcf,          /*  0b */
+	vcg::vertex::MarkOcf,           /*  0b */
+	vcg::vertex::TexCoordfOcf,      /*  0b */
+	vcg::vertex::CurvaturefOcf,     /*  0b */
+	vcg::vertex::CurvatureDirfOcf,  /*  0b */
+	vcg::vertex::RadiusfOcf         /*  0b */ >
 {
 public:
 	vector<int> neighbors;
@@ -57,8 +64,14 @@ public:
 	double eigen_confidence;
 	Point3f eigen_vector0; //Associate with the biggest eigen value
 	Point3f eigen_vector1; // Also use for remember last better virtual point
-	//Point3f eigen_vector2; //The smallest eigen value : should be PCA normal N()
+	Point3f eigen_vector2; //The smallest eigen value : should be PCA normal N()
 	
+	double eigen_value0;
+	double eigen_value1;
+	double eigen_value2;
+
+
+
   bool is_skel_virtual; //in our papaer, we said bridge point instead of virtual point
 	bool is_skel_branch;
   bool is_fixed_original; 
@@ -100,7 +113,11 @@ public:
 		nearest_neighbor_dist(0.0),
 		eigen_vector0(Point3f(1, 0, 0)),
 		eigen_vector1(Point3f(0, 1, 0)),
+		eigen_vector2(Point3f(0, 0, 1)),
 		target_index(-1),
+		eigen_value0(0.),
+		eigen_value1(0.),
+		eigen_value2(0.),
     skel_radius(-1.0)
 		{
 			N() = Point3f(0,0,0);
@@ -192,7 +209,36 @@ public:
 	}
 };
 
-class CFace : public vcg::Face<CUsedTypes, vcg::face::VertexRef> {};
-class CMesh : public vcg::tri::TriMesh< std::vector<CVertex>, std::vector<CFace> > {};
+// class CFace : public vcg::Face<CUsedTypes, vcg::face::VertexRef> {};
+// class CMesh : public vcg::tri::TriMesh< std::vector<CVertex>, std::vector<CFace> > {};
 
+class CEdge : public vcg::Edge < CUsedTypes, vcg::edge::EVAdj >
+{
+public:
+	inline CEdge(){};
+	inline CEdge(CVertex * v0, CVertex * v1){ V(0) = v0; V(1) = v1; };
+	static inline CEdge OrderedEdge(CVertex* v0, CVertex* v1){
+		if (v0 < v1) return CEdge(v0, v1);
+		else return CEdge(v1, v0);
+	}
+};
+
+class CFace : public vcg::Face < CUsedTypes,
+	vcg::face::InfoOcf,              /* 4b */
+	vcg::face::VertexRef,            /*12b */
+	vcg::face::BitFlags,             /* 4b */
+	vcg::face::Normal3f,             /*12b */
+	vcg::face::QualityfOcf,          /* 0b */
+	vcg::face::MarkOcf,              /* 0b */
+	vcg::face::Color4bOcf,           /* 0b */
+	vcg::face::FFAdjOcf,             /* 0b */
+	vcg::face::VFAdjOcf,             /* 0b */
+	vcg::face::WedgeTexCoordfOcf     /* 0b */
+	/*vcg::face::FFAdj, vcg::face::VFAdj, vcg::face::VertexRef, vcg::face::BitFlags*/ >
+{};
+
+class CMesh : public vcg::tri::TriMesh < vcg::vertex::vector_ocf<CVertex>, vcg::face::vector_ocf<CFace>/*, std::vector<CEdge>*/ >
+{
+
+};
 

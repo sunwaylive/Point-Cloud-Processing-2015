@@ -45,6 +45,9 @@ public:
 	CMesh* getCurrentTargetDualSamples();
 
 	CMesh* getCurrentOriginal();
+
+	CMesh* getCurrentEllipsoid();
+
 	Skeleton* getCurrentSkeleton();
 
 	void recomputeBox();
@@ -79,6 +82,8 @@ public:
 	CMesh samples;
   CMesh dual_samples;
 	CMesh skel_points;
+
+	CMesh ellipsoid_mesh;
 
 	CMesh target_samples;
 	CMesh target_dual_samples;

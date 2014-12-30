@@ -94,6 +94,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Target Dual Samples", true));
 	glarea.addParam(new RichBool("Show Correspondences", false));
 
+	glarea.addParam(new RichBool("Show Eigen Directions", true));
 
 
 	glarea.addParam(new RichBool("Show Bounding Box", false));
@@ -282,6 +283,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Move Sample", false));
 	wLop.addParam(new RichBool("Run Move Skel", false));
 
+	wLop.addParam(new RichBool("Compute Eigen Directions", false));
 
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
 

@@ -62,6 +62,8 @@ void MainWindow::initWidgets()
   ui.actionShow_Picked_Neighbor->setChecked(paras->drawer.getBool("Draw Picked Point Neighbor"));
 	ui.actionShow_Cloest_Dual->setChecked(paras->glarea.getBool("Show Cloest Dual Connection"));
 	ui.actionShow_Target->setChecked(paras->glarea.getBool("Show Target Samples"));
+	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
+
 
 }
 
@@ -118,6 +120,7 @@ void MainWindow::initConnect()
   connect(ui.actionShow_Dual,SIGNAL(toggled(bool)),this,SLOT(showDualPoints(bool)));
   connect(ui.actionShow_Connection,SIGNAL(toggled(bool)),this,SLOT(showConnection(bool)));
   connect(ui.actionPick_Dual,SIGNAL(toggled(bool)),this,SLOT(pickDualPoints(bool)));
+	connect(ui.actionShow_Eigens, SIGNAL(toggled(bool)), this, SLOT(showEigenDirections(bool)));
 
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
@@ -546,6 +549,12 @@ void MainWindow::showPickPointNeighbor(bool _val)
 {
   paras->drawer.setValue("Draw Picked Point Neighbor", BoolValue(_val));
 }
+
+void MainWindow::showEigenDirections(bool _val)
+{
+	paras->glarea.setValue("Show Eigen Directions", BoolValue(_val));
+}
+
 
 void MainWindow::showColorfulBranches(bool _val)
 {

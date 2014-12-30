@@ -24,10 +24,14 @@
 #ifndef __VCG_GLTRIMESH
 #define __VCG_GLTRIMESH
 
+
+
+
 #include <queue>
 #include <vector>
 
-//#include <GL/glew.h>
+#include <GL/glew.h>
+
 #include <wrap/gl/space.h>
 #include <wrap/gl/math.h>
 #include <vcg/space/color4.h>
@@ -146,7 +150,8 @@ public:
 		if(curr_hints&HNUseVBO)
 		{
 			for(int i=0;i<3;++i)
-				if(glIsBuffer(array_buffers[i]))
+				//if(glIsBuffer(array_buffers[i]))
+				if (glIsBuffer(array_buffers[i]))
 					glDeleteBuffersARB(1, (GLuint *)(array_buffers+i));
 		}
 	}

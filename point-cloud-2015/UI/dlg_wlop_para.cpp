@@ -1,4 +1,7 @@
 #include "UI/dlg_wlop_para.h"
+#include <vcg/complex/trimesh/create/marching_cubes.h>
+#include <vcg/complex/trimesh/create/mc_trivial_walker.h>
+
 
 WlopParaDlg::WlopParaDlg(QWidget *p, ParameterMgr * _paras, GLArea * _area) : QFrame(p)
 {
@@ -189,6 +192,9 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->move_sample_2, SIGNAL(clicked()), this, SLOT(applyMoveSample()));
 	connect(ui->move_skel, SIGNAL(clicked()), this, SLOT(applyMoveSkel()));
+
+	connect(ui->compute_eigen_directions, SIGNAL(clicked()), this, SLOT(applyComputeEigenDirections()));
+
 
 }
 
@@ -793,9 +799,77 @@ void WlopParaDlg::applyInnerPointsClassification()
 
 void WlopParaDlg::applyEllipsoidFitting()
 {
-	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
+	SimpleVolume<SimpleVoxel> volume;
+
+	typedef vcg::tri::TrivialWalker<CMesh, SimpleVolume<SimpleVoxel> >	MyWalker;
+	typedef vcg::tri::MarchingCubes<CMesh, MyWalker>	MyMarchingCubes;
+	MyWalker walker;
+
+	Box3d rbb;
+	rbb.min[0] = -1;
+	rbb.min[1] = -1;
+	rbb.min[2] = -1;
+	rbb.max[0] = 1;
+	rbb.max[1] = 1;
+	rbb.max[2] = 1;
+	double step = 0.01;
+	Point3i siz = Point3i::Construct((rbb.max - rbb.min)*(1.0 / step));
+
+ 	double x, y, z;
+
+	volume.Init(siz);
+	double eigen_value0 = 0.7;
+	double eigen_value1 = 0.2;
+	double eigen_value2 = 0.1;
+
+	double eigen_value0_2 = 1.0 / (eigen_value0 * eigen_value0);
+	double eigen_value1_2 = 1.0 / (eigen_value1 * eigen_value1);
+	double eigen_value2_2 = 1.0 / (eigen_value2 * eigen_value2);
+
+
+	for (double i = 0; i < siz[0]; i++)
+		for (double j = 0; j < siz[1]; j++)
+			for (double k = 0; k < siz[2]; k++)
+			{
+		     x = rbb.min[0] + step*i;
+		     y = rbb.min[1] + step*j;
+		     z = rbb.min[2] + step*k;
+				 //volume.Val(i, j, k) = x+y*j+z*k;
+				 volume.Val(i, j, k) = x*x*eigen_value0_2 + 
+					                     y*y*eigen_value1_2 + 
+															 z*z*eigen_value2_2 - 1;
+			}
+
+	// MARCHING CUBES
+	//CMesh* original = area->dataMgr.getCurrentOriginal();
+	CMesh mesh;
+
+	MyMarchingCubes					mc(mesh, walker);
+	walker.BuildMesh<MyMarchingCubes>(mesh, volume, mc, 0);
+	Matrix44f tr; tr.SetIdentity(); tr.SetTranslate(rbb.min[0], rbb.min[1], rbb.min[2]);
+	Matrix44f sc; sc.SetIdentity(); sc.SetScale(step, step, step);
+	tr = tr*sc;
+
+	tri::UpdatePosition<CMesh>::Matrix(mesh, tr);
+	tri::UpdateNormals<CMesh>::PerVertexNormalizedPerFace(mesh);
+	tri::UpdateBounding<CMesh>::Box(mesh);					// updates bounding box
+
+	cout << "mesh: " << mesh.vert.size() << endl;
+	cout << "mesh: " << mesh.face.size() << endl;
+
+	int mask = tri::io::Mask::IOM_ALL;
+	tri::io::ExporterPLY<CMesh>::Save(mesh, "ellipsoid.ply", mask, false);
+
+	CMesh* ellipsoid = area->dataMgr.getCurrentEllipsoid();
+	QString str("ellipsoid.ply");
+	int err = tri::io::Importer<CMesh>::Open(*ellipsoid, str.toStdString().data(), mask);
+
+
+	area->needUpdateStatus();
+
+// 	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
 }
 
 
@@ -925,6 +999,13 @@ void WlopParaDlg::applyMoveSkel()
 	m_paras->wLop.setValue("Run Move Skel", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Move Skel", BoolValue(false));
+}
+
+void WlopParaDlg::applyComputeEigenDirections()
+{
+	m_paras->wLop.setValue("Compute Eigen Directions", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Compute Eigen Directions", BoolValue(false));
 }
 
 

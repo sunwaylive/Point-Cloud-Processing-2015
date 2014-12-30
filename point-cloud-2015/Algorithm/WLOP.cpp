@@ -356,6 +356,12 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Compute Eigen Directions"))
+	{
+		runComputeEigenDirections();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -1649,6 +1655,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 							new_pos[i] = samples_similarity[i];
 						}
 
+
+						//new_pos[i] = samples_similarity[i]; // force similarity
 
 						//new_pos[i] = samples_similarity[i];
 						//new_pos[i] = (average[i] / average_weight_sum[i] * v.eigen_confidence) + samples_similarity[i] * (1 - v.eigen_confidence);
@@ -6773,6 +6781,13 @@ void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
 	}
 }
 
+void WLOP::runComputeEigenDirections()
+{
+ 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+ 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+}
+
 void WLOP::computeInitialNeighborSize()
 {
 	GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 1, false, "WlopParaDlg::computeInitialNeighborSize()");
@@ -6804,3 +6819,4 @@ void WLOP::computeInitialNeighborSize()
 
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 }
+

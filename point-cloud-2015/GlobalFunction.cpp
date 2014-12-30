@@ -642,12 +642,26 @@ void GlobalFun::computeEigenWithTheta(CMesh* _samples, double radius)
 			iter->eigen_vector0[d] = eigenvectors[d][0];
 		for (int d=0; d<3; d++)
 			iter->eigen_vector1[d] = eigenvectors[d][1];
+		for (int d = 0; d < 3; d++)
+			iter->eigen_vector2[d] = eigenvectors[d][2];
+
+
 // 		for (int d=0; d<3; d++)
 // 			iter->N()[d] = eigenvectors[d][2];
 
 		iter->eigen_vector0.Normalize();
 		iter->eigen_vector1.Normalize();
+		iter->eigen_vector2.Normalize();
 //		iter->N().Normalize();
+
+		iter->eigen_value0 = eigenvalues[0] / sum_eigen_value;
+		iter->eigen_value1 = eigenvalues[1] / sum_eigen_value;
+		iter->eigen_value2 = eigenvalues[2] / sum_eigen_value;
+
+		if (currIndex < 10)
+		{
+			cout << iter->eigen_value0 << "  " << iter->eigen_value1 << "  " << iter->eigen_value2 << "  " << endl;
+		}
 	}
 }
 

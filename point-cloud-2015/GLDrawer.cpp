@@ -28,6 +28,8 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	sample_color = para->getColor("Sample Point Color");
 	normal_width = para->getDouble("Normal Line Width");
 	normal_length  = para->getDouble("Normal Line Length");
+	curr_radius = global_paraMgr.data.getDouble("CGrid Radius");
+
 	sample_dot_size = para->getDouble("Sample Dot Size");
 	dual_sample_dot_size = para->getDouble("Dual Sample Dot Size");
 
@@ -866,6 +868,60 @@ void GLDrawer::generateRandomColorList(int num)
     double b = (rand() % 1000) * 0.001;
     random_color_list.push_back(GLColor(r, g, b));
   }
+}
+
+void GLDrawer::drawEigenDirectionsOfone(CVertex& v)
+{
+	double width = normal_width;
+//double length = normal_length;
+	double length = curr_radius;
+
+	if (bCullFace && !isCanSee(v.P(), v.N()))
+	{
+		return;
+	}
+
+	Point3f x_end = v.P() + v.eigen_vector0 * length + v.eigen_vector0 * v.eigen_value0 * length*2.5;
+	Point3f y_end = v.P() + v.eigen_vector1 * length + v.eigen_vector1 * v.eigen_value1 * length*2.5;
+	Point3f z_end = v.P() + v.eigen_vector2 * length + v.eigen_vector2 * v.eigen_value2 * length*2.5;
+
+	//Point3f x_end = v.P() + v.eigen_vector0 * v.eigen_value0 * length;
+	//Point3f y_end = v.P() + v.eigen_vector1 * v.eigen_value1 * length;
+ 	//Point3f z_end = v.P() + v.eigen_vector2 * v.eigen_value2 * length;
+
+
+	glDrawLine(v.P(), x_end, cRed, width);
+	glDrawLine(v.P(), y_end, cGreen, width);
+	glDrawLine(v.P(), z_end, cBlue, width);
+}
+
+void GLDrawer::drawEigenDirections(CMesh* samples)
+{
+	double width = normal_width;
+	double length = normal_length;
+	
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+
+		drawEigenDirectionsOfone(v);
+
+
+// 		if (bUseConfidenceColor)
+// 		{
+// 			Point3f diff = v.P() - dual_v.P();
+// 			double proj_dist = diff * v.N();
+// 			Point3f proj_point = v.P() - v.N() * proj_dist;
+// 			glDrawLine(v.P(), proj_point, cBrown, width);
+// 		}
+// 		else
+// 		{
+// 			glDrawLine(v.P(), dual_v.P(), cBrown, width);
+// 		}
+
+
+		
+	}
 }
 
 void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)

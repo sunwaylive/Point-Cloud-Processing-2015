@@ -202,6 +202,7 @@
     <addaction name="actionShow_Confidence_Color"/>
     <addaction name="actionShow_Cloest_Dual"/>
     <addaction name="actionShow_Target"/>
+    <addaction name="actionShow_Eigens"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -272,6 +273,7 @@
    <addaction name="actionCull_Points"/>
    <addaction name="separator"/>
    <addaction name="actionSpray_Erase"/>
+   <addaction name="actionShow_Eigens"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -831,6 +833,14 @@
   <action name="actionAdd_Samples_To_Original">
    <property name="text">
     <string>Add Samples To Original</string>
+   </property>
+  </action>
+  <action name="actionShow_Eigens">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Eigens</string>
    </property>
   </action>
  </widget>

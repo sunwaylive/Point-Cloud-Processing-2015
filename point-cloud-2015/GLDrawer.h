@@ -67,6 +67,9 @@ public:
 	void setRGBNormals(vector<Point3f>& normals){RGB_normals = normals; }
 
   void drawDualSampleRelations(CMesh* samples, CMesh* dual_samples);
+	void drawEigenDirections(CMesh* samples);
+	void drawEigenDirectionsOfone(CVertex& v);
+
 
 public:
 	GLColor getColorByType(const CVertex& v);
@@ -116,6 +119,8 @@ private:
 	double sample_dot_size;
 	double dual_sample_dot_size;
 	double original_dot_size;
+
+	double curr_radius;
 
 	double sample_cofidence_color_scale;
 	double iso_value_shift;

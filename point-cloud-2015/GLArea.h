@@ -148,7 +148,7 @@ private: // For snapshot
 	Point3f rotate_normal;
 	Point3f rotate_pos;
 
-
+	//vcg::GlTrimesh<CMesh> glw;
 
 public:
 	void saveSnapshot();
@@ -172,6 +172,7 @@ private:
 
 
 public:
+	
 	DataMgr dataMgr;
 	GLDrawer glDrawer;	
 	

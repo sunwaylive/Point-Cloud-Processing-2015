@@ -12,6 +12,8 @@
 #include "ParameterMgr.h"
 #include "calculationthread.h"
 #include "Algorithm/pointcloud_normal.h"
+#include <vcg/complex/trimesh/update/normal.h>
+
 using namespace std;
 
 class WlopParaDlg : public QFrame
@@ -107,6 +109,7 @@ class WlopParaDlg : public QFrame
 		void applyMoveSample();
 		void applyMoveSkel();
 
+		void applyComputeEigenDirections();
 
 		void applyComputeInitialNeighborhood();
 		void oneKEY();

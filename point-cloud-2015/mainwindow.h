@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QFileDialog>
 #include "Algorithm/normal_extrapolation.h"
@@ -90,6 +91,7 @@ private slots:
 	void setSnapshotEachIteration(bool _val);
 	void setNoSnapshotWithRadius(bool _val);
   void showColorfulBranches(bool _val);
+	void showEigenDirections(bool _val);
 
 	void showTargets(bool _val);
 
