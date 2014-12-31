@@ -971,6 +971,19 @@
       <string>Compute Eigen Directions</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="compute_eigen_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>700</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compute Eigen Neighborhood</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

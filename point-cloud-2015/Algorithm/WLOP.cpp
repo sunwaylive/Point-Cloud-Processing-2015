@@ -362,6 +362,12 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Compute Eigen Neighborhood"))
+	{
+		runComputeEigenNeighborhood();
+		return;
+	}
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -6781,11 +6787,150 @@ void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
 	}
 }
 
+void WLOP::runComputeEigenNeighborhood()
+{
+	runComputeEigenDirections();
+
+	cout << "WLOP:: runComputeEigenNeighborhood" << endl;
+	//vector<Point3f> axis(3);
+	vector<double> lengthes(3);
+
+	vector< vector<double>> ranges;
+	double max_length = 0;
+
+	double eigin_para2 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para2");
+	double eigin_para1 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para1");
+	double radius = para->getDouble("CGrid Radius");
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+
+		Point3f x_diff = dual_v.eigen_vector0 * radius*eigin_para1 + dual_v.eigen_vector0 * dual_v.eigen_value0 * radius*eigin_para2;
+		Point3f y_diff = dual_v.eigen_vector1 * radius*eigin_para1 + dual_v.eigen_vector1 * dual_v.eigen_value1 * radius*eigin_para2;
+		Point3f z_diff = dual_v.eigen_vector2 * radius*eigin_para1 + dual_v.eigen_vector2 * dual_v.eigen_value2 * radius*eigin_para2;
+		vector<double> lengthes(3);
+
+		lengthes[0] = x_diff.Norm();
+		lengthes[1] = y_diff.Norm();
+		lengthes[2] = z_diff.Norm();
+
+		if (lengthes[0] > max_length)
+		{
+			max_length = lengthes[0];
+		}
+		ranges.push_back(lengthes);
+	}
+
+	GlobalFun::computeBallNeighbors(dual_samples, samples, max_length, dual_samples->bbox);
+
+	//filter out
+	if (1) //!para->getBool("WLOP test bool")
+	{
+		
+		for (int i = 0; i < dual_samples->vert.size(); i++)
+		{
+			CVertex& dual_v = dual_samples->vert[i];
+			vector<int> filtered_neighbor;
+
+			vector<double> range = ranges[i];
+			for (int j = 0; j < dual_v.original_neighbors.size(); j++)
+			{
+				int index = dual_v.original_neighbors[j];
+
+				CVertex& t = samples->vert[index];
+
+				Point3f diff = t.P() - dual_v.P();
+
+				double proj_x = abs(diff*dual_v.eigen_vector0);
+				double proj_y = abs(diff*dual_v.eigen_vector1);
+				double proj_z = abs(diff*dual_v.eigen_vector2);
+
+				if (proj_x < range[0] && proj_y < range[1] && proj_z < range[2])
+				{
+					filtered_neighbor.push_back(index);
+				}
+
+			}
+
+			dual_v.original_neighbors = filtered_neighbor;
+		}
+	}
+}
+
 void WLOP::runComputeEigenDirections()
 {
  	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
  	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
+
+	if (!para->getBool("WLOP test bool"))
+	{
+		for (int i = 0; i < dual_samples->vert.size(); i++)
+		{
+			CVertex& dual_v = dual_samples->vert[i];
+			CVertex& v = samples->vert[i];
+
+			vector<Point3f> dirs;
+			Point3f dir = (v.P() - dual_v.P()).Normalize();
+			dirs.push_back(dir);
+
+			for (int j = 0; j < dual_v.neighbors.size(); j++)
+			{
+				int index = dual_v.neighbors[j];
+
+				CVertex& dual_t = dual_samples->vert[index];
+				CVertex& t = samples->vert[index];
+
+				dir = (t.P() - dual_t.P()).Normalize();
+				dirs.push_back(dir);
+			}
+
+			double sum_proj_x = 0.0;
+			double sum_proj_y = 0.0;
+			double sum_proj_z = 0.0;
+
+			for (int j = 0; j < dirs.size(); j++)
+			{
+				Point3f dir = dirs[j];
+				sum_proj_x += abs(dir * dual_v.eigen_vector0);
+				sum_proj_y += abs(dir * dual_v.eigen_vector1);
+				sum_proj_z += abs(dir * dual_v.eigen_vector2);
+			}
+
+			sum_proj_x /= dirs.size();
+			sum_proj_y /= dirs.size();
+			sum_proj_z /= dirs.size();
+
+			double sum_sum_proj = sum_proj_x + sum_proj_y + sum_proj_z;
+			dual_v.eigen_value0 = (sum_sum_proj - sum_proj_x) / sum_sum_proj;
+			dual_v.eigen_value1 = (sum_sum_proj - sum_proj_y) / sum_sum_proj;
+			dual_v.eigen_value2 = (sum_sum_proj - sum_proj_z) / sum_sum_proj;
+
+			double sum_eigen = dual_v.eigen_value0 + dual_v.eigen_value1 + dual_v.eigen_value2;
+			dual_v.eigen_value0 /= sum_eigen;
+			dual_v.eigen_value1 /= sum_eigen;
+			dual_v.eigen_value2 /= sum_eigen;
+
+			dual_v.eigen_value0 = pow(dual_v.eigen_value0, 7);
+			dual_v.eigen_value1 = pow(dual_v.eigen_value1, 7);
+			dual_v.eigen_value2 = pow(dual_v.eigen_value2, 7);
+
+			sum_eigen = dual_v.eigen_value0 + dual_v.eigen_value1 + dual_v.eigen_value2;
+			dual_v.eigen_value0 /= sum_eigen;
+			dual_v.eigen_value1 /= sum_eigen;
+			dual_v.eigen_value2 /= sum_eigen;
+
+			if (i < 10)
+			{
+// 				cout << "new sum_proj: " << sum_proj_x << "  "
+// 					    << sum_proj_y<< "  "
+// 							<< sum_proj_z << "  sum: "
+// 							<< sum_sum_proj << "  " << endl;;
+				cout << "new eigen: " << dual_v.eigen_value0 << "  " << dual_v.eigen_value1 << "  " << dual_v.eigen_value2 << "  " << endl;;
+			}
+		}
+	}
 }
 
 void WLOP::computeInitialNeighborSize()

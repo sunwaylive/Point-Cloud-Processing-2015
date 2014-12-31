@@ -488,7 +488,7 @@ void GLDrawer::drawPickedDisk(CMesh* dual_samples, NeighborDisk* disk)
 
 void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, vector<int>& pickList)
 {
-  double width = para->getDouble("Sample Draw Width") * 1.9;
+  double width = para->getDouble("Sample Draw Width") * 2.5;
   //GLColor dnn_color = cOrange;
 	GLColor dnn_color = cBlack;
 
@@ -876,14 +876,17 @@ void GLDrawer::drawEigenDirectionsOfone(CVertex& v)
 //double length = normal_length;
 	double length = curr_radius;
 
+	double eigin_para2 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para2");
+	double eigin_para1 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para1");
+
 	if (bCullFace && !isCanSee(v.P(), v.N()))
 	{
 		return;
 	}
 
-	Point3f x_end = v.P() + v.eigen_vector0 * length + v.eigen_vector0 * v.eigen_value0 * length*2.5;
-	Point3f y_end = v.P() + v.eigen_vector1 * length + v.eigen_vector1 * v.eigen_value1 * length*2.5;
-	Point3f z_end = v.P() + v.eigen_vector2 * length + v.eigen_vector2 * v.eigen_value2 * length*2.5;
+	Point3f x_end = v.P() + v.eigen_vector0 * length*eigin_para1 + v.eigen_vector0 * v.eigen_value0 * length*eigin_para2;
+	Point3f y_end = v.P() + v.eigen_vector1 * length*eigin_para1 + v.eigen_vector1 * v.eigen_value1 * length*eigin_para2;
+	Point3f z_end = v.P() + v.eigen_vector2 * length*eigin_para1 + v.eigen_vector2 * v.eigen_value2 * length*eigin_para2;
 
 	//Point3f x_end = v.P() + v.eigen_vector0 * v.eigen_value0 * length;
 	//Point3f y_end = v.P() + v.eigen_vector1 * v.eigen_value1 * length;

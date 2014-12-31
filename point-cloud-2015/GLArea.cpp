@@ -421,7 +421,7 @@ void GLArea::paintGL()
       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
-			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentSamples(), pickList);
+			glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentSamples(), pickList);
 
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentSamples(), dataMgr.getCurrentOriginal(), pickList);
 
@@ -446,7 +446,11 @@ void GLArea::paintGL()
 
   if (para->getBool("Show Radius")&& !(takeSnapTile && para->getBool("No Snap Radius"))) 
   {
-    drawNeighborhoodRadius();
+		if (!para->getBool("Pick Dual Point"))
+		{
+			drawNeighborhoodRadius();
+		}
+    
   }
 
   glDepthMask(GL_TRUE);
@@ -692,10 +696,11 @@ void GLArea::drawNeighborhoodRadius()
   CMesh* samples = dataMgr.getCurrentSamples();
 
 	CMesh* ellipsoid = dataMgr.getCurrentEllipsoid();
-	if (para->getBool("Show Eigen Directions") && !ellipsoid->vert.empty())
-	{
-	}
-  else if (para->getBool("Show All Radius") && samples->vn < 1000)
+// 	if (para->getBool("Show Eigen Directions") && !ellipsoid->vert.empty())
+// 	{
+// 	}
+// 	else 
+		if (para->getBool("Show All Radius") && samples->vn < 1000)
   {
     for(int i = 0; i < samples->vert.size(); i++)
     {

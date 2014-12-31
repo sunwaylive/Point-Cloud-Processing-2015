@@ -113,6 +113,7 @@ private:
 	void runMoeveSkel();
 
 	void runComputeEigenDirections();
+	void runComputeEigenNeighborhood();
 
 
 

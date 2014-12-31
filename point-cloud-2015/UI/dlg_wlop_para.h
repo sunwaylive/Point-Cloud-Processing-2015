@@ -110,6 +110,7 @@ class WlopParaDlg : public QFrame
 		void applyMoveSkel();
 
 		void applyComputeEigenDirections();
+		void applyComputeEigenNeighbor();
 
 		void applyComputeInitialNeighborhood();
 		void oneKEY();

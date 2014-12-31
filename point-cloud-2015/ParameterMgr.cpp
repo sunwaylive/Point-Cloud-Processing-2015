@@ -75,8 +75,8 @@ void ParameterMgr::initGlareaParameter()
 
   glarea.addParam(new RichBool("Show Dual Samples", true) );
   glarea.addParam(new RichBool("Show Dual Samples Quad", false));
-  glarea.addParam(new RichBool("Show Dual Samples Dot", false));
-  glarea.addParam(new RichBool("Show Dual Samples Circle", true));
+  glarea.addParam(new RichBool("Show Dual Samples Dot", true));
+  glarea.addParam(new RichBool("Show Dual Samples Circle", false));
   glarea.addParam(new RichBool("Show Dual Samples Sphere", false));
 
   glarea.addParam(new RichBool("Show Dual Connection", false) );
@@ -105,7 +105,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show All Radius", false));
 	glarea.addParam(new RichBool("Show Radius Use Pick", true));
 	glarea.addParam(new RichBool("Show Red Radius Line", true));
-	glarea.addParam(new RichBool("Multiply Pick Point", true) );
+	glarea.addParam(new RichBool("Multiply Pick Point", false) );
   glarea.addParam(new RichDouble("Picked Index", 0));
 	glarea.addParam(new RichBool("Show Cloest Dual Connection", false));
 
@@ -142,7 +142,7 @@ void ParameterMgr::initGlareaParameter()
 void ParameterMgr::initDrawerParameter()
 {
 	drawer.addParam(new RichBool("Doing Pick", false));
-	drawer.addParam(new RichBool("Need Cull Points", true) );
+	drawer.addParam(new RichBool("Need Cull Points", false) );
 	drawer.addParam(new RichBool("Use Pick Original", false));
 	drawer.addParam(new RichBool("Use Pick Mode2", false) );
 	drawer.addParam(new RichBool("Skeleton Light", true));
@@ -228,6 +228,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Inner Points Classification", false));
 
 
+	wLop.addParam(new RichBool("WLOP test bool", false));
+
+
 	wLop.addParam(new RichBool("Run Search Neighborhood", false));
 	wLop.addParam(new RichBool("Run Smooth Neighborhood", false));
 	wLop.addParam(new RichBool("Run Inner Points Regularization", false));
@@ -256,6 +259,9 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Sefl KNN", 15));
 
 
+	wLop.addParam(new RichDouble("Eigen Neighborhood Para2", 2.0));
+	wLop.addParam(new RichDouble("Eigen Neighborhood Para1", 0.5));
+
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));
   wLop.addParam(new RichBool("Run Normal Reform", false));
@@ -271,6 +277,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Eigen Confidence Threshold", 0.97));
 	wLop.addParam(new RichDouble("Mutual Distance Threshold", 0.1));
 
+
 	wLop.addParam(new RichDouble("Progressive Min KNN", 20));
 	wLop.addParam(new RichDouble("Progressive Max KNN", 2000));
 	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
@@ -284,6 +291,8 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Move Skel", false));
 
 	wLop.addParam(new RichBool("Compute Eigen Directions", false));
+	wLop.addParam(new RichBool("Compute Eigen Neighborhood", false));
+
 
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
 

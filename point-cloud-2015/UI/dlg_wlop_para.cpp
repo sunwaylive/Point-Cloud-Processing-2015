@@ -194,6 +194,7 @@ void WlopParaDlg::initConnects()
 	connect(ui->move_skel, SIGNAL(clicked()), this, SLOT(applyMoveSkel()));
 
 	connect(ui->compute_eigen_directions, SIGNAL(clicked()), this, SLOT(applyComputeEigenDirections()));
+	connect(ui->compute_eigen_neighborhood, SIGNAL(clicked()), this, SLOT(applyComputeEigenNeighbor()));
 
 
 }
@@ -414,6 +415,7 @@ void WlopParaDlg::useKitePoints(bool _val)
 void WlopParaDlg::useBackwardFirst(bool _val)
 {
 	run_backward_first = _val;
+	m_paras->wLop.setValue("WLOP test bool", BoolValue(_val));
 }
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
@@ -799,28 +801,44 @@ void WlopParaDlg::applyInnerPointsClassification()
 
 void WlopParaDlg::applyEllipsoidFitting()
 {
+
+	double eigen_value0 = 0.7;
+	double eigen_value1 = 0.2;
+	double eigen_value2 = 0.1;
+
+	int pick_idx = global_paraMgr.glarea.getDouble("Picked Index");
+	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+	CVertex v = dual_samples->vert[pick_idx];
+	double eigin_para2 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para2");
+	double eigin_para1 = global_paraMgr.wLop.getDouble("Eigen Neighborhood Para1");
+
+	eigen_value0 = eigin_para1 + v.eigen_value0*eigin_para2;
+	eigen_value1 = eigin_para1 + v.eigen_value1*eigin_para2;
+	eigen_value2 = eigin_para1 + v.eigen_value2*eigin_para2;
+
+
 	SimpleVolume<SimpleVoxel> volume;
 
 	typedef vcg::tri::TrivialWalker<CMesh, SimpleVolume<SimpleVoxel> >	MyWalker;
 	typedef vcg::tri::MarchingCubes<CMesh, MyWalker>	MyMarchingCubes;
 	MyWalker walker;
 
+	double volume_size = eigen_value0;
 	Box3d rbb;
-	rbb.min[0] = -1;
-	rbb.min[1] = -1;
-	rbb.min[2] = -1;
-	rbb.max[0] = 1;
-	rbb.max[1] = 1;
-	rbb.max[2] = 1;
-	double step = 0.01;
-	Point3i siz = Point3i::Construct((rbb.max - rbb.min)*(1.0 / step));
+	rbb.min[0] = -volume_size;
+	rbb.min[1] = -volume_size;
+	rbb.min[2] = -volume_size;
+	rbb.max[0] = volume_size;
+	rbb.max[1] = volume_size;
+	rbb.max[2] = volume_size;
+	double step = volume_size * 0.02;
+	Point3i siz = Point3i::Construct((rbb.max - rbb.min)*(volume_size / step));
 
  	double x, y, z;
 
 	volume.Init(siz);
-	double eigen_value0 = 0.7;
-	double eigen_value1 = 0.2;
-	double eigen_value2 = 0.1;
+
+
 
 	double eigen_value0_2 = 1.0 / (eigen_value0 * eigen_value0);
 	double eigen_value1_2 = 1.0 / (eigen_value1 * eigen_value1);
@@ -1006,7 +1024,17 @@ void WlopParaDlg::applyComputeEigenDirections()
 	m_paras->wLop.setValue("Compute Eigen Directions", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Compute Eigen Directions", BoolValue(false));
+
+	applyEllipsoidFitting();
 }
+
+void WlopParaDlg::applyComputeEigenNeighbor()
+{
+	m_paras->wLop.setValue("Compute Eigen Neighborhood", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Compute Eigen Neighborhood", BoolValue(false));
+}
+
 
 
 void WlopParaDlg::oneKEY()
