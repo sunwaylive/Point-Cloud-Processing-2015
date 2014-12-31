@@ -321,8 +321,8 @@ void GLArea::paintGL()
 		}
 		glDrawer.drawEigenDirectionsOfone(v);
 
- 		glw.m = dataMgr.getCurrentEllipsoid();
- 		glw.Draw(GLW::DMSmooth, GLW::CMPerMesh, GLW::TMNone);
+//  		glw.m = dataMgr.getCurrentEllipsoid();
+//  		glw.Draw(GLW::DMSmooth, GLW::CMPerMesh, GLW::TMNone);
 
 	}
 

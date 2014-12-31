@@ -24,14 +24,10 @@
 #ifndef __VCG_GLTRIMESH
 #define __VCG_GLTRIMESH
 
-
-
-
 #include <queue>
 #include <vector>
 
 #include <GL/glew.h>
-
 #include <wrap/gl/space.h>
 #include <wrap/gl/math.h>
 #include <vcg/space/color4.h>
@@ -63,7 +59,7 @@ public:
 		HNHasFaceNormal       = 0x0400,		// E' l'utente che si preoccupa di tenere aggiornata le normali per vertice
 		HNUseVArray           = 0x0800,
 		HNUseLazyEdgeStrip	  = 0x1000,		// Edge Strip are generated only when requested
-		//HNUseVBO              = 0x2000,		// Use Vertex Buffer Object
+		HNUseVBO              = 0x2000,		// Use Vertex Buffer Object
 		HNIsPolygonal         = 0x4000    // In wireframe modes, hide faux edges
 	};
 
@@ -147,13 +143,12 @@ public:
 	~GlTrimesh()
 	{
 		//Delete the VBOs
-// 		if(curr_hints&HNUseVBO)
-// 		{
-// 			for(int i=0;i<3;++i)
-// 				//if(glIsBuffer(array_buffers[i]))
-// 				if (glIsBuffer(array_buffers[i]))
-// 					glDeleteBuffersARB(1, (GLuint *)(array_buffers+i));
-// 		}
+		if(curr_hints&HNUseVBO)
+		{
+			for(int i=0;i<3;++i)
+				if(glIsBuffer(array_buffers[i]))
+					glDeleteBuffersARB(1, (GLuint *)(array_buffers+i));
+		}
 	}
 
 	void SetHintParami(const HintParami hip, const int value)
@@ -192,33 +187,33 @@ void Update(/*Change c=CHAll*/)
 {
 	if(m==0) return;
 
-// 	if(curr_hints&HNUseVArray || curr_hints&HNUseVBO)
-// 	{
-// 		typename MESH_TYPE::FaceIterator fi;
-// 		indices.clear();
-// 		for(fi = m->face.begin(); fi != m->face.end(); ++fi)
-// 		{
-// 			indices.push_back((unsigned int)((*fi).V(0) - &(*m->vert.begin())));
-// 			indices.push_back((unsigned int)((*fi).V(1) - &(*m->vert.begin())));
-// 			indices.push_back((unsigned int)((*fi).V(2) - &(*m->vert.begin())));
-// 		}
+	if(curr_hints&HNUseVArray || curr_hints&HNUseVBO)
+	{
+		typename MESH_TYPE::FaceIterator fi;
+		indices.clear();
+		for(fi = m->face.begin(); fi != m->face.end(); ++fi)
+		{
+			indices.push_back((unsigned int)((*fi).V(0) - &(*m->vert.begin())));
+			indices.push_back((unsigned int)((*fi).V(1) - &(*m->vert.begin())));
+			indices.push_back((unsigned int)((*fi).V(2) - &(*m->vert.begin())));
+		}
 
-// 		if(curr_hints&HNUseVBO)
-// 		{
-// 			if(!glIsBuffer(array_buffers[1]))
-// 				glGenBuffers(2,(GLuint*)array_buffers);
-// 			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[0]);
-// 			glBufferData(GL_ARRAY_BUFFER_ARB, m->vn * sizeof(typename MESH_TYPE::VertexType),
-// 				(char *)&(m->vert[0].P()), GL_STATIC_DRAW_ARB);
-// 
-// 			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[1]);
-// 			glBufferData(GL_ARRAY_BUFFER_ARB, m->vn * sizeof(typename MESH_TYPE::VertexType),
-// 				(char *)&(m->vert[0].N()), GL_STATIC_DRAW_ARB);
-// 		}
-// 
-// 		glVertexPointer(3,GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
-// 		glNormalPointer(GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
-// 	}
+		if(curr_hints&HNUseVBO)
+		{
+			if(!glIsBuffer(array_buffers[1]))
+				glGenBuffers(2,(GLuint*)array_buffers);
+			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[0]);
+			glBufferData(GL_ARRAY_BUFFER_ARB, m->vn * sizeof(typename MESH_TYPE::VertexType),
+				(char *)&(m->vert[0].P()), GL_STATIC_DRAW_ARB);
+
+			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[1]);
+			glBufferData(GL_ARRAY_BUFFER_ARB, m->vn * sizeof(typename MESH_TYPE::VertexType),
+				(char *)&(m->vert[0].N()), GL_STATIC_DRAW_ARB);
+		}
+
+		glVertexPointer(3,GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
+		glNormalPointer(GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
+	}
 
 	//int C=c;
 	//if((C&CHVertex) || (C&CHFace)) {
@@ -354,33 +349,33 @@ void DrawFill()
 	if(tm == TMPerWedge || tm == TMPerWedgeMulti )
 		glDisable(GL_TEXTURE_2D);
 
-// 	if(curr_hints&HNUseVBO)
-// 	{
-// 		if( (cm==CMNone) || (cm==CMPerMesh) )
-// 		{
-// 			if (nm==NMPerVert)
-// 				glEnableClientState (GL_NORMAL_ARRAY);
-// 			glEnableClientState (GL_VERTEX_ARRAY);
-// 
-// 			if (nm==NMPerVert)
-// 			{
-// 				glBindBuffer(GL_ARRAY_BUFFER,array_buffers[1]);
-// 				glNormalPointer(GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
-// 			}
-// 			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[0]);
-// 			glVertexPointer(3,GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
-// 
-// 			glDrawElements(GL_TRIANGLES ,m->fn*3,GL_UNSIGNED_INT, &(*indices.begin()) );
-// 			glDisableClientState (GL_VERTEX_ARRAY);
-// 			if (nm==NMPerVert)
-// 				glDisableClientState (GL_NORMAL_ARRAY);
-// 
-// 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-// 
-// 			return;
-// 
-// 		}
-// 	}
+	if(curr_hints&HNUseVBO)
+	{
+		if( (cm==CMNone) || (cm==CMPerMesh) )
+		{
+			if (nm==NMPerVert)
+				glEnableClientState (GL_NORMAL_ARRAY);
+			glEnableClientState (GL_VERTEX_ARRAY);
+
+			if (nm==NMPerVert)
+			{
+				glBindBuffer(GL_ARRAY_BUFFER,array_buffers[1]);
+				glNormalPointer(GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
+			}
+			glBindBuffer(GL_ARRAY_BUFFER,array_buffers[0]);
+			glVertexPointer(3,GL_FLOAT,sizeof(typename MESH_TYPE::VertexType),0);
+
+			glDrawElements(GL_TRIANGLES ,m->fn*3,GL_UNSIGNED_INT, &(*indices.begin()) );
+			glDisableClientState (GL_VERTEX_ARRAY);
+			if (nm==NMPerVert)
+				glDisableClientState (GL_NORMAL_ARRAY);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			return;
+
+		}
+	}
 
 	if(curr_hints&HNUseVArray)
 	{
