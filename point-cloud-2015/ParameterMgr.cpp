@@ -255,6 +255,7 @@ void ParameterMgr::initWLopParameter()
 	
 	wLop.addParam(new RichBool("Use Original Averaging KNN", false));
 	wLop.addParam(new RichBool("Use Kite Points", false));
+	wLop.addParam(new RichBool("Use Eigen Neighborhood", true));
 
 	wLop.addParam(new RichDouble("Sefl KNN", 15));
 

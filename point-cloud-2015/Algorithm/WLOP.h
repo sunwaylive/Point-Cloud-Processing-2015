@@ -112,8 +112,8 @@ private:
 	void runMoveSample();
 	void runMoeveSkel();
 
-	void runComputeEigenDirections();
-	void runComputeEigenNeighborhood();
+	void runComputeEigenDirections(CMesh* dual_samples, CMesh* samples);
+	void runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples);
 
 
 
@@ -162,6 +162,7 @@ private:
 	bool use_closest_dual;
 	int added_sample_num;
 	bool use_kite_points;
+	bool use_eigen_neighborhood;
 
 public:
 	typedef enum { Bilateral, DistanceDiff, NormalDiff, Constant}WeightType;

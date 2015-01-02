@@ -137,6 +137,10 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+	if (!connect(ui->use_eigen_neighborhood, SIGNAL(clicked(bool)), this, SLOT(useEigenNeighborhood(bool))))
+	{
+		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
+	}
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -257,6 +261,8 @@ bool WlopParaDlg::initWidgets()
 	state = m_paras->wLop.getBool("Use Kite Points") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->Use_kite_points->setCheckState(state);
 
+	state = m_paras->wLop.getBool("Use Eigen Neighborhood") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->use_eigen_neighborhood->setCheckState(state);
 
 	update();
 	repaint();
@@ -416,6 +422,11 @@ void WlopParaDlg::useBackwardFirst(bool _val)
 {
 	run_backward_first = _val;
 	m_paras->wLop.setValue("WLOP test bool", BoolValue(_val));
+}
+
+void WlopParaDlg::useEigenNeighborhood(bool _val)
+{
+	m_paras->wLop.setValue("Use Eigen Neighborhood", BoolValue(_val));
 }
 
 void WlopParaDlg::useAdaptiveMu(bool _val)
@@ -799,6 +810,8 @@ void WlopParaDlg::applyInnerPointsClassification()
 	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(false));
 }
 
+
+
 void WlopParaDlg::applyEllipsoidFitting()
 {
 
@@ -817,13 +830,19 @@ void WlopParaDlg::applyEllipsoidFitting()
 	eigen_value2 = eigin_para1 + v.eigen_value2*eigin_para2;
 
 
+// 	eigen_value0 = 0.45;
+// 	eigen_value1 = 0.45;
+// 	eigen_value2 = 0.1;
+
 	SimpleVolume<SimpleVoxel> volume;
 
 	typedef vcg::tri::TrivialWalker<CMesh, SimpleVolume<SimpleVoxel> >	MyWalker;
 	typedef vcg::tri::MarchingCubes<CMesh, MyWalker>	MyMarchingCubes;
 	MyWalker walker;
 
-	double volume_size = eigen_value0;
+	double volume_size = eigen_value0 * 2;
+	//double volume_size = 2;
+
 	Box3d rbb;
 	rbb.min[0] = -volume_size;
 	rbb.min[1] = -volume_size;
@@ -831,7 +850,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 	rbb.max[0] = volume_size;
 	rbb.max[1] = volume_size;
 	rbb.max[2] = volume_size;
-	double step = volume_size * 0.02;
+	double step = volume_size * 0.01;
 	Point3i siz = Point3i::Construct((rbb.max - rbb.min)*(volume_size / step));
 
  	double x, y, z;

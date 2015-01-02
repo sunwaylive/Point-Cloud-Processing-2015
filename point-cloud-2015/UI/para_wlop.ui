@@ -984,6 +984,19 @@
       <string>Compute Eigen Neighborhood</string>
      </property>
     </widget>
+    <widget class="QCheckBox" name="use_eigen_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>750</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use Eigen Neighborhood</string>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

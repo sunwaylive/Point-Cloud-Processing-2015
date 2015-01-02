@@ -31,6 +31,7 @@ void WLOP::setInput(DataMgr* pData)
 {
 	use_closest_dual = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 	use_kite_points = para->getBool("Use Kite Points");
+	use_eigen_neighborhood = para->getBool("Use Eigen Neighborhood");
 
 	if(!pData->isSamplesEmpty() && !pData->isOriginalEmpty())
 	{
@@ -193,11 +194,7 @@ void WLOP::run()
     return;
   }
 
-  if (para->getBool("Run Skel WLOP"))
-  {
-    runSkelWlop();
-    return;
-  }
+
 
 	if (para->getBool("Run MAT LOP"))
 	{
@@ -358,13 +355,21 @@ void WLOP::run()
 
 	if (para->getBool("Compute Eigen Directions"))
 	{
-		runComputeEigenDirections();
+		runComputeEigenDirections(samples, original);
 		return;
 	}
 
 	if (para->getBool("Compute Eigen Neighborhood"))
 	{
-		runComputeEigenNeighborhood();
+		runComputeEigenNeighborhood(dual_samples, samples);
+		return;
+	}
+
+	if (para->getBool("Run Skel WLOP"))
+	{
+		runSkelWlop();
+		//runComputeEigenNeighborhood(samples, original);
+
 		return;
 	}
 
@@ -3043,37 +3048,59 @@ void WLOP::runSkelWlop()
 
   initVertexes(true);
 
-  time.start("Samples Initial");
-  GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-  GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-  time.end();
+	if (use_eigen_neighborhood)
+	{
+		time.start("Samples Initial");
+		runComputeEigenNeighborhood(samples, original);
 
-  if (nTimeIterated == 0) 
-  {
-    time.start("Original Initial");
-    GlobalFun::computeBallNeighbors(original, NULL, 
-      para->getDouble("CGrid Radius"), original->bbox);
+		if (nTimeIterated == 0)
+		{
+			original_density.assign(original->vn, 0);
+			if (para->getBool("Need Compute Density"))
+			{
+				computeDensity(true, para->getDouble("CGrid Radius"));
+			}
+		}
+		time.end();
+	}
+	else
+	{
+		time.start("Samples Initial");
+		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+		GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+		time.end();
 
-    original_density.assign(original->vn, 0);
-    if (para->getBool("Need Compute Density"))
-    {
-      computeDensity(true, para->getDouble("CGrid Radius"));
-    }
-    time.end();
-  }
+		if (nTimeIterated == 0)
+		{
+			time.start("Original Initial");
+			GlobalFun::computeBallNeighbors(original, NULL,
+				para->getDouble("CGrid Radius"), original->bbox);
 
-  time.start("Sample Original neighbor");
-  GlobalFun::computeBallNeighbors(samples, original, 
-    para->getDouble("CGrid Radius"), box);
-  time.end();
+			original_density.assign(original->vn, 0);
+			if (para->getBool("Need Compute Density"))
+			{
+				computeDensity(true, para->getDouble("CGrid Radius"));
+			}
+			time.end();
+		}
 
-  time.start("computeAverageTerm");
-  computeAverageTerm(samples, original);
-  time.end();
+		time.start("Sample Original neighbor");
+		GlobalFun::computeBallNeighbors(samples, original,
+			para->getDouble("CGrid Radius"), box);
+		time.end();
 
-  time.start("computeRepulsionTerm");
-  computeRepulsionTerm(samples);
-  time.end();
+
+	}
+	
+
+	time.start("computeAverageTerm");
+	computeAverageTerm(samples, original);
+	time.end();
+
+	time.start("computeRepulsionTerm");
+	computeRepulsionTerm(samples);
+	time.end();
+
 
   double min_sigma = GlobalFun::getDoubleMAXIMUM();
   double max_sigma = -1;
@@ -5693,7 +5720,7 @@ void WLOP::runSmoothNeighborhood()
 			continue;
 		}
 
-		cout << "new eigen_confidence: ";
+		cout << "new 2eigen_confidence: ";
 
 		if (v.neighbors.empty())
 		{
@@ -6787,9 +6814,9 @@ void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
 	}
 }
 
-void WLOP::runComputeEigenNeighborhood()
+void WLOP::runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples)
 {
-	runComputeEigenDirections();
+	runComputeEigenDirections(samples, original);
 
 	cout << "WLOP:: runComputeEigenNeighborhood" << endl;
 	//vector<Point3f> axis(3);
@@ -6855,10 +6882,40 @@ void WLOP::runComputeEigenNeighborhood()
 
 			dual_v.original_neighbors = filtered_neighbor;
 		}
+
+
+		GlobalFun::computeBallNeighbors(dual_samples, NULL, max_length, dual_samples->bbox);
+		for (int i = 0; i < dual_samples->vert.size(); i++)
+		{
+			CVertex& dual_v = dual_samples->vert[i];
+			vector<int> filtered_neighbor;
+
+			vector<double> range = ranges[i];
+			for (int j = 0; j < dual_v.neighbors.size(); j++)
+			{
+				int index = dual_v.neighbors[j];
+
+				CVertex& t = dual_samples->vert[index];
+
+				Point3f diff = t.P() - dual_v.P();
+
+				double proj_x = abs(diff*dual_v.eigen_vector0);
+				double proj_y = abs(diff*dual_v.eigen_vector1);
+				double proj_z = abs(diff*dual_v.eigen_vector2);
+
+				if (proj_x < range[0] && proj_y < range[1] && proj_z < range[2])
+				{
+					filtered_neighbor.push_back(index);
+				}
+
+			}
+			
+			dual_v.neighbors = filtered_neighbor;
+		}
 	}
 }
 
-void WLOP::runComputeEigenDirections()
+void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 {
  	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
  	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));

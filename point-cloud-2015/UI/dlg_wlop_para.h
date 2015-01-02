@@ -62,6 +62,7 @@ class WlopParaDlg : public QFrame
 		void useKitePoints(bool _val);
 
 		void useBackwardFirst(bool _val);
+		void useEigenNeighborhood(bool _val);
 
 		//
 		void applyWlop();
@@ -117,6 +118,8 @@ class WlopParaDlg : public QFrame
 
 	private:
 		bool run_backward_first;
+
+		
 
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;
