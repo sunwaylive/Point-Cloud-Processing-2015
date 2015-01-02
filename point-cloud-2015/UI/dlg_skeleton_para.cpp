@@ -415,10 +415,10 @@ void SkeletonParaDlg::getSkeletonGrowthRate(double _val)
 
 void SkeletonParaDlg::getSkeletonRepulsionMu(double _val)
 {
-	if (m_paras->glarea.getBool("GLarea Busying"))
-	{
-		return;
-	}
+// 	if (m_paras->glarea.getBool("GLarea Busying"))
+// 	{
+// 		return;
+// 	}
 
 	m_paras->skeleton.setValue("Repulsion Mu",DoubleValue(_val));
 

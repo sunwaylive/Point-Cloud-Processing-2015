@@ -1684,6 +1684,12 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					new_pos[i] = average[i] / average_weight_sum[i];
 				}
 
+				if (mu >1.0)
+				{
+					new_pos[i] = v.P();
+				}
+
+
 				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
 				{
 					new_pos[i] += repulsion[i] * (mu / repulsion_weight_sum[i]);
@@ -1714,7 +1720,11 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 //   			}
 //   			else
 			{
-				if (average_weight_sum[i] > 1e-20)
+				if (mu > 1.0)
+				{
+					new_pos[i] = v.P();
+				}
+				else if (average_weight_sum[i] > 1e-20)
 				{
 					new_pos[i] = average[i] / average_weight_sum[i];
 				}
@@ -3135,8 +3145,15 @@ void WLOP::runSkelWlop()
     c = v.P();
 
     double mu = (mu_length / sigma_length) * (v.eigen_confidence - min_sigma) + mu_min;
+		if (use_eigen_neighborhood)
+		{
+			mu = mu_max;
+		}
 
-    if (average_weight_sum[i] > 1e-20)
+		if (mu_max > 1.0)
+		{
+		}
+    else if (average_weight_sum[i] > 1e-20)
     {
 			if (use_kite_points)
 			{
@@ -3150,13 +3167,12 @@ void WLOP::runSkelWlop()
 			{
 				v.P() = average[i] / average_weight_sum[i];
 			}
-      //
-
     }
-//     if (repulsion_weight_sum[i] > 1e-20 && mu >= 0)
-//     {
-//       v.P() +=  repulsion[i] * (mu / repulsion_weight_sum[i]);
-//     }
+
+		if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+		{
+			v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+		}
 
     if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
     {

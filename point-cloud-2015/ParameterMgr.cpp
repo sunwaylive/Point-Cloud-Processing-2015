@@ -334,7 +334,7 @@ void ParameterMgr::initSkeletonParameter()
 	skeleton.addParam(new RichDouble("Radius Update Speed", 0.5));
 
 	//step0
-	skeleton.addParam(new RichDouble("Repulsion Mu", 0.35));
+	skeleton.addParam(new RichDouble("Repulsion Mu", 0.5));
 	skeleton.addParam(new RichDouble("Repulsion Mu2", 0.15));
 	skeleton.addParam(new RichDouble("Follow Sample Radius", 0.33));
 	skeleton.addParam(new RichDouble("Follow Sample Max Angle", 80));// should add to UI
