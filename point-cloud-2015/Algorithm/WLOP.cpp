@@ -32,6 +32,8 @@ void WLOP::setInput(DataMgr* pData)
 	use_closest_dual = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 	use_kite_points = para->getBool("Use Kite Points");
 	use_eigen_neighborhood = para->getBool("Use Eigen Neighborhood");
+	use_ellipsoid_weight = para->getBool("Use Ellipsoid Weight");
+	use_ellipsoid_repulsion = para->getBool("Use Ellipsoid Repulsion");
 
 	if(!pData->isSamplesEmpty() && !pData->isOriginalEmpty())
 	{
@@ -142,6 +144,10 @@ void WLOP::initVertexes(bool clear_neighbor)
 
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+
 	average.assign(samples->vn, vcg::Point3f(0, 0, 0));
 
 	repulsion_weight_sum.assign(samples->vn, 0);
@@ -355,7 +361,14 @@ void WLOP::run()
 
 	if (para->getBool("Compute Eigen Directions"))
 	{
-		runComputeEigenDirections(samples, original);
+		if (para->getBool("Run Skel WLOP"))
+		{
+			runComputeEigenDirections(samples, original);
+		}
+		else
+		{
+			runComputeEigenDirections(dual_samples, samples);
+		}
 		return;
 	}
 
@@ -681,6 +694,11 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   bool use_tangent = para->getBool("Use Tangent Vector");
 
+	if (use_ellipsoid_repulsion)
+	{
+		repulsion_power = 6;
+	}
+
 	if (para->getBool("Run Skel WLOP"))
 	{
 		use_tangent = false;
@@ -716,6 +734,13 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 
 			repulsion[i] += diff * rep;  
 			repulsion_weight_sum[i] += rep;
+
+			if (use_ellipsoid_repulsion)
+			{
+				repulsion_x[i] = v.eigen_vector0 * (v.eigen_vector0 * diff) * v.eigen_value0 * rep;
+				repulsion_y[i] = v.eigen_vector1 * (v.eigen_vector1 * diff) * v.eigen_value1 * rep;
+				repulsion_z[i] = v.eigen_vector2 * (v.eigen_vector2 * diff) * v.eigen_value2 * rep;
+			}
 		}
 	}
 }
@@ -3107,6 +3132,11 @@ void WLOP::runSkelWlop()
 	computeAverageTerm(samples, original);
 	time.end();
 
+
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+
+
 	time.start("computeRepulsionTerm");
 	computeRepulsionTerm(samples);
 	time.end();
@@ -3171,7 +3201,25 @@ void WLOP::runSkelWlop()
 
 		if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
 		{
-			v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+// 			if (use_ellipsoid_repulsion)
+// 			{
+// 				Point3f move_x = repulsion_x[i] * (mu / repulsion_weight_sum[i]);
+// 				Point3f move_y = repulsion_y[i] * (mu / repulsion_weight_sum[i]);
+// 				Point3f move_z = repulsion_z[i] * (mu / repulsion_weight_sum[i]);
+// 				Point3f move = move_x + move_y + move_z;
+// 
+// 				if (i < 5)
+// 				{
+// 					cout << "repulsion : " << move.X() << "	" << move.Y() << "	" << move.Z() << "	" << endl;
+// 				}
+// 
+// 				v.P() += move;
+// 			}
+// 			else
+			{
+				v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+
+			}
 		}
 
     if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20 )
@@ -5638,6 +5686,10 @@ void WLOP::runInnerPointsRegularization()
 	vector<Point3f> regular_term(dual_samples->vert.size());
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+
 	repulsion_weight_sum.assign(samples->vn, 0);
 
 	//bool need_density = para->getBool("Need Compute Density");

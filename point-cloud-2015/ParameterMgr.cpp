@@ -255,13 +255,17 @@ void ParameterMgr::initWLopParameter()
 	
 	wLop.addParam(new RichBool("Use Original Averaging KNN", false));
 	wLop.addParam(new RichBool("Use Kite Points", false));
-	wLop.addParam(new RichBool("Use Eigen Neighborhood", true));
 
 	wLop.addParam(new RichDouble("Sefl KNN", 15));
 
 
-	wLop.addParam(new RichDouble("Eigen Neighborhood Para2", 2.0));
-	wLop.addParam(new RichDouble("Eigen Neighborhood Para1", 0.5));
+	wLop.addParam(new RichDouble("Eigen Neighborhood Para2", 1.0));
+	wLop.addParam(new RichDouble("Eigen Neighborhood Para1", 2.0));
+
+	wLop.addParam(new RichBool("Use Eigen Neighborhood", true));
+
+	wLop.addParam(new RichBool("Use Ellipsoid Weight", true));
+	wLop.addParam(new RichBool("Use Ellipsoid Repulsion", true));
 
 
   wLop.addParam(new RichBool("Run Compute Initial Sample Neighbor", false));

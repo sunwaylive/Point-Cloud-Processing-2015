@@ -310,6 +310,8 @@ void Skeletonization::initVertexes()
 
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
+
+
 	average.assign(samples->vn, vcg::Point3f(0, 0, 0));
 
 	repulsion_weight_sum.assign(samples->vn, 0);

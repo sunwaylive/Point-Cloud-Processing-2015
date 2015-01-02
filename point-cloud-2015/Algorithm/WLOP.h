@@ -137,6 +137,12 @@ private:
 	vector<Point3f> repulsion;
 	vector<double>  repulsion_weight_sum;
 
+	vector<Point3f> repulsion_x;
+	vector<Point3f> repulsion_y;
+	vector<Point3f> repulsion_z;
+
+	Eigen::Matrax33f matA;
+
   vector<Point3f> samples_average;
   vector<double>  samples_average_weight_sum;
 
@@ -163,6 +169,9 @@ private:
 	int added_sample_num;
 	bool use_kite_points;
 	bool use_eigen_neighborhood;
+
+	bool use_ellipsoid_weight;
+	bool use_ellipsoid_repulsion;
 
 public:
 	typedef enum { Bilateral, DistanceDiff, NormalDiff, Constant}WeightType;

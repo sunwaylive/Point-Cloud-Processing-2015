@@ -829,6 +829,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 	eigen_value1 = eigin_para1 + v.eigen_value1*eigin_para2;
 	eigen_value2 = eigin_para1 + v.eigen_value2*eigin_para2;
 
+	cout << "eigen values!!: " << eigen_value0 << "	" << eigen_value1 << "	" << eigen_value2 << "	" << endl;
 
 // 	eigen_value0 = 0.45;
 // 	eigen_value1 = 0.45;
@@ -840,7 +841,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 	typedef vcg::tri::MarchingCubes<CMesh, MyWalker>	MyMarchingCubes;
 	MyWalker walker;
 
-	double volume_size = eigen_value0 * 2;
+	double volume_size = eigen_value0 * 1.2;
 	//double volume_size = 2;
 
 	Box3d rbb;
