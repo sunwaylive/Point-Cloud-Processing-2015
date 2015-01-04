@@ -3350,6 +3350,10 @@ void WLOP::runSkelWlop()
 				{
 					final_dir += v.eigen_vector2 * v.eigen_value2 * repulsion_z_length[i];
 				}
+				//final_dir += v.eigen_vector0 * v.eigen_value0 * repulsion_x_length[i];
+				//final_dir += v.eigen_vector1 * v.eigen_value1 * repulsion_y_length[i];
+				//final_dir += v.eigen_vector2 * v.eigen_value2 * repulsion_z_length[i];
+
 				
 				if (i < 5)
 				{
@@ -7029,7 +7033,16 @@ void WLOP::compute_neighbor_weights(vector<CVertex>& samples,
 
 void WLOP::runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples)
 {
-	runComputeEigenDirections(samples, original);
+// 	if (para->getBool("Run Skel WLOP"))
+// 	{
+// 		runComputeEigenDirections(samples, original);
+// 	}
+// 	else
+// 	{
+// 		runComputeEigenDirections(dual_samples, samples);
+// 	}
+	runComputeEigenDirections(dual_samples, samples);
+
 
 	bool use_separate_neighborhood = para->getBool("Use Separate Neighborhood");
 
@@ -7139,7 +7152,7 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 {
  	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
  	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
 
 	if (!para->getBool("WLOP test bool"))
 	{
@@ -7159,6 +7172,11 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 				CVertex& dual_t = dual_samples->vert[index];
 				CVertex& t = samples->vert[index];
 
+// 				if (j < 3)
+// 				{
+// 					cout << "v t  " << t.P()[0] << "	" << dual_t.P()[0] << endl;
+// 				}
+
 				dir = (t.P() - dual_t.P()).Normalize();
 				dirs.push_back(dir);
 			}
@@ -7173,11 +7191,24 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 				sum_proj_x += abs(dir * dual_v.eigen_vector0);
 				sum_proj_y += abs(dir * dual_v.eigen_vector1);
 				sum_proj_z += abs(dir * dual_v.eigen_vector2);
+
+// 				if (j < 3)
+// 				{
+// 					cout << "innter  " << dir[0] << "	" << dual_v.eigen_vector0[0] << endl;
+// 				}
 			}
 
 			sum_proj_x /= dirs.size();
 			sum_proj_y /= dirs.size();
 			sum_proj_z /= dirs.size();
+
+
+// 			if (i < 5)
+// 			{
+// 				cout << "dir size: " << dirs.size() << endl;
+// 				cout << "old eigen: " << dual_v.eigen_value0 << "  " << dual_v.eigen_value1 << "  " << dual_v.eigen_value2 << "  " << endl;
+// 				cout << "sum_proj_: " << sum_proj_z << "  " << sum_proj_z << "  " << sum_proj_z << "  " << endl;;
+// 			}
 
 			double sum_sum_proj = sum_proj_x + sum_proj_y + sum_proj_z;
 			dual_v.eigen_value0 = (sum_sum_proj - sum_proj_x) / sum_sum_proj;
@@ -7204,7 +7235,7 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 // 					    << sum_proj_y<< "  "
 // 							<< sum_proj_z << "  sum: "
 // 							<< sum_sum_proj << "  " << endl;;
-				cout << "new eigen: " << dual_v.eigen_value0 << "  " << dual_v.eigen_value1 << "  " << dual_v.eigen_value2 << "  " << endl;;
+				//cout << "new eigen: " << dual_v.eigen_value0 << "  " << dual_v.eigen_value1 << "  " << dual_v.eigen_value2 << "  " << endl;;
 			}
 		}
 	}
