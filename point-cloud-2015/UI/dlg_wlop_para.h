@@ -46,6 +46,8 @@ class WlopParaDlg : public QFrame
 
 		void get_local_angle_threshold(double _val);
 
+		void get_eigen_neighbor_para1(double _val);
+		void get_eigen_neighbor_para2(double _val);
 
 		void isDensity(bool _val);
 		void isPca(bool _val);
@@ -63,6 +65,10 @@ class WlopParaDlg : public QFrame
 
 		void useBackwardFirst(bool _val);
 		void useEigenNeighborhood(bool _val);
+
+		void useSeparateNeighborhood(bool _val);
+		void useEllipsoidWeight(bool _val);
+		void useEllipsoidRepulsion(bool _val);
 
 		//
 		void applyWlop();

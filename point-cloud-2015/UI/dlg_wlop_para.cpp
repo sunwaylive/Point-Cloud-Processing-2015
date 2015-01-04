@@ -105,6 +105,10 @@ void WlopParaDlg::initConnects()
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
 
+	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para1(bool)));
+	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para2(bool)));
+
+
   if(!connect(ui->Use_Elliptical_Original_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useEllipticalOriginalNeighbor(bool))))
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -141,6 +145,11 @@ void WlopParaDlg::initConnects()
 	{
 		cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
 	}
+
+	connect(ui->use_separate_neighborhood, SIGNAL(clicked(bool)), this, SLOT(useSeparateNeighborhood(bool)));
+	connect(ui->use_ellipsoid_weight, SIGNAL(clicked(bool)), this, SLOT(useEllipsoidWeight(bool)));
+	connect(ui->use_ellipsoid_repulsion, SIGNAL(clicked(bool)), this, SLOT(useEllipsoidRepulsion(bool)));
+
 	//
 	if(!connect(ui->wlop_apply,SIGNAL(clicked()),this,SLOT(applyWlop())))
 	{
@@ -221,6 +230,9 @@ bool WlopParaDlg::initWidgets()
 	ui->local_neighbor_size_surface_point->setValue(m_paras->wLop.getDouble("Local Neighbor Size For Surface Points"));
 	ui->cooling_parameter->setValue(m_paras->wLop.getDouble("Inner Points Cooling Parameter"));
 
+	ui->eigen_neighbor_para1->setValue(m_paras->wLop.getDouble("Eigen Neighborhood Para1"));
+	ui->eigen_neighbor_para2->setValue(m_paras->wLop.getDouble("Eigen Neighborhood Para2"));
+
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
 	ui->compute_density->setCheckState(state);
@@ -263,6 +275,13 @@ bool WlopParaDlg::initWidgets()
 
 	state = m_paras->wLop.getBool("Use Eigen Neighborhood") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->use_eigen_neighborhood->setCheckState(state);
+
+	state = m_paras->wLop.getBool("Use Separate Neighborhood") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->use_separate_neighborhood->setCheckState(state);
+	state = m_paras->wLop.getBool("Use Ellipsoid Weight") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->use_ellipsoid_weight->setCheckState(state);
+	state = m_paras->wLop.getBool("Use Ellipsoid Repulsion") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->use_ellipsoid_repulsion->setCheckState(state);
 
 	update();
 	repaint();
@@ -348,6 +367,15 @@ void WlopParaDlg::get_local_angle_threshold(double _val)
 	m_paras->wLop.setValue("Local Angle Threshold", DoubleValue(_val));
 }
 
+void WlopParaDlg::get_eigen_neighbor_para1(double _val)
+{
+	m_paras->wLop.setValue("Eigen Neighborhood Para1", DoubleValue(_val));
+}
+
+void WlopParaDlg::get_eigen_neighbor_para2(double _val)
+{
+	m_paras->wLop.setValue("Eigen Neighborhood Para2", DoubleValue(_val));
+}
 
 
 void WlopParaDlg::isDensity(bool _val)
@@ -444,6 +472,20 @@ void WlopParaDlg::useAdaptiveMu(bool _val)
   }
 }
 
+void WlopParaDlg::useSeparateNeighborhood(bool _val)
+{
+	m_paras->wLop.setValue("Use Separate Neighborhood", BoolValue(_val));
+}
+
+void WlopParaDlg::useEllipsoidWeight(bool _val)
+{
+	m_paras->wLop.setValue("Use Ellipsoid Weight", BoolValue(_val));
+}
+
+void WlopParaDlg::useEllipsoidRepulsion(bool _val)
+{
+	m_paras->wLop.setValue("Use Ellipsoid Repulsion", BoolValue(_val));
+}
 
 // apply
 void WlopParaDlg::applyWlop()
@@ -841,7 +883,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 	typedef vcg::tri::MarchingCubes<CMesh, MyWalker>	MyMarchingCubes;
 	MyWalker walker;
 
-	double volume_size = eigen_value0 * 1.2;
+	double volume_size = eigen_value0 * 2.2;
 	//double volume_size = 2;
 
 	Box3d rbb;
@@ -851,14 +893,12 @@ void WlopParaDlg::applyEllipsoidFitting()
 	rbb.max[0] = volume_size;
 	rbb.max[1] = volume_size;
 	rbb.max[2] = volume_size;
-	double step = volume_size * 0.01;
+	double step = volume_size * 0.1;
 	Point3i siz = Point3i::Construct((rbb.max - rbb.min)*(volume_size / step));
 
  	double x, y, z;
 
 	volume.Init(siz);
-
-
 
 	double eigen_value0_2 = 1.0 / (eigen_value0 * eigen_value0);
 	double eigen_value1_2 = 1.0 / (eigen_value1 * eigen_value1);

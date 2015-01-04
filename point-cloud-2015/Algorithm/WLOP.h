@@ -7,10 +7,12 @@
 //#include <CGAL/wlop_simplify_and_regularize_point_set_test_AABB_tree.h>
 //#include <CGAL/tags.h>
 #include "Algorithm/pointcloud_normal.h"
+#include "eigenlib/Eigen/Eigen"
 
 using namespace std;
 using namespace vcg;
 
+//typedef Eigen::Matrix<float, 3, 3> Matrix33f;
 
 // better code is going to be in CGAL 
 class WLOP : public PointCloudAlgorithm
@@ -131,17 +133,26 @@ private:
 	int nTimeIterated;
 	double error_x;
 
+	double repulsion_radius;
+
 	vector<double> samples_density;
 	vector<double> original_density;
 
 	vector<Point3f> repulsion;
 	vector<double>  repulsion_weight_sum;
 
-	vector<Point3f> repulsion_x;
-	vector<Point3f> repulsion_y;
-	vector<Point3f> repulsion_z;
+// 	vector<Point3f> repulsion_x;
+// 	vector<Point3f> repulsion_y;
+// 	vector<Point3f> repulsion_z;
 
-	Eigen::Matrax33f matA;
+	vector<double> repulsion_x_length;
+	vector<double> repulsion_y_length;
+	vector<double> repulsion_z_length;
+
+
+	//Matrix33f matA;
+	//vector< Eigen::Matrix3f> repulsion_matA_set;
+	vector<Matrix33f> repulsion_matA_set;
 
   vector<Point3f> samples_average;
   vector<double>  samples_average_weight_sum;

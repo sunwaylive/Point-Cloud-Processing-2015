@@ -35,6 +35,12 @@ void WLOP::setInput(DataMgr* pData)
 	use_ellipsoid_weight = para->getBool("Use Ellipsoid Weight");
 	use_ellipsoid_repulsion = para->getBool("Use Ellipsoid Repulsion");
 
+	repulsion_radius = para->getDouble("CGrid Radius");
+	if (para->getBool("Use Separate Neighborhood"))
+	{
+		repulsion_radius = para->getDouble("CGrid Radius") * para->getDouble("Eigen Neighborhood Para1");
+	}
+
 	if(!pData->isSamplesEmpty() && !pData->isOriginalEmpty())
 	{
 		default_sphere = pData->default_sphere;
@@ -144,9 +150,20 @@ void WLOP::initVertexes(bool clear_neighbor)
 
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+//  	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
+//  	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
+//  	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+	
+	repulsion_x_length.assign(samples->vn, 0.);
+	repulsion_y_length.assign(samples->vn, 0.);
+	repulsion_z_length.assign(samples->vn, 0.);
+
+
+	//Eigen::Matrix3f iden = Eigen::Matrix3d::Identity(3,3);
+	Matrix33f iden;
+	iden.SetIdentity();
+
+	repulsion_matA_set.assign(samples->vn, iden);
 
 	average.assign(samples->vn, vcg::Point3f(0, 0, 0));
 
@@ -525,7 +542,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 	double fix_original_weight = global_paraMgr.skeleton.getDouble("Fix Original Weight");
 	//bool use_fixed_original = (para->getBool("Run Skel WLOP") && global_paraMgr.glarea.getBool("Show Samples"));
-	bool use_fixed_original = para->getBool("Run Skel WLOP");
+	//bool use_fixed_original = para->getBool("Run Skel WLOP");
 
 	//bool need_normal_weight = para->getBool("Need Compute Density");
 	//bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
@@ -607,6 +624,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			if (use_elliptical_neighbor)
 			{
+				if (i < 5)
+				{
+					cout << "use_elliptical_neighbor" << endl;
+				}
 				if (use_nearest_neighbor)
 				{
 					float new_radius = radius + v.nearest_neighbor_dist;
@@ -619,17 +640,31 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			if (need_normal_weight)
 			{
+				if (i < 5)
+				{
+					cout << "need_normal_weight" << endl;
+				}
+
 				double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
 				w *= normal_diff;
 			}
 
 			if (need_density)
 			{
+// 				if (i < 2)
+// 				{
+// 					cout << "need_original_density" << endl;
+// 				}
+
 				w *= original_density[t.m_index];
 			}
 
-			if (L2 || use_self_wlop)
+			if (L2 /*|| use_elliptical_neighbor*/ /*|| use_self_wlop*/)
 			{
+				if (i < 2)
+				{
+					cout << "L2L2L2L2L2" << endl;
+				}
 				w = 1.0;
 			}
 
@@ -638,13 +673,17 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 				w = 1.0;
 // 			}
 
-			if (use_fixed_original)
-			{
-				if (dual_samples->vert[t.m_index].is_fixed_sample)
-				{
-					w *= fix_original_weight;
-				}
-			}
+// 			if (use_fixed_original)
+// 			{
+// 				if (i < 2)
+// 				{
+// 					cout << "use_fixed_originaluse_fixed_originaluse_fixed_original" << endl;
+// 				}
+// 				if (dual_samples->vert[t.m_index].is_fixed_sample)
+// 				{
+// 					w *= fix_original_weight;
+// 				}
+// 			}
 
 // 			if (use_tangent)
 // 			{
@@ -667,12 +706,13 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			else
 			if (use_tangent /*&& !use_confidence*/)
 			{
+				if (i < 2)
+				{
+					cout << "use_tangent use_tangent use_tangent" << endl;
+				}
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
 			}
-// 			else if (need_anti_normal)
-// 			{
-// 			}
 			else 
 			{
 				average[i] += t.P() * w;
@@ -696,7 +736,7 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 
 	if (use_ellipsoid_repulsion)
 	{
-		repulsion_power = 6;
+		repulsion_power = 5;
 	}
 
 	if (para->getBool("Run Skel WLOP"))
@@ -708,6 +748,33 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	for(int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
+
+		Point3f eigenX = v.eigen_vector0 * v.eigen_value0;
+		Point3f eigenY = v.eigen_vector1 * v.eigen_value1;
+		Point3f eigenZ = v.eigen_vector2 * v.eigen_value2;
+
+		//Eigen::Matrix3d eigen_MAT;
+		Matrix33f eigen_MAT;
+		eigen_MAT.SetRow(0, eigenX);
+		eigen_MAT.SetRow(1, eigenY);
+		eigen_MAT.SetRow(2, eigenZ);
+
+		Matrix33f eigen_Trans;
+		eigen_Trans = eigen_MAT.Transpose();
+
+		if (i < 4)
+		{
+			cout << "eigen matric:!! " << eigen_Trans[0][0] <<
+				"  " << eigen_Trans[0][1] << "  " << eigen_Trans[1][1] << "  " << eigen_Trans[2][2] << endl;
+		}
+
+		Matrix33f eigen_multi = eigen_Trans * eigen_MAT;
+		Point3f col0 = eigen_multi.GetColumn(0);
+		Point3f col1 = eigen_multi.GetColumn(1);
+		Point3f col2 = eigen_multi.GetColumn(2);
+
+
+
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
 			CVertex& t = samples->vert[v.neighbors[j]];
@@ -726,20 +793,36 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 
 			double w = exp(dist2*iradius16);
 			double rep = w * pow(1.0 / len, repulsion_power);
+			//double rep = w;
 
 			if (need_density)
 			{
 				rep *= samples_density[t.m_index];
 			}
 
-			repulsion[i] += diff * rep;  
-			repulsion_weight_sum[i] += rep;
-
 			if (use_ellipsoid_repulsion)
 			{
-				repulsion_x[i] = v.eigen_vector0 * (v.eigen_vector0 * diff) * v.eigen_value0 * rep;
-				repulsion_y[i] = v.eigen_vector1 * (v.eigen_vector1 * diff) * v.eigen_value1 * rep;
-				repulsion_z[i] = v.eigen_vector2 * (v.eigen_vector2 * diff) * v.eigen_value2 * rep;
+				//Point3f diff_eigen = (v.P() - t.P()) * eigen_multi;
+				//Point3f diff2 = v.P() - t.P();
+				//Point3f diff2 = t.P() - v.P();
+				//Point3f diff_eigen(diff2*col0, diff2*col1, diff2*col2);
+
+				//repulsion[i] += diff_eigen * rep;
+				repulsion_weight_sum[i] += rep;
+
+				//cout << "i " << i << endl;
+				repulsion_x_length[i] += diff * v.eigen_vector0 * rep;
+				repulsion_y_length[i] += diff * v.eigen_vector1 * rep;
+				repulsion_z_length[i] += diff * v.eigen_vector2 * rep;
+
+// 				repulsion_x[i] = v.eigen_vector0 * (v.eigen_vector0 * diff) * v.eigen_value0 * rep;
+// 				repulsion_y[i] = v.eigen_vector1 * (v.eigen_vector1 * diff) * v.eigen_value1 * rep;
+// 				repulsion_z[i] = v.eigen_vector2 * (v.eigen_vector2 * diff) * v.eigen_value2 * rep;
+			}
+			else
+			{
+				repulsion[i] += diff * rep;
+				repulsion_weight_sum[i] += rep;
 			}
 		}
 	}
@@ -1522,6 +1605,8 @@ double WLOP::iterate()
 		for (int i = 0; i < new_positions.size(); i++)
 		{
 			samples->vert[i].P() = new_positions[i];
+
+			samples->vert[i].N() = repulsion[i] * (0.5 / repulsion_weight_sum[i]);;
 		}
   }
 
@@ -3085,7 +3170,8 @@ void WLOP::runSkelWlop()
 
 	if (use_eigen_neighborhood)
 	{
-		time.start("Samples Initial");
+		cout << "use_eigen_neighborhood" << endl;
+		time.start("Samples runComputeEigenNeighborhood");
 		runComputeEigenNeighborhood(samples, original);
 
 		if (nTimeIterated == 0)
@@ -3133,9 +3219,25 @@ void WLOP::runSkelWlop()
 	time.end();
 
 
-	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+	if (!use_eigen_neighborhood)
+	{
+		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+		GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+	}
+	else
+	{
+		time.start("Samples runComputeEigenNeighborhood");
+		runComputeEigenNeighborhood(samples, original);
+		time.end();
+	}
 
+	if (para->getBool("Need Compute Density"))
+	{
+		
+		time.start("Compute Density For Sample");
+		computeDensity(false, repulsion_radius);
+		time.end();
+	}
 
 	time.start("computeRepulsionTerm");
 	computeRepulsionTerm(samples);
@@ -3157,10 +3259,11 @@ void WLOP::runSkelWlop()
     }
   }
 
-  double mu_max = global_paraMgr.skeleton.getDouble("Repulsion Mu");
-	double mu_min = global_paraMgr.skeleton.getDouble("Repulsion Mu2");
-  double mu_length = abs(mu_max - mu_min);
-  double sigma_length = abs(max_sigma - min_sigma);
+//  double mu_max = global_paraMgr.skeleton.getDouble("Repulsion Mu");
+// 	double mu_min = global_paraMgr.skeleton.getDouble("Repulsion Mu2");
+//   double mu_length = abs(mu_max - mu_min);
+//  double sigma_length = abs(max_sigma - min_sigma);
+	double mu = para->getDouble("Repulsion Mu");
   Point3f c;
   int moving_num = 0;
   double max_error = 0;
@@ -3174,19 +3277,28 @@ void WLOP::runSkelWlop()
     }
     c = v.P();
 
-    double mu = (mu_length / sigma_length) * (v.eigen_confidence - min_sigma) + mu_min;
-		if (use_eigen_neighborhood)
-		{
-			mu = mu_max;
-		}
+//    double mu = (mu_length / sigma_length) * (v.eigen_confidence - min_sigma) + mu_min;
+// 		if (use_eigen_neighborhood)
+// 		{
+// 			mu = mu_max;
+// 		}
+//		double mu
 
-		if (mu_max > 1.0)
+		if (mu > 1.0)
 		{
+			if (i <5)
+			{
+				cout << "no using first term" << endl;
+			}
 		}
     else if (average_weight_sum[i] > 1e-20)
     {
 			if (use_kite_points)
 			{
+				if (i <3)
+				{
+					cout << "use_kite_points use_kite_points" << endl;
+				}
 				CVertex& sample_point = original->vert[i];
 				Point3f avg_point = average[i] / average_weight_sum[i];
 				double proj_dist = abs((avg_point - sample_point.P()) * sample_point.N());
@@ -3201,24 +3313,56 @@ void WLOP::runSkelWlop()
 
 		if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
 		{
-// 			if (use_ellipsoid_repulsion)
-// 			{
-// 				Point3f move_x = repulsion_x[i] * (mu / repulsion_weight_sum[i]);
-// 				Point3f move_y = repulsion_y[i] * (mu / repulsion_weight_sum[i]);
-// 				Point3f move_z = repulsion_z[i] * (mu / repulsion_weight_sum[i]);
-// 				Point3f move = move_x + move_y + move_z;
-// 
-// 				if (i < 5)
-// 				{
-// 					cout << "repulsion : " << move.X() << "	" << move.Y() << "	" << move.Z() << "	" << endl;
-// 				}
-// 
-// 				v.P() += move;
-// 			}
-// 			else
+
+
+			// 			if (use_ellipsoid_repulsion)
+			// 			{
+			// 				Point3f move_x = repulsion_x[i] * (mu / repulsion_weight_sum[i]);
+			// 				Point3f move_y = repulsion_y[i] * (mu / repulsion_weight_sum[i]);
+			// 				Point3f move_z = repulsion_z[i] * (mu / repulsion_weight_sum[i]);
+			// 				Point3f move = move_x + move_y + move_z;
+			// 
+			// 				if (i < 5)
+			// 				{
+			// 					cout << "repulsion : " << move.X() << "	" << move.Y() << "	" << move.Z() << "	" << endl;
+			// 				}
+			// 
+			// 				v.P() += move;
+			// 			}
+			// 			else
+ 			if (use_ellipsoid_repulsion)
+ 			{
+				repulsion_x_length[i] = repulsion_x_length[i] * (mu / repulsion_weight_sum[i]);
+				repulsion_y_length[i] = repulsion_y_length[i] * (mu / repulsion_weight_sum[i]);
+				repulsion_z_length[i] = repulsion_z_length[i] * (mu / repulsion_weight_sum[i]);
+
+				Point3f final_dir = Point3f(0, 0, 0);
+				double threshold = 0.3;
+				if (v.eigen_value0 > threshold)
+				{
+					final_dir  += v.eigen_vector0 * v.eigen_value0 * repulsion_x_length[i];
+				}
+				if (v.eigen_value1 > threshold)
+				{
+					final_dir += v.eigen_vector1 * v.eigen_value1 * repulsion_y_length[i];
+				}
+				if (v.eigen_value2 > threshold)
+				{
+					final_dir += v.eigen_vector2 * v.eigen_value2 * repulsion_z_length[i];
+				}
+				
+				if (i < 5)
+				{
+					cout << "eigen values final: " << v.eigen_value0 << "	" << v.eigen_value1 << "	" << v.eigen_value2 << "	" << endl;
+				}
+
+				v.P() += final_dir;
+				v.N() = final_dir.Normalize();
+ 			}
+ 			else
 			{
 				v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
-
+				v.N() = repulsion[i].Normalize();
 			}
 		}
 
@@ -5686,9 +5830,11 @@ void WLOP::runInnerPointsRegularization()
 	vector<Point3f> regular_term(dual_samples->vert.size());
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+// 	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
+// 	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
+// 	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
+
+
 
 	repulsion_weight_sum.assign(samples->vn, 0);
 
@@ -5864,7 +6010,6 @@ void WLOP::computeConstNeighborhoodUsingRadius(double radius)
 
 void WLOP::runMoveBackward()
 {
-	cout << "runSkelWlop" << endl;
 	double curr_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
 
 	double stop_angle_threshold = para->getDouble("Local Angle Threshold");
@@ -6886,6 +7031,8 @@ void WLOP::runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples)
 {
 	runComputeEigenDirections(samples, original);
 
+	bool use_separate_neighborhood = para->getBool("Use Separate Neighborhood");
+
 	cout << "WLOP:: runComputeEigenNeighborhood" << endl;
 	//vector<Point3f> axis(3);
 	vector<double> lengthes(3);
@@ -6917,11 +7064,13 @@ void WLOP::runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples)
 		ranges.push_back(lengthes);
 	}
 
-	GlobalFun::computeBallNeighbors(dual_samples, samples, max_length, dual_samples->bbox);
-
-	//filter out
-	if (1) //!para->getBool("WLOP test bool")
+	if (use_separate_neighborhood)
 	{
+		GlobalFun::computeBallNeighbors(dual_samples, samples, radius, dual_samples->bbox);
+	}
+	else
+	{
+		GlobalFun::computeBallNeighbors(dual_samples, samples, max_length, dual_samples->bbox);
 		
 		for (int i = 0; i < dual_samples->vert.size(); i++)
 		{
@@ -6950,8 +7099,11 @@ void WLOP::runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples)
 
 			dual_v.original_neighbors = filtered_neighbor;
 		}
+	}
 
-
+	//filter out
+	if (1) //!para->getBool("WLOP test bool")
+	{
 		GlobalFun::computeBallNeighbors(dual_samples, NULL, max_length, dual_samples->bbox);
 		for (int i = 0; i < dual_samples->vert.size(); i++)
 		{
@@ -7037,16 +7189,16 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
 			dual_v.eigen_value1 /= sum_eigen;
 			dual_v.eigen_value2 /= sum_eigen;
 
-			dual_v.eigen_value0 = pow(dual_v.eigen_value0, 7);
-			dual_v.eigen_value1 = pow(dual_v.eigen_value1, 7);
-			dual_v.eigen_value2 = pow(dual_v.eigen_value2, 7);
+			dual_v.eigen_value0 = pow(dual_v.eigen_value0, 8);
+			dual_v.eigen_value1 = pow(dual_v.eigen_value1, 8);
+			dual_v.eigen_value2 = pow(dual_v.eigen_value2, 8);
 
 			sum_eigen = dual_v.eigen_value0 + dual_v.eigen_value1 + dual_v.eigen_value2;
 			dual_v.eigen_value0 /= sum_eigen;
 			dual_v.eigen_value1 /= sum_eigen;
 			dual_v.eigen_value2 /= sum_eigen;
 
-			if (i < 10)
+			if (i < 5)
 			{
 // 				cout << "new sum_proj: " << sum_proj_x << "  "
 // 					    << sum_proj_y<< "  "

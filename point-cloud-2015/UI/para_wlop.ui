@@ -962,7 +962,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>600</y>
+       <y>580</y>
        <width>151</width>
        <height>31</height>
       </rect>
@@ -995,6 +995,109 @@
      </property>
      <property name="text">
       <string>Use Eigen Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="use_separate_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>780</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use Separate  Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="use_ellipsoid_weight">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>810</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use Ellipsoid Weight</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="use_ellipsoid_repulsion">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>840</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use Ellipsoid Repulsion</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>630</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Eigen Neighborhood Para1</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="eigen_neighbor_para1">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>630</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>660</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Eigen Neighborhood Para2</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="eigen_neighbor_para2">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>660</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
     </widget>
    </widget>
