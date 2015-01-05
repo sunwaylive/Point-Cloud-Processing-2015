@@ -649,7 +649,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 				w *= normal_diff;
 			}
 
-			if (need_density)
+			if (need_density && !original_density.empty())
 			{
 // 				if (i < 2)
 // 				{
@@ -723,6 +723,67 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	}
 }
 
+void WLOP::computeDLinkRepulsionTerm(CMesh* samples)
+{
+	double radius = para->getDouble("CGrid Radius");
+	double radius2 = radius * radius;
+	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+	bool use_tangent = para->getBool("Use Tangent Vector");
+
+	double repulsion_power = para->getDouble("Repulsion Power");
+	bool need_density = para->getBool("Need Compute Density");
+
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	double sigma_threshold = pow(max(1e-8, cos(sigma / 180.0*3.1415926)), 2);
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = samples->vert[v.neighbors[j]];
+			
+			Point3f diff = v.P() - t.P();
+
+			if (use_tangent)
+			{
+				diff = GlobalFun::getTangentVector(diff, v.N());
+			}
+
+			Point3f d_link = v.P() - dual_v.P();
+			//double link_weight = d_link * diff;
+			//link_weight = d_link.Normalize() * diff.Normalize();
+			//link_weight = 1.0;
+			//Point3f repul = diff *(diff * d_link);
+			//double direction_diff = exp(pow(d_link.Normalize() * diff.Normalize(), 2) / sigma_threshold);
+			//double direction_diff = 1-abs(d_link.Normalize() * diff.Normalize());
+
+			double link_weight = abs(d_link * diff);
+
+			if (i < 5)
+			{
+				//cout << "dir diff: " << direction_diff << endl;
+			}
+
+			double dist2 = diff.SquaredNorm();
+			double len = sqrt(dist2);
+			if (len <= 0.001 * radius) len = radius*0.001;
+
+			double theta = exp(dist2*iradius16);
+			double theta2 = 2 * theta;
+			//double weight = theta2 * pow(1.0 / len, repulsion_power);
+			double weight = theta2 * link_weight;
+
+			repulsion[i] += diff * weight;
+			repulsion_weight_sum[i] += weight;
+		}
+	}
+
+
+}
+
 
 void WLOP::computeRepulsionTerm(CMesh* samples)
 {
@@ -784,7 +845,6 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
       if (use_tangent)
       {
         diff = GlobalFun::getTangentVector(diff, v.N());
-				//diff2 = GlobalFun::getTangentVector(diff, v.N());
       }
 
 			double dist2 = diff.SquaredNorm();
@@ -1166,8 +1226,8 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double length_threshold_dist2 = length_threshold_dist * length_threshold_dist;
 	double iradius16_length = -4.0 / length_threshold_dist2;
 
-	//double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
-	double sigma = 45;
+	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+	//double sigma = 45;
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	bool use_confidence = para->getBool("Use Confidence");
@@ -1606,7 +1666,7 @@ double WLOP::iterate()
 		{
 			samples->vert[i].P() = new_positions[i];
 
-			samples->vert[i].N() = repulsion[i] * (0.5 / repulsion_weight_sum[i]);;
+			//samples->vert[i].N() = repulsion[i] * (0.5 / repulsion_weight_sum[i]);;
 		}
   }
 
@@ -5459,26 +5519,104 @@ void WLOP::innerpointsClassification()
 
 void WLOP::runMoveSample()
 {
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-
-	for (int i = 0; i < dual_samples->vert.size(); i++)
+	if (false)
 	{
-		CVertex& v = samples->vert[i];
-		CVertex& dual_v = dual_samples->vert[i];
+		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-		Point3f diff = v.P() - dual_v.P();
-// 		double proj_dist = diff * dual_v.eigen_vector0;
-// 		v.P() -= dual_v.eigen_vector0 * proj_dist;
+		for (int i = 0; i < dual_samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			CVertex& dual_v = dual_samples->vert[i];
 
+			Point3f diff = v.P() - dual_v.P();
 
-		 		double proj_dist = diff * dual_v.N();
-		 		v.P() = dual_v.P() + dual_v.N() * proj_dist;
-
-// 		double proj_dist = diff * dual_v.eigen_vector0;
-// 		//dual_v.N() = dual_v.eigen_vector0;
-// 		dual_v.P() += dual_v.eigen_vector0 * proj_dist;
+			double proj_dist = diff * dual_v.N();
+			v.P() = dual_v.P() + dual_v.N() * proj_dist;
+		}
 	}
+	else
+	{
+		Timer time;
+		initVertexes(true);
+
+		time.start("Samples Initial");
+		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+		GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+		time.end();
+
+
+		time.start("Sample Original neighbor");
+		GlobalFun::computeBallNeighbors(samples, original,
+			para->getDouble("CGrid Radius"), box);
+		time.end();
+
+		double mu = para->getDouble("Repulsion Mu");
+
+		time.start("computeAverageTerm");
+		computeAverageTerm(samples, original);
+		time.end();
+		
+		time.start("computeRepulsionTerm");
+		computeDLinkRepulsionTerm(samples);
+		time.end();
+
+		Point3f c;
+		int moving_num = 0;
+		double max_error = 0;
+
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			if (v.is_fixed_sample || v.is_skel_ignore)
+			{
+				continue;
+			}
+			c = v.P();
+
+
+			if (mu > 1.0)
+			{
+				if (i < 5)
+				{
+					cout << "no using first term" << endl;
+				}
+			}
+			else if (average_weight_sum[i] > 1e-20)
+			{
+				v.P() = average[i] / average_weight_sum[i];			
+			}
+
+			if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+			{
+				v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+
+				if (i <5)
+				{
+					cout << "move repulsion: " << repulsion[i].X() << "  " << repulsion[i].Y() << "  " << repulsion[i].Z() << "  " << endl;
+				}
+				v.eigen_vector0 = repulsion[i] * (mu / repulsion_weight_sum[i]);
+			}
+
+
+
+			if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20)
+			{
+				moving_num++;
+				Point3f diff = v.P() - c;
+				double move_error = sqrt(diff.SquaredNorm());
+
+				error_x += move_error;
+			}
+		}
+		error_x = error_x / moving_num;
+
+		para->setValue("Current Movement Error", DoubleValue(error_x));
+		cout << "****finished compute Skeletonization error:	" << error_x << endl;
+		return;
+
+	}
+
 
 }
 
@@ -6116,7 +6254,7 @@ void WLOP::runMoveBackward()
 			continue;
 		}
 
-		if ((real_step_size[i] / step_size) < 0.7)
+		if ((real_step_size[i] / step_size) < cooling_parameter)
 		{
 			dual_v.is_fixed_sample = true;
 			dual_v.is_boundary = true;
@@ -6175,7 +6313,7 @@ void WLOP::runMoveBackward()
 			}
 		}
 
-		if (number_of_fixed > v.neighbors.size() * 0.45)
+		if (number_of_fixed > v.neighbors.size() * 0.46)
 		{
 			dual_v.is_fixed_sample = true;
 		}
@@ -6728,7 +6866,12 @@ void WLOP::runSelfPCA()
 	{
 		normals_save[i] = dual_samples->vert[i].N();
 		dual_samples->vert[i].neighbors = samples->vert[i].neighbors;
-		//dual_samples->vert[i].is_fixed_sample = true;
+
+		if (use_eigen_neighborhood)
+		{
+			dual_samples->vert[i].is_fixed_sample = true;
+		}
+		
 	}
 
 	
@@ -7265,8 +7408,8 @@ void WLOP::computeInitialNeighborSize()
 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 2.0));
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 1.5));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 3.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 2.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 4.0));
 	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.25));
 
 

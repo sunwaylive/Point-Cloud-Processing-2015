@@ -112,7 +112,7 @@ void GLDrawer::draw(DrawType type, CMesh* _mesh)
 			}
 		}
 
-    if(!(bCullFace /*&& !vi->is_dual_sample*/ /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
+    if(!(bCullFace && !vi->is_dual_sample /*&& !vi->bIsOriginal*/) || isCanSee(p, normal))		
     {
 			switch(type)
 			{
@@ -178,7 +178,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 	}
 
 
-	if (v.is_boundary && !bUseConfidenceColor)
+	if (v.is_boundary && bUseConfidenceColor)
    {
      //return cBlue;
 		return cOrange;

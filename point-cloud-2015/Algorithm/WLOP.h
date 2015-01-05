@@ -78,6 +78,9 @@ private:
 	void computeSampleSimilarityTerm(CMesh* samples);
 	void computeRepulsionTerm(CMesh* samples);
 
+	void computeDLinkRepulsionTerm(CMesh* samples);
+
+
 	void computeDensity(bool isOriginal, double radius);
 	void recomputePCA_Normal();
 

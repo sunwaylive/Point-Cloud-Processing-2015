@@ -201,7 +201,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
 	wLop.addParam(new RichDouble("Local Neighbor Size For Inner Points", 0.040));
 	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.060));
-	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.5));
+	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.7));
 
 	wLop.addParam(new RichDouble("Local Angle Threshold", 45));
 
@@ -307,8 +307,8 @@ void ParameterMgr::initWLopParameter()
 void ParameterMgr::initSkeletonParameter()
 {
   /// 
-  skeleton.addParam(new RichDouble("Repulsion Power", 1.0));
-  skeleton.addParam(new RichDouble("Average Power", 1.0));
+  skeleton.addParam(new RichDouble("Repulsion Power", 2.0));
+  skeleton.addParam(new RichDouble("Average Power", 2.0));
 
   /// 
   skeleton.addParam(new RichDouble("Num Of Iterate Time", 1));
