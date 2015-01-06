@@ -804,6 +804,7 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	{
 		use_tangent = false;
 	}
+	bool run_skel_wlop = para->getBool("Run Skel WLOP");
 
 	cout << endl<< endl<< "Sample Neighbor Size:" << samples->vert[0].neighbors.size() << endl<< endl;
 	for(int i = 0; i < samples->vert.size(); i++)
@@ -860,24 +861,14 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 				rep *= samples_density[t.m_index];
 			}
 
-			if (use_ellipsoid_repulsion)
+			if (use_ellipsoid_repulsion && run_skel_wlop)
 			{
-				//Point3f diff_eigen = (v.P() - t.P()) * eigen_multi;
-				//Point3f diff2 = v.P() - t.P();
-				//Point3f diff2 = t.P() - v.P();
-				//Point3f diff_eigen(diff2*col0, diff2*col1, diff2*col2);
-
-				//repulsion[i] += diff_eigen * rep;
 				repulsion_weight_sum[i] += rep;
 
 				//cout << "i " << i << endl;
 				repulsion_x_length[i] += diff * v.eigen_vector0 * rep;
 				repulsion_y_length[i] += diff * v.eigen_vector1 * rep;
 				repulsion_z_length[i] += diff * v.eigen_vector2 * rep;
-
-// 				repulsion_x[i] = v.eigen_vector0 * (v.eigen_vector0 * diff) * v.eigen_value0 * rep;
-// 				repulsion_y[i] = v.eigen_vector1 * (v.eigen_vector1 * diff) * v.eigen_value1 * rep;
-// 				repulsion_z[i] = v.eigen_vector2 * (v.eigen_vector2 * diff) * v.eigen_value2 * rep;
 			}
 			else
 			{
@@ -1207,27 +1198,19 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 	if (use_closest_dual)
 	{
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::computeSampleSimilarityTermcomputeSampleSimilarityTerm()");
 	}
 
-	//double radius = para->getDouble("CGrid Radius");
-
-// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-// 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-
-	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::computeSampleSimilarityTerm()");
-
-	double radius = para->getDouble("CGrid Radius") * 2.0;
+	double radius = para->getDouble("CGrid Radius") * 1.5;
 	double radius2 = radius * radius;
 	double iradius16 = -4.0 / radius2;
 	double iradius16_perpend = -4.0 / radius2;
 
-	double length_threshold_dist = radius * 0.3;
+	double length_threshold_dist = radius * 0.7;
 	double length_threshold_dist2 = length_threshold_dist * length_threshold_dist;
 	double iradius16_length = -4.0 / length_threshold_dist2;
 
 	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
-	//double sigma = 45;
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	bool use_confidence = para->getBool("Use Confidence");
@@ -1246,10 +1229,13 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 			neighbor_idx = v.neighbors[0];
 		}
 
+		v.dual_index = neighbor_idx;
 		CVertex& dual_v = dual_samples->vert[neighbor_idx];
 
 		Point3f diff = v.P() - dual_v.P();
-		double proj_dist = abs(diff * v.N());
+		//double proj_dist = abs(diff * v.N());
+		double proj_dist = sqrt(diff.SquaredNorm());
+
 		v.skel_radius = proj_dist;
 	
 		v.dual_index = neighbor_idx;
@@ -1258,13 +1244,19 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	}
 
 	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 50, false, "WlopParaDlg::computeSampleSimilarityTerm()");
-	GlobalFun::computeBallNeighbors(samples, NULL, radius, samples->bbox);
-
+	//GlobalFun::computeBallNeighbors(samples, NULL, radius, samples->bbox);
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, radius, samples->bbox);
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		samples->vert[i].neighbors = dual_samples->vert[i].neighbors;
+	}
 
 	vector<double> new_radiuses;
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
+		//new_radiuses.push_back(samples->vert[i].skel_radius);
 		new_radiuses.push_back(samples->vert[i].skel_radius);
+
 	}
 
 
@@ -1302,8 +1294,9 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 			double dist2 = (v.P() - t.P()).SquaredNorm();
 			double dist_diff = exp(dist2 * iradius16);
 
-			double length_dist = abs(v.skel_radius - t.skel_radius);
-			if (length_dist > length_threshold_dist)
+			double sign_dist = t.skel_radius - v.skel_radius;
+			double length_dist = abs(sign_dist);
+			if (sign_dist > length_threshold_dist)
 			{
 				continue;
 			}
@@ -1352,10 +1345,16 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		CVertex dual_v = dual_samples->vert[neighbor_idx];
 
-		Point3f backward_v = v.P() - v.N() * v.skel_radius;
-		Point3f forward_v = backward_v + v.N() * new_radiuses[i];
 
+
+// 		Point3f backward_v = v.P() - v.N() * v.skel_radius;
+// 		Point3f forward_v = backward_v + v.N() * new_radiuses[i];
+
+		Point3f direction = (v.P() - dual_v.P()).Normalize();
+		Point3f forward_v = dual_v.P() + direction * new_radiuses[i];
 		samples_similarity[i] = forward_v;
+
+
 
 // 		Point3f diff = v.P() - dual_v.P();
 // 		double proj_dist = diff * dual_v.eigen_vector0;
@@ -1702,7 +1701,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	double save_threshold_dist = radius * 0.25;
 
 //	double mu = para->getDouble("Repulsion Mu");
-	double radius_threshold = radius * 0.6;
+	double radius_threshold = radius * 0.5;
 	//GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
 	Point3f c;
 
@@ -1727,10 +1726,6 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 		if (use_tangent)
  		{
-// 			for (int i = 0; i < samples->vert.size(); i++)
-// 			{
-// 				CVertex& v = samples->vert[i];
-// 				c = v.P();
 
 				if (use_self_wlop)
 				{
@@ -1781,6 +1776,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					}
 					else if (use_confidence /*&& v.eigen_confidence < 0.85*/)
  					{
+						//using this
 						Point3f avg_point = average[i] / average_weight_sum[i];
 						Point3f sim_point = samples_similarity[i];
 
@@ -1797,7 +1793,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						}
 						
 						double dist_sim = GlobalFun::computeEulerDist(v.P(), sim_point);
-						if (dist_sim > save_threshold_dist)
+						if (dist_sim > save_threshold_dist && (sim_point-v.P())*v.N() > 0)
 						{
 							sim_point = v.P();
 							v.is_skel_branch = true;
@@ -1835,14 +1831,6 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							new_pos[i] = samples_similarity[i];
 						}
-
-
-						//new_pos[i] = samples_similarity[i]; // force similarity
-
-						//new_pos[i] = samples_similarity[i];
-						//new_pos[i] = (average[i] / average_weight_sum[i] * v.eigen_confidence) + samples_similarity[i] * (1 - v.eigen_confidence);
-
-
  					}
  					else
  					{
@@ -1875,35 +1863,21 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 		}
 		else
 		{
-
-// 			if (use_self_wlop && v.is_fixed_sample)
-// 			{
-// 				new_pos[i] = v.P();
-// 			}
-// 			else
-//   			if (use_self_wlop)
-//   			{
-//   				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
-//   				{
-//   					new_pos[i] = v.P() + repulsion[i] * (0.1 / repulsion_weight_sum[i]);
-//   				}
-//   			}
-//   			else
+			
+			if (mu > 1.0)
 			{
-				if (mu > 1.0)
-				{
-					new_pos[i] = v.P();
-				}
-				else if (average_weight_sum[i] > 1e-20)
-				{
-					new_pos[i] = average[i] / average_weight_sum[i];
-				}
-
-				if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
-				{
-					new_pos[i] += repulsion[i] * (mu / repulsion_weight_sum[i]);
-				}
+				new_pos[i] = v.P();
 			}
+			else if (average_weight_sum[i] > 1e-20)
+			{
+				new_pos[i] = average[i] / average_weight_sum[i];
+			}
+
+			if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+			{
+				new_pos[i] += repulsion[i] * (mu / repulsion_weight_sum[i]);
+			}
+			
 
 
 			if (repulsion_weight_sum[i] > 1e-20)
@@ -3390,7 +3364,7 @@ void WLOP::runSkelWlop()
 			// 				v.P() += move;
 			// 			}
 			// 			else
- 			if (use_ellipsoid_repulsion)
+ 			if (use_ellipsoid_repulsion )
  			{
 				repulsion_x_length[i] = repulsion_x_length[i] * (mu / repulsion_weight_sum[i]);
 				repulsion_y_length[i] = repulsion_y_length[i] * (mu / repulsion_weight_sum[i]);
@@ -3421,12 +3395,12 @@ void WLOP::runSkelWlop()
 				}
 
 				v.P() += final_dir;
-				v.N() = final_dir.Normalize();
+				//v.N() = final_dir.Normalize();
  			}
  			else
 			{
 				v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
-				v.N() = repulsion[i].Normalize();
+				//v.N() = repulsion[i].Normalize();
 			}
 		}
 
@@ -5519,7 +5493,7 @@ void WLOP::innerpointsClassification()
 
 void WLOP::runMoveSample()
 {
-	if (false)
+	if (true)
 	{
 		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
 		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
@@ -5537,83 +5511,8 @@ void WLOP::runMoveSample()
 	}
 	else
 	{
-		Timer time;
-		initVertexes(true);
-
-		time.start("Samples Initial");
-		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-		GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-		time.end();
 
 
-		time.start("Sample Original neighbor");
-		GlobalFun::computeBallNeighbors(samples, original,
-			para->getDouble("CGrid Radius"), box);
-		time.end();
-
-		double mu = para->getDouble("Repulsion Mu");
-
-		time.start("computeAverageTerm");
-		computeAverageTerm(samples, original);
-		time.end();
-		
-		time.start("computeRepulsionTerm");
-		computeDLinkRepulsionTerm(samples);
-		time.end();
-
-		Point3f c;
-		int moving_num = 0;
-		double max_error = 0;
-
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			if (v.is_fixed_sample || v.is_skel_ignore)
-			{
-				continue;
-			}
-			c = v.P();
-
-
-			if (mu > 1.0)
-			{
-				if (i < 5)
-				{
-					cout << "no using first term" << endl;
-				}
-			}
-			else if (average_weight_sum[i] > 1e-20)
-			{
-				v.P() = average[i] / average_weight_sum[i];			
-			}
-
-			if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
-			{
-				v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
-
-				if (i <5)
-				{
-					cout << "move repulsion: " << repulsion[i].X() << "  " << repulsion[i].Y() << "  " << repulsion[i].Z() << "  " << endl;
-				}
-				v.eigen_vector0 = repulsion[i] * (mu / repulsion_weight_sum[i]);
-			}
-
-
-
-			if (average_weight_sum[i] > 1e-20 && repulsion_weight_sum[i] > 1e-20)
-			{
-				moving_num++;
-				Point3f diff = v.P() - c;
-				double move_error = sqrt(diff.SquaredNorm());
-
-				error_x += move_error;
-			}
-		}
-		error_x = error_x / moving_num;
-
-		para->setValue("Current Movement Error", DoubleValue(error_x));
-		cout << "****finished compute Skeletonization error:	" << error_x << endl;
-		return;
 
 	}
 
