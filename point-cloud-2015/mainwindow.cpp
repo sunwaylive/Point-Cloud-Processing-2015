@@ -590,17 +590,42 @@ void MainWindow::showClosestDualConnection(bool _val)
 
 	paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(_val));
 
-	if (_val)
-	{
-		//GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "showClosestDualConnection");
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "showClosestDualConnection");
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, global_paraMgr.wLop.getDouble("CGrid Radius"), samples->bbox);
 
-		for (int i = 0; i < samples->vert.size(); i++)
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+
+		double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+		int dual_idx = i;
+		for (int j = 0; j < dual_v.neighbors.size(); j++)
 		{
-			CVertex& v = samples->vert[i];
-			v.dual_index = v.neighbors[0];
+			int index = dual_v.neighbors[j];
+			CVertex& dual_t = dual_samples->vert[index];
+
+			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+			if (dist2 < min_dist2)
+			{
+				min_dist2 = dist2;
+				dual_idx = index;
+			}
 		}
+
+		v.dual_index = dual_idx;
 	}
+
+// 	if (_val)
+// 	{
+// 		//GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "showClosestDualConnection");
+// 		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "showClosestDualConnection");
+// 
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			CVertex& v = samples->vert[i];
+// 			v.dual_index = v.neighbors[0];
+// 		}
+// 	}
 
 }
 

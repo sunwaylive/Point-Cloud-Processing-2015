@@ -1195,11 +1195,13 @@ void WLOP::computeSampleAverageTerm(CMesh* samples)
 
 void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 {
-	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
-	if (use_closest_dual)
-	{
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::computeSampleSimilarityTermcomputeSampleSimilarityTerm()");
-	}
+// 	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+// 	if (use_closest_dual)
+// 	{
+// 		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::computeSampleSimilarityTermcomputeSampleSimilarityTerm()");
+// 	}
+
+	computeDualIndex(samples, dual_samples);
 
 	double radius = para->getDouble("CGrid Radius") * 1.5;
 	double radius2 = radius * radius;
@@ -1223,28 +1225,16 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	{
 		CVertex& v = samples->vert[i];
 
-		int neighbor_idx = i;
-		if (use_closest_dual)
-		{
-			neighbor_idx = v.neighbors[0];
-		}
-
-		v.dual_index = neighbor_idx;
-		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+		CVertex& dual_v = dual_samples->vert[v.dual_index];
 
 		Point3f diff = v.P() - dual_v.P();
 		//double proj_dist = abs(diff * v.N());
 		double proj_dist = sqrt(diff.SquaredNorm());
 
 		v.skel_radius = proj_dist;
-	
-		v.dual_index = neighbor_idx;
-
 		samples->bbox.Add(v.P());
 	}
 
-	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 50, false, "WlopParaDlg::computeSampleSimilarityTerm()");
-	//GlobalFun::computeBallNeighbors(samples, NULL, radius, samples->bbox);
 	GlobalFun::computeBallNeighbors(dual_samples, NULL, radius, samples->bbox);
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
@@ -1254,9 +1244,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	vector<double> new_radiuses;
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
-		//new_radiuses.push_back(samples->vert[i].skel_radius);
 		new_radiuses.push_back(samples->vert[i].skel_radius);
-
 	}
 
 
@@ -1277,7 +1265,6 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		if (v.neighbors.size() < 3)
 		{
-			
 			continue;
 		}
 
@@ -1326,26 +1313,14 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		}
 	}
 
-	if (use_closest_dual)
-	{
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
-	}
+	computeDualIndex(samples, dual_samples);
 
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
 		v.recompute_m_render();
 
-		int neighbor_idx = i;
-
-		if (use_closest_dual)
-		{
-			neighbor_idx = v.neighbors[0];
-		}
-
-		CVertex dual_v = dual_samples->vert[neighbor_idx];
-
-
+		CVertex dual_v = dual_samples->vert[v.dual_index];
 
 // 		Point3f backward_v = v.P() - v.N() * v.skel_radius;
 // 		Point3f forward_v = backward_v + v.N() * new_radiuses[i];
@@ -4190,27 +4165,27 @@ void WLOP::runDetectKitePoitns()
 
 void WLOP::runRegularizeNormals()
 {
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+	computeDualIndex(samples, dual_samples);
 
-	GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+ 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+ 	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
 	bool use_confidence = para->getBool("Use Confidence");
 
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
-		CVertex dual_v2 = dual_samples->vert[i];
+		//CVertex dual_v = dual_samples->vert[i];
 
 // 		if (!v.is_boundary)
 // 		{
 // 			continue;
 // 		}
 
-		if (i < 10)
-		{
-			cout << "runRegularizeNormals() confidence: " << v.eigen_confidence << "  " << dual_v2.eigen_confidence << endl;
-		}
+// 		if (i < 10)
+// 		{
+// 			cout << "runRegularizeNormals() confidence: " << v.eigen_confidence << "  " << dual_v2.eigen_confidence << endl;
+// 		}
 
 		if (use_confidence && v.eigen_confidence > 0.8)
 		{
@@ -4221,22 +4196,35 @@ void WLOP::runRegularizeNormals()
 //  			continue;
 //  		}
 
-		int neighbor_idx = v.neighbors[0];
-		//int neighbor_idx = i;
-		CVertex& dual_v = dual_samples->vert[neighbor_idx];
+// 		int neighbor_idx = v.neighbors[0];
+// 		//int neighbor_idx = i;
+		CVertex& dual_v = dual_samples->vert[v.dual_index];
 		Point3f diff = v.P() - dual_v.P();
-		double proj_dist = diff * dual_v.eigen_vector0;
-		Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
-		Point3f dir = (v.P() - proj_p).Normalize();
 
-		if (dir*v.N() < 0)
-		{
-			v.N() = ((-dir + v.N()) / 2.0).Normalize();
-		}
-		else
-		{
-			v.N() = ((dir + v.N()) / 2.0).Normalize();
-		}
+		Point3f dir = diff;
+		//v.N() = dir.Normalize();
+ 		if (dual_v.eigen_confidence > 0.93)
+ 		{
+ 			cout << dual_v.eigen_confidence << endl;
+ 			double proj_dist = diff * dual_v.eigen_vector0;
+ 			Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
+ 			Point3f dir = (v.P() - proj_p).Normalize();
+ 		}
+ 		else
+ 		{
+ 			dir = diff.Normalize();
+ 			//continue;
+ 		}
+		v.N() = ((dir + v.N()) / 2.0).Normalize();
+ 
+//  		if (dir*v.N() < 0)
+//  		{
+//  			v.N() = ((-dir + v.N()) / 2.0).Normalize();
+//  		}
+//  		else
+//  		{
+//  			v.N() = ((dir + v.N()) / 2.0).Normalize();
+//  		}
 	}
 
 	return;
@@ -7352,11 +7340,45 @@ void WLOP::computeInitialNeighborSize()
 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 2.0));
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 4.0));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 6.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 3.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 5.0));
 	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 1.5));
 
 
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 }
 
+
+void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
+{
+	cout << "computeDualIndex" << endl;
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, 1.2*para->getDouble("CGrid Radius"), dual_samples->bbox);
+	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex& dual_v = dual_samples->vert[i];
+
+		double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+		int dual_idx = i;
+
+		if (use_cloest)
+		{
+			for (int j = 0; j < dual_v.neighbors.size(); j++)
+			{
+				int index = dual_v.neighbors[j];
+				CVertex& dual_t = dual_samples->vert[index];
+
+				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+				if (dist2 < min_dist2)
+				{
+					min_dist2 = dist2;
+					dual_idx = index;
+				}
+			}
+		}
+
+		v.dual_index = dual_idx;
+	}
+}

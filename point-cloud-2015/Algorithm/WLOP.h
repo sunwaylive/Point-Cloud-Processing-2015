@@ -120,6 +120,8 @@ private:
 	void runComputeEigenDirections(CMesh* dual_samples, CMesh* samples);
 	void runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples);
 
+	void computeDualIndex(CMesh* samples, CMesh* dual_samples);
+
 
 
 private:

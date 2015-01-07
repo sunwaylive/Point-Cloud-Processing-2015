@@ -274,6 +274,10 @@
    <addaction name="separator"/>
    <addaction name="actionSpray_Erase"/>
    <addaction name="actionShow_Eigens"/>
+   <addaction name="separator"/>
+   <addaction name="action_Dual_Circle"/>
+   <addaction name="action_Dual_Dot"/>
+   <addaction name="actionShow_Picked_Neighbor"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -720,6 +724,9 @@
    </property>
   </action>
   <action name="actionShow_Picked_Neighbor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Show Picked Neighbor</string>
    </property>
