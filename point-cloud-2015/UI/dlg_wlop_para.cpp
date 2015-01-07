@@ -1099,37 +1099,46 @@ void WlopParaDlg::applyComputeEigenNeighbor()
 
 void WlopParaDlg::oneKEY()
 {
-	m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
-	m_paras->wLop.setValue("Need Similarity", BoolValue(true));
-	m_paras->wLop.setValue("Use Confidence", BoolValue(true));
-	m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
-	m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
+	double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");
+	m_paras->wLop.setValue("Num Of Iterate Time", DoubleValue(1));
 
-	
-
-	applyComputeConfidence();
-	
-
-	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-	CMesh* samples;
-	samples = area->dataMgr.getCurrentSamples();
-	vector<Point3f> remember_normal(samples->vert.size());
-	for (int i = 0; i < samples->vert.size(); i++)
+	for (int i = 0; i < iter_time; i++)
 	{
-		remember_normal[i] = samples->vert[i].N();
-	}
-	vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
-	pca_para.fittingAdjNum = knn;
-	vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		if (v.N() * remember_normal[i] < 0)
+		m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
+		m_paras->wLop.setValue("Need Similarity", BoolValue(true));
+		m_paras->wLop.setValue("Use Confidence", BoolValue(true));
+		m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
+		m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
+
+
+
+		applyComputeConfidence();
+
+
+		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+		CMesh* samples;
+		samples = area->dataMgr.getCurrentSamples();
+		vector<Point3f> remember_normal(samples->vert.size());
+		for (int i = 0; i < samples->vert.size(); i++)
 		{
-			v.N() *= -1;
+			remember_normal[i] = samples->vert[i].N();
 		}
+		vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+		pca_para.fittingAdjNum = knn;
+		vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			if (v.N() * remember_normal[i] < 0)
+			{
+				v.N() *= -1;
+			}
+		}
+
+		applyRegularizeNormals();
+		applyWlop();
 	}
 
-	applyRegularizeNormals();
-	applyWlop();
+
+
 }

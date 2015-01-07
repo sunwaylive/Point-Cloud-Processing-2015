@@ -5717,44 +5717,44 @@ void WLOP::runMatLOP()
 			dual_v.is_fixed_sample = true;
 			
 
-			if (dual_v.skel_radius < 1e-15)
-			{
-				dual_v.skel_radius = curr_radius;
-			}
-
-			if (i < 20)
-			{
-				cout << "v.skel: " << dual_v.skel_radius << endl;
-			}
+// 			if (dual_v.skel_radius < 1e-15)
+// 			{
+// 				dual_v.skel_radius = curr_radius;
+// 			}
+// 
+// 			if (i < 20)
+// 			{
+// 				cout << "v.skel: " << dual_v.skel_radius << endl;
+// 			}
 		}
 	}
 
 	cout << "4" << endl;
 
-	curr_radius += para->getDouble("Increasing Step Size");
-	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(curr_radius));
+// 	curr_radius += para->getDouble("Increasing Step Size");
+// 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(curr_radius));
 
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		CVertex& dual_v = dual_samples->vert[i];
-
-		v.skel_radius = dual_v.skel_radius;
-		v.eigen_confidence = dual_v.skel_radius;
-		dual_v.eigen_confidence = dual_v.skel_radius;
-	}
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 
+// 		v.skel_radius = dual_v.skel_radius;
+// 		v.eigen_confidence = dual_v.skel_radius;
+// 		dual_v.eigen_confidence = dual_v.skel_radius;
+// 	}
 
 	// 	GlobalFun::normalizeConfidence(samples->vert, 0.0);
 	// 
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-
-		if (i < 150)
-		{
-			cout << "inside  " << v.eigen_confidence << endl;
-		}
-	}
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 
+// 		if (i < 150)
+// 		{
+// 			cout << "inside  " << v.eigen_confidence << endl;
+// 		}
+// 	}
 }
 
 
@@ -6062,6 +6062,52 @@ void WLOP::runMoveBackward()
 	initVertexes(true);
 
 
+	time.start("Sample0000dual_samples neighbor");
+	GlobalFun::computeBallNeighbors(dual_samples, NULL,
+		stop_neighbor_size, box);
+	time.end();
+
+
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		CVertex& dual_v = dual_samples->vert[i];
+
+		if (dual_v.is_fixed_sample)
+		{
+			continue;
+		}
+
+		bool keep_going = true;
+		for (int j = 0; j < dual_v.neighbors.size(); j++)
+		{
+			CVertex& t = dual_samples->vert[dual_v.neighbors[j]];
+
+			double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), t.N());
+
+			if (angle > stop_angle_threshold || dual_v.N() * t.N() < 0)
+			{
+				keep_going = false;
+				break;
+			}
+		}
+
+		if (keep_going)
+		{
+			dual_v.is_fixed_sample = false;
+		}
+		else
+		{
+			dual_v.is_fixed_sample = true;
+
+			if (dual_v.skel_radius < 1e-15)
+			{
+				dual_v.skel_radius = curr_radius;
+			}
+		}
+	}
+
+
+
 	vector<Point3f> remember_position(dual_samples->vert.size());
 	vector<Point3f> remember_normal(dual_samples->vert.size());
 
@@ -6138,7 +6184,7 @@ void WLOP::runMoveBackward()
 	}
 
 
-	time.start("Sample neighbor");
+	time.start("Sample0000dual_samples neighbor");
 	GlobalFun::computeBallNeighbors(dual_samples, NULL,
 		stop_neighbor_size, box);
 	time.end();
@@ -6156,19 +6202,18 @@ void WLOP::runMoveBackward()
 		if ((real_step_size[i] / step_size) < cooling_parameter)
 		{
 			dual_v.is_fixed_sample = true;
-			dual_v.is_boundary = true;
+			//dual_v.is_boundary = true;
 			continue;
 		}
 
 		bool keep_going = true;
-
 		for (int j = 0; j < dual_v.neighbors.size(); j++)
 		{
 			CVertex& t = dual_samples->vert[dual_v.neighbors[j]];
 
 			double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), t.N());
 
-			if (angle > stop_angle_threshold)
+			if (angle > stop_angle_threshold || dual_v.N() * t.N() < 0)
 			{
 				keep_going = false;
 				break;
@@ -6197,69 +6242,69 @@ void WLOP::runMoveBackward()
 	computeConstNeighborhoodUsingRadius(local_radius);
 
 	// smooth neighbor
-	for (int i = 0; i < dual_samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-		CVertex& v = samples->vert[i];
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		CVertex& v = samples->vert[i];
+// 
+// 		double number_of_fixed = 0;
+// 		for (int j = 0; j < v.neighbors.size(); j++)
+// 		{
+// 			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+// 			if (dual_t.is_fixed_sample)
+// 			{
+// 				number_of_fixed += 1.0;
+// 			}
+// 		}
+// 
+// 		if (number_of_fixed > v.neighbors.size() * 0.3)
+// 		{
+// 			dual_v.is_fixed_sample = true;
+// 		}
+// 		else
+// 		{
+// 			dual_v.is_fixed_sample = false;
+// 		}
+// 	}
 
-		double number_of_fixed = 0;
-		for (int j = 0; j < v.neighbors.size(); j++)
-		{
-			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
-			if (dual_t.is_fixed_sample)
-			{
-				number_of_fixed += 1.0;
-			}
-		}
 
-		if (number_of_fixed > v.neighbors.size() * 0.46)
-		{
-			dual_v.is_fixed_sample = true;
-		}
-		else
-		{
-			dual_v.is_fixed_sample = false;
-		}
-	}
-
-
-	if (para->getBool("Need Compute PCA"))
-		//if (true)
-	{
-		cout << "Compute PCA  " << endl;
-		dual_samples->vn = dual_samples->vert.size();
-		CVertex v;
-		mesh_temp.assign(samples->vn, v);
-		cout << "Compute PCA" << endl;
-		for (int i = 0; i < dual_samples->vn; i++)
-		{
-			mesh_temp[i].P() = dual_samples->vert[i].P();
-		}
-
-		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-		vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
-
-		for (int i = 0; i < dual_samples->vn; i++)
-		{
-			Point3f& new_normal = mesh_temp[i].N();
-			CVertex& v = dual_samples->vert[i];
-
-			if (v.is_fixed_sample)
-			{
-				continue;
-			}
-
-			if (v.N() * new_normal > 0)
-			{
-				v.N() = new_normal;
-			}
-			else
-			{
-				v.N() = -new_normal;
-			}
-			v.recompute_m_render();
-		}
-	}
+// 	if (para->getBool("Need Compute PCA"))
+// 		//if (true)
+// 	{
+// 		cout << "Compute PCA  " << endl;
+// 		dual_samples->vn = dual_samples->vert.size();
+// 		CVertex v;
+// 		mesh_temp.assign(samples->vn, v);
+// 		cout << "Compute PCA" << endl;
+// 		for (int i = 0; i < dual_samples->vn; i++)
+// 		{
+// 			mesh_temp[i].P() = dual_samples->vert[i].P();
+// 		}
+// 
+// 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+// 		vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
+// 
+// 		for (int i = 0; i < dual_samples->vn; i++)
+// 		{
+// 			Point3f& new_normal = mesh_temp[i].N();
+// 			CVertex& v = dual_samples->vert[i];
+// 
+// 			if (v.is_fixed_sample)
+// 			{
+// 				continue;
+// 			}
+// 
+// 			if (v.N() * new_normal > 0)
+// 			{
+// 				v.N() = new_normal;
+// 			}
+// 			else
+// 			{
+// 				v.N() = -new_normal;
+// 			}
+// 			v.recompute_m_render();
+// 		}
+// 	}
 }
 
 //void WLOP::runMoveBackward()
@@ -7307,9 +7352,9 @@ void WLOP::computeInitialNeighborSize()
 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 2.0));
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 2.0));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 4.0));
-	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.25));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 4.0));
+	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 6.0));
+	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 1.5));
 
 
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
