@@ -329,14 +329,14 @@ void GLArea::paintGL()
 
 	if (para->getBool("Show Normal")) 
 	{
-    if (para->getBool("Show Dual Samples"))
-    {
-      glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
-    }
-    else if(para->getBool("Show Samples"))
+		if (para->getBool("Show Samples"))
 		{
 			glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentSamples());
 		}
+    else if (para->getBool("Show Dual Samples"))
+    {
+      glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentDualSamples());
+    }
 		else
 		{
 			if(!dataMgr.isOriginalEmpty())
