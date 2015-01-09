@@ -124,6 +124,8 @@ private:
 
 
 
+	void runComputeAverageDistThreshold();
+
 private:
 	RichParameterSet* para;
 

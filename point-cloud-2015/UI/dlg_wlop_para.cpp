@@ -967,6 +967,10 @@ void WlopParaDlg::applySearchNeighborhood()
 
 void WlopParaDlg::applySmoothNeighborhood()
 {
+	CMesh* samples = area->dataMgr.getCurrentSamples();
+	GlobalFun::smoothConfidences(samples, global_paraMgr.wLop.getDouble("CGrid Radius"));
+	GlobalFun::normalizeConfidence(samples->vert, 0.0);
+
 	m_paras->wLop.setValue("Run Smooth Neighborhood", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Smooth Neighborhood", BoolValue(false));

@@ -275,7 +275,7 @@ void ParameterMgr::initWLopParameter()
   wLop.addParam(new RichBool("Run Normal Reform", false));
 
 	wLop.addParam(new RichDouble("Current Movement Error", 0.0));
-	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
+	
 
 	wLop.addParam(new RichDouble("Original Averaging KNN", 415));
 
@@ -314,6 +314,13 @@ void ParameterMgr::initWLopParameter()
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 	//void WLOP::runComputeConfidence()
+	wLop.addParam(new RichBool("Run Estimate Average Dist Threshold", false));
+	wLop.addParam(new RichBool("Use Average Dist Threshold", true));
+
+	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.00));
+	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.80));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
+
 
 }
 
