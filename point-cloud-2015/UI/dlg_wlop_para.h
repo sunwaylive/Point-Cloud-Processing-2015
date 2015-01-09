@@ -49,6 +49,19 @@ class WlopParaDlg : public QFrame
 		void get_eigen_neighbor_para1(double _val);
 		void get_eigen_neighbor_para2(double _val);
 
+		void Average_Closest_Dist(double _val);
+		void search_dual_index_para(double _val);
+		void Average_Dist_To_Input_Threshold(double _val);
+		void Choose_ADT_Threshold_Percentage(double _val);
+		void Original_Confidence_KNN(double _val);
+		void Similarity_Term_Neighbor_Para(double _val);
+		void Similarity_Length_Outlier_Threshold(double _val);
+		void Density_Confidence_Segment_Threshold(double _val);
+		void Eigen_Directional_Threshold(double _val);
+		void Save_Move_Dist_Along_Normal_Para(double _val);
+		void Big_Repulsion_Power(double _val);
+
+
 		void isDensity(bool _val);
 		void isPca(bool _val);
     void needSampleAverage(bool _val);
@@ -70,6 +83,14 @@ class WlopParaDlg : public QFrame
 		void useEllipsoidWeight(bool _val);
 		void useEllipsoidRepulsion(bool _val);
 
+
+
+		void use_Average_Dist_Threshold(bool _val);
+		void use_Confidence_To_Combine_Normal(bool _val);
+		void use_Only_Do_Repuslion(bool _val);
+		void use_Only_Do_Avergage(bool _val);
+		void use_Use_Confidence_To_Merge(bool _val);
+
 		//
 		void applyWlop();
     void applyDualWlop();
@@ -77,6 +98,9 @@ class WlopParaDlg : public QFrame
     void applyStepForward();
     void applyDualConnection();
 		void applyMatLOP();
+
+		void applyRunEstimateAverageDistThreshold();
+
 
 		void copySamplesToDualSamples();
 

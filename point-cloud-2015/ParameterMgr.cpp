@@ -288,7 +288,7 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichDouble("Progressive Min KNN", 20));
 	wLop.addParam(new RichDouble("Progressive Max KNN", 2000));
-	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
+	wLop.addParam(new RichBool("Run Progressive Neighborhood", true));
 
 	wLop.addParam(new RichBool("Run Ellipsoid Fitting", false));
 	wLop.addParam(new RichBool("Run MAT LOP", false));
@@ -302,24 +302,43 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Compute Eigen Neighborhood", false));
 
 
-	wLop.addParam(new RichBool("Only Use Repulsion", false));
-
 
 	//new parameters:
+	wLop.addParam(new RichDouble("Average Closest Dist", 0.05));
 
-	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
+	wLop.addParam(new RichDouble("Search Dual Index Para", 1.5));
+	wLop.addParam(new RichBool("Use Progressive Search Index", true));
 
-	//void WLOP::runRegularizeNormals()
-
-	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 	//void WLOP::runComputeConfidence()
 	wLop.addParam(new RichBool("Run Estimate Average Dist Threshold", false));
-	wLop.addParam(new RichBool("Use Average Dist Threshold", true));
+	wLop.addParam(new RichBool("Use Average Dist Threshold", false));
+
 
 	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.00));
-	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.80));
+	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.70));
 	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
+
+
+	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
+	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.5));
+	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 5.8));//no need?
+
+
+	//void WLOP::runRegularizeNormals()
+	wLop.addParam(new RichDouble("Density Confidence Segment Threshold", 0.8));
+	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.95));
+	wLop.addParam(new RichBool("Use Confidence To Combine Normal", true));
+
+	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
+
+
+	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.3));
+	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
+
+	wLop.addParam(new RichBool("Only Do Repuslion", false));
+	wLop.addParam(new RichBool("Only Do Avergage", false));
+	wLop.addParam(new RichBool("Use Confidence To Merge", true));
 
 
 }

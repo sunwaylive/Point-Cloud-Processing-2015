@@ -170,14 +170,14 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 	}
 
 
-// 	if (v.is_skel_branch)
-// 	{
-// 		return cBlue;
-// 	}
-// 	if (v.is_skel_virtual)
-// 	{
-// 		return cGreen;
-// 	}
+	if (v.is_skel_branch && bUseConfidenceColor)
+  	{
+  		return cBlue;
+  	}
+	if (v.is_skel_virtual && bUseConfidenceColor)
+  	{
+  		return cGreen;
+  	}
 
 
 	if (v.is_boundary && bUseConfidenceColor)

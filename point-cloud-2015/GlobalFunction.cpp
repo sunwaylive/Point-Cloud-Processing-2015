@@ -1041,7 +1041,7 @@ vector<double> GlobalFun::computeDensityConfidence(CMesh *mesh, double radius)
 
 vector<double> GlobalFun::smoothConfidences(CMesh *mesh, double radius)
 {
-	cout << "smooth neighbors confidence: " << mesh->vert.size() << endl;
+	cout << "smooth neighbors confidence: " /*<< mesh->vert.size()*/ << endl;
 	double radius2 = radius * radius;
 	double iradius16 = -4 / radius2;
 

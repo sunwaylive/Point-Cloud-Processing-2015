@@ -105,9 +105,26 @@ void WlopParaDlg::initConnects()
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
   }
 
+	connect(ui->Average_Closest_Dist, SIGNAL(valueChanged(double)), this, SLOT(Average_Closest_Dist(double)));
+	connect(ui->search_dual_index_para, SIGNAL(valueChanged(double)), this, SLOT(search_dual_index_para(double)));
+	connect(ui->Average_Dist_To_Input_Threshold, SIGNAL(valueChanged(double)), this, SLOT(Average_Dist_To_Input_Threshold(double)));
+	connect(ui->Choose_ADT_Threshold_Percentage, SIGNAL(valueChanged(double)), this, SLOT(Choose_ADT_Threshold_Percentage(double)));
+	connect(ui->Original_Confidence_KNN, SIGNAL(valueChanged(double)), this, SLOT(Original_Confidence_KNN(double)));
+	connect(ui->Similarity_Term_Neighbor_Para, SIGNAL(valueChanged(double)), this, SLOT(Similarity_Term_Neighbor_Para(double)));
+	connect(ui->Similarity_Length_Outlier_Threshold, SIGNAL(valueChanged(double)), this, SLOT(Similarity_Length_Outlier_Threshold(double)));
+	connect(ui->Density_Confidence_Segment_Threshold, SIGNAL(valueChanged(double)), this, SLOT(Density_Confidence_Segment_Threshold(double)));
+	connect(ui->Eigen_Directional_Threshold, SIGNAL(valueChanged(double)), this, SLOT(Eigen_Directional_Threshold(double)));
+	connect(ui->Save_Move_Dist_Along_Normal_Para, SIGNAL(valueChanged(double)), this, SLOT(Save_Move_Dist_Along_Normal_Para(double)));
+	connect(ui->Big_Repulsion_Power, SIGNAL(valueChanged(double)), this, SLOT(Big_Repulsion_Power(double)));
+
 	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para1(bool)));
 	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para2(bool)));
 
+	connect(ui->Use_Average_Dist_Threshold, SIGNAL(clicked(bool)), this, SLOT(use_Average_Dist_Threshold(bool)));
+	connect(ui->Use_Confidence_To_Combine_Normal, SIGNAL(clicked(bool)), this, SLOT(use_Confidence_To_Combine_Normal(bool)));
+	connect(ui->Only_Do_Repuslion, SIGNAL(clicked(bool)), this, SLOT(use_Only_Do_Repuslion(bool)));
+	connect(ui->Only_Do_Avergage, SIGNAL(clicked(bool)), this, SLOT(use_Only_Do_Avergage(bool)));
+	connect(ui->Use_Confidence_To_Merge, SIGNAL(clicked(bool)), this, SLOT(use_Use_Confidence_To_Merge(bool)));
 
   if(!connect(ui->Use_Elliptical_Original_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useEllipticalOriginalNeighbor(bool))))
   {
@@ -209,6 +226,7 @@ void WlopParaDlg::initConnects()
 	connect(ui->compute_eigen_directions, SIGNAL(clicked()), this, SLOT(applyComputeEigenDirections()));
 	connect(ui->compute_eigen_neighborhood, SIGNAL(clicked()), this, SLOT(applyComputeEigenNeighbor()));
 
+	connect(ui->Run_Estimate_Average_Dist_Threshold, SIGNAL(clicked()), this, SLOT(applyRunEstimateAverageDistThreshold()));
 
 }
 
@@ -232,6 +250,19 @@ bool WlopParaDlg::initWidgets()
 
 	ui->eigen_neighbor_para1->setValue(m_paras->wLop.getDouble("Eigen Neighborhood Para1"));
 	ui->eigen_neighbor_para2->setValue(m_paras->wLop.getDouble("Eigen Neighborhood Para2"));
+
+	ui->Average_Closest_Dist->setValue(m_paras->wLop.getDouble("Average Closest Dist"));
+	ui->search_dual_index_para->setValue(m_paras->wLop.getDouble("Search Dual Index Para"));
+	ui->Average_Dist_To_Input_Threshold->setValue(m_paras->wLop.getDouble("Average Dist To Input Threshold"));
+	ui->Choose_ADT_Threshold_Percentage->setValue(m_paras->wLop.getDouble("Choose ADT Threshold Percentage"));
+	ui->Original_Confidence_KNN->setValue(m_paras->wLop.getDouble("Original Confidence KNN"));
+	ui->Similarity_Term_Neighbor_Para->setValue(m_paras->wLop.getDouble("Similarity Term Neighbor Para"));
+	ui->Similarity_Length_Outlier_Threshold->setValue(m_paras->wLop.getDouble("Similarity Length Outlier Threshold"));
+	ui->Density_Confidence_Segment_Threshold->setValue(m_paras->wLop.getDouble("Density Confidence Segment Threshold"));
+	ui->Eigen_Directional_Threshold->setValue(m_paras->wLop.getDouble("Eigen Directional Threshold"));
+	ui->Save_Move_Dist_Along_Normal_Para->setValue(m_paras->wLop.getDouble("Save Move Dist Along Normal Para"));
+	ui->Big_Repulsion_Power->setValue(m_paras->wLop.getDouble("Big Repulsion Power"));
+
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -282,6 +313,18 @@ bool WlopParaDlg::initWidgets()
 	ui->use_ellipsoid_weight->setCheckState(state);
 	state = m_paras->wLop.getBool("Use Ellipsoid Repulsion") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->use_ellipsoid_repulsion->setCheckState(state);
+
+
+	state = m_paras->wLop.getBool("Use Average Dist Threshold") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_Average_Dist_Threshold->setCheckState(state);
+	state = m_paras->wLop.getBool("Use Confidence To Combine Normal") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_Confidence_To_Combine_Normal->setCheckState(state);
+	state = m_paras->wLop.getBool("Only Do Repuslion") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Only_Do_Repuslion->setCheckState(state);
+	state = m_paras->wLop.getBool("Only Do Avergage") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Only_Do_Avergage->setCheckState(state);
+	state = m_paras->wLop.getBool("Use Confidence To Merge") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->Use_Confidence_To_Merge->setCheckState(state);
 
 	update();
 	repaint();
@@ -377,6 +420,62 @@ void WlopParaDlg::get_eigen_neighbor_para2(double _val)
 	m_paras->wLop.setValue("Eigen Neighborhood Para2", DoubleValue(_val));
 }
 
+
+
+void WlopParaDlg::Average_Closest_Dist(double _val)
+{
+	m_paras->wLop.setValue("Average Closest Dist", DoubleValue(_val));
+}
+
+void WlopParaDlg::search_dual_index_para(double _val)
+{
+	m_paras->wLop.setValue("Search Dual Index Para", DoubleValue(_val));
+}
+
+void WlopParaDlg::Average_Dist_To_Input_Threshold(double _val)
+{
+	m_paras->wLop.setValue("Average Dist To Input Threshold", DoubleValue(_val));
+}
+
+void WlopParaDlg::Choose_ADT_Threshold_Percentage(double _val)
+{
+	m_paras->wLop.setValue("Choose ADT Threshold Percentage", DoubleValue(_val));
+}
+
+void WlopParaDlg::Original_Confidence_KNN(double _val)
+{
+	m_paras->wLop.setValue("Original Confidence KNN", DoubleValue(_val));
+}
+
+void WlopParaDlg::Similarity_Term_Neighbor_Para(double _val)
+{
+	m_paras->wLop.setValue("Similarity Term Neighbor Para", DoubleValue(_val));
+}
+
+void WlopParaDlg::Similarity_Length_Outlier_Threshold(double _val)
+{
+	m_paras->wLop.setValue("Similarity Length Outlier Threshold", DoubleValue(_val));
+}
+
+void WlopParaDlg::Density_Confidence_Segment_Threshold(double _val)
+{
+	m_paras->wLop.setValue("Density Confidence Segment Threshold", DoubleValue(_val));
+}
+
+void WlopParaDlg::Eigen_Directional_Threshold(double _val)
+{
+	m_paras->wLop.setValue("Eigen Directional Threshold", DoubleValue(_val));
+}
+
+void WlopParaDlg::Save_Move_Dist_Along_Normal_Para(double _val)
+{
+	m_paras->wLop.setValue("Save Move Dist Along Normal Para", DoubleValue(_val));
+}
+
+void WlopParaDlg::Big_Repulsion_Power(double _val)
+{
+	m_paras->wLop.setValue("Big Repulsion Power", DoubleValue(_val));
+}
 
 void WlopParaDlg::isDensity(bool _val)
 {
@@ -485,6 +584,34 @@ void WlopParaDlg::useEllipsoidWeight(bool _val)
 void WlopParaDlg::useEllipsoidRepulsion(bool _val)
 {
 	m_paras->wLop.setValue("Use Ellipsoid Repulsion", BoolValue(_val));
+}
+
+
+
+
+void WlopParaDlg::use_Average_Dist_Threshold(bool _val)
+{
+	m_paras->wLop.setValue("Use Average Dist Threshold", BoolValue(_val));
+}
+
+void WlopParaDlg::use_Confidence_To_Combine_Normal(bool _val)
+{
+	m_paras->wLop.setValue("Use Confidence To Combine Normal", BoolValue(_val));
+}
+
+void WlopParaDlg::use_Only_Do_Repuslion(bool _val)
+{
+	m_paras->wLop.setValue("Only Do Repuslion", BoolValue(_val));
+}
+
+void WlopParaDlg::use_Only_Do_Avergage(bool _val)
+{
+	m_paras->wLop.setValue("Only Do Avergage", BoolValue(_val));
+}
+
+void WlopParaDlg::use_Use_Confidence_To_Merge(bool _val)
+{
+	m_paras->wLop.setValue("Use Confidence To Merge", BoolValue(_val));
 }
 
 // apply
@@ -684,6 +811,15 @@ void WlopParaDlg::applyDualConnection()
 	 //calculation_thread.start();
 	 
  }
+
+
+ void WlopParaDlg::applyRunEstimateAverageDistThreshold()
+ {
+	 m_paras->wLop.setValue("Run Estimate Average Dist Threshold", BoolValue(true));
+	 area->runWlop();
+	 m_paras->wLop.setValue("Run Estimate Average Dist Threshold", BoolValue(false));
+ }
+
 
  void WlopParaDlg::applyMatLOP()
  {
