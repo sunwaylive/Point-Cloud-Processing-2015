@@ -304,6 +304,17 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichBool("Only Use Repulsion", false));
 
+
+	//new parameters:
+
+	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
+
+	//void WLOP::runRegularizeNormals()
+
+	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
+
+	//void WLOP::runComputeConfidence()
+
 }
 
 void ParameterMgr::initSkeletonParameter()
