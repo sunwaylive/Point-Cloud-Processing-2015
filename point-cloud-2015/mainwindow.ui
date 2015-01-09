@@ -277,7 +277,22 @@
    <addaction name="separator"/>
    <addaction name="action_Dual_Circle"/>
    <addaction name="action_Dual_Dot"/>
+   <addaction name="action_Dual_Sphere"/>
    <addaction name="actionShow_Picked_Neighbor"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+   <addaction name="actionAmbient_Color"/>
+   <addaction name="actionDiffuse_Color"/>
+   <addaction name="actionFeature_Color"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">

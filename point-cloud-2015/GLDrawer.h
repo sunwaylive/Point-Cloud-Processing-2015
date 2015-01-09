@@ -129,6 +129,8 @@ private:
 	QColor sample_color;
 	QColor feature_color;
 	QColor normal_color;
+	QColor dlink_color;
+
 	GLColor pick_color;
 
 	QColor skel_bone_color;

@@ -173,6 +173,8 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichColor("Feature Color", QColor(0, 0, 255) ));
 	drawer.addParam(new RichColor("Pick Point Color", QColor(128, 128, 0) ));
 	drawer.addParam(new RichColor("Pick Point DNN Color", QColor(0, 0, 155) ));
+	drawer.addParam(new RichColor("DLink Color", QColor(0, 0, 0)));
+
 
 	drawer.addParam(new RichColor("Skeleton Bone Color", QColor(200, 0, 0) ));
 	drawer.addParam(new RichColor("Skeleton Node Color", QColor(50, 250, 50) ));
@@ -307,7 +309,7 @@ void ParameterMgr::initWLopParameter()
 void ParameterMgr::initSkeletonParameter()
 {
   /// 
-  skeleton.addParam(new RichDouble("Repulsion Power", 2.0));
+  skeleton.addParam(new RichDouble("Repulsion Power", 1.0));
   skeleton.addParam(new RichDouble("Average Power", 2.0));
 
   /// 

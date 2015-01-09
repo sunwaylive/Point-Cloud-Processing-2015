@@ -912,7 +912,9 @@ void MainWindow::normalColor()
 
 void MainWindow::featureColor()
 {
-	area->changeColor("Feature Color");
+	//area->changeColor("Feature Color");
+	area->changeColor("DLink Color");
+
 	area->updateGL();
 }
 

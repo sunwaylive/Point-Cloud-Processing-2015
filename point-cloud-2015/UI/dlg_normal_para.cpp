@@ -150,6 +150,7 @@ void NormalParaDlg::applyNormalSmoothing()
 
 void NormalParaDlg::applyPCANormal()
 {
+	bool use_previous_orientation = global_paraMgr.norSmooth.getBool("Run Anistropic PCA");
 	if (m_paras->norSmooth.getBool("Run Anistropic PCA"))
 	{
 		area->runNormalSmoothing();
@@ -189,14 +190,18 @@ void NormalParaDlg::applyPCANormal()
  
      vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
 
-		 for (int i = 0; i < samples->vert.size(); i++)
+		 if (use_previous_orientation)
 		 {
-			 CVertex& v = samples->vert[i];
-			 if (v.N() * remember_normal[i] < 0)
+			 for (int i = 0; i < samples->vert.size(); i++)
 			 {
-				 v.N() *= -1;
+				 CVertex& v = samples->vert[i];
+				 if (v.N() * remember_normal[i] < 0)
+				 {
+					 v.N() *= -1;
+				 }
 			 }
 		 }
+
 	}
 	area->dataMgr.recomputeQuad();
 	area->updateGL();

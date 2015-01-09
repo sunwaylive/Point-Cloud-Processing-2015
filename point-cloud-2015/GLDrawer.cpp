@@ -35,6 +35,8 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 
 	original_dot_size = para->getDouble("Original Dot Size");
 	normal_color = para->getColor("Normal Line Color");
+	dlink_color = para->getColor("DLink Color");
+
 	feature_color = para->getColor("Feature Color");
 	pick_color = para->getColor("Pick Point Color");
 
@@ -972,11 +974,11 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 			Point3f diff = v.P() - dual_v.P();
 			double proj_dist = diff * v.N();
 			Point3f proj_point = v.P() - v.N() * proj_dist;
-			glDrawLine(v.P(), proj_point, cBrown, width);
+			glDrawLine(v.P(), proj_point, dlink_color, width);
 		}
 		else
 		{
-			glDrawLine(v.P(), dual_v.P(), cBrown, width);
+			glDrawLine(v.P(), dual_v.P(), dlink_color, width);
 		}
 
 
