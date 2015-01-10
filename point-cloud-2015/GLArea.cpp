@@ -35,6 +35,9 @@ GLArea::GLArea(QWidget *parent): QGLWidget(/*QGLFormat(QGL::DoubleBuffer | QGL::
 	CVertex v;
 	cout << sizeof(v) << endl;
 	loadDefaultModel();
+
+	show_something = false;
+	something = 0;
 }
 
 GLArea::~GLArea(void)
@@ -141,6 +144,10 @@ void GLArea::resizeGL(int w, int h)
 
 void GLArea::paintGL() 
 {
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
+	}
 	paintMutex.lock();{
 
 	if (is_paintGL_locked)
@@ -243,7 +250,10 @@ void GLArea::paintGL()
 			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSamples());
 	}
 
-  
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
+	}
 
   if(para->getBool("Show Dual Samples"))
   {
@@ -259,6 +269,11 @@ void GLArea::paintGL()
 		if (para->getBool("Show Dual Samples Sphere"))
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
   }
+
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
+	}
 
 	if (para->getBool("Show Target Samples"))
 	{
@@ -292,10 +307,16 @@ void GLArea::paintGL()
 
   lightOnOff(para->getBool("Light On or Off"));
 
+
 	if (para->getBool("Show Dual Connection"))
 	{
 		glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
 		glDrawer.drawDualSampleRelations(dataMgr.getCurrentTargetSamples(), dataMgr.getCurrentTargetDualSamples());
+	}
+
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
 	}
 
 	if (para->getBool("Show Eigen Directions"))
@@ -326,6 +347,11 @@ void GLArea::paintGL()
 
 	}
 
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
+	}
+
 
 	if (para->getBool("Show Normal")) 
 	{
@@ -342,6 +368,12 @@ void GLArea::paintGL()
 			if(!dataMgr.isOriginalEmpty())
 			  glDrawer.draw(GLDrawer::NORMAL, dataMgr.getCurrentOriginal());
 		}
+	}
+
+
+	if (show_something)
+	{
+		cout << "show something: " << something++ << endl;
 	}
 
 	if (para->getBool("Show Skeleton"))
@@ -396,6 +428,13 @@ void GLArea::paintGL()
   
   		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
   	}
+
+
+		if (show_something)
+		{
+			cout << "show something: Pick Dual Point" << something++ << endl;
+		}
+
 
 	if (!(takeSnapTile && para->getBool("No Snap Radius")))
 	{
@@ -459,6 +498,13 @@ void GLArea::paintGL()
     
   }
 
+	if (show_something)
+	{
+		cout << "show something: final" << something++ << endl;
+
+	}
+
+
   glDepthMask(GL_TRUE);
   lightOnOff(para->getBool("Light On or Off"));
 
@@ -484,6 +530,14 @@ void GLArea::paintGL()
 	}
 
 	}
+
+	if (show_something)
+	{
+		cout << "show something: final" << something++ << endl;
+		show_something = false;
+		something = 0;
+	}
+
 PAINT_RETURN:
 	paintMutex.unlock();
 }
@@ -1131,7 +1185,7 @@ void GLArea::runWlop()
 
   global_paraMgr.glarea.setValue("GLarea Busying", BoolValue(true));
 
-	//cout << "wloppppppppppppppppppppppppppppp 1" << endl;
+	cout << "wloppppppppppppppppppppppppppppp 1" << endl;
 
   bool is_break = false;
 	for (int i = 0; i < global_paraMgr.wLop.getDouble("Num Of Iterate Time"); i++)
@@ -1171,7 +1225,7 @@ void GLArea::runWlop()
 // 		}
 // 	}
 
-	//cout << "wloppppppppppppppppppppppppppppp 2" << endl;
+	cout << "wloppppppppppppppppppppppppppppp 2" << endl;
 
   if (is_break)
   {
@@ -1192,7 +1246,9 @@ void GLArea::runWlop()
 	global_paraMgr.wLop.setValue("Run Anisotropic LOP", BoolValue(false));
 	global_paraMgr.wLop.setValue("Run Skel WLOP", BoolValue(false));
 	
-	//cout << "wloppppppppppppppppppppppppppppp 3" << endl;
+	cout << "wloppppppppppppppppppppppppppppp 3" << endl;
+
+	show_something = true;
 }
 
 void GLArea::runSkeletonization_linear()

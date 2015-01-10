@@ -2380,7 +2380,15 @@ void WLOP::runComputeConfidence()
 
 		}
 
-		v.eigen_confidence = sum_dist / sum_weight;
+		if (sum_weight > 0)
+		{
+			v.eigen_confidence = sum_dist / sum_weight;
+		}
+		else
+		{
+			cout << "NO neighbor???" << endl;
+			v.eigen_confidence = 1;
+		}
 
 		if (use_dist_threshold)
 		{
@@ -2428,11 +2436,11 @@ void WLOP::runComputeConfidence()
 	}
 
 	//ofstream outfile2("average_neighbor_dist2.txt");
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		//outfile2 << v.eigen_confidence << endl;
-	}
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		//outfile2 << v.eigen_confidence << endl;
+// 	}
 
 
 	cout << "finshed compute confidence#######" << endl;

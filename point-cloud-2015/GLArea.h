@@ -173,6 +173,9 @@ private:
 
 public:
 	
+	bool show_something;
+	int something;
+
 	DataMgr dataMgr;
 	GLDrawer glDrawer;	
 	

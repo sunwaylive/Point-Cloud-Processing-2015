@@ -633,6 +633,7 @@ void WlopParaDlg::applyWlop()
   //  calculation_thread.start();
   //}
 
+	cout << "finish WlopParaDlg::applyWlop()" << endl;
 }
 
 //void WlopParaDlg::applyDualConnection()
@@ -1246,7 +1247,7 @@ void WlopParaDlg::oneKEY()
 	{
 		m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
 		m_paras->wLop.setValue("Need Similarity", BoolValue(true));
-		m_paras->wLop.setValue("Use Confidence", BoolValue(true));
+		//m_paras->wLop.setValue("Use Confidence", BoolValue(true));
 		m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
 		m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
 
@@ -1276,9 +1277,11 @@ void WlopParaDlg::oneKEY()
 		}
 
 		//applyComputeConfidence();
-		applyComputeConfidence();
+		//applyComputeConfidence();
 		applyRegularizeNormals();
 		applyWlop();
+
+		cout << "finish one key" << endl;
 	}
 
 
