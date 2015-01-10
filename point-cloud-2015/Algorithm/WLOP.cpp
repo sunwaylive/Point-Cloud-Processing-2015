@@ -190,6 +190,7 @@ void WLOP::initVertexes(bool clear_neighbor)
 void WLOP::run()
 {
 
+	cout << "1" << endl;
   if (para->getBool("Run Projection"))
   {
     runProjection();
@@ -246,6 +247,8 @@ void WLOP::run()
     return;
   }
 
+	cout << "2" << endl;
+
   if (para->getBool("Run Regularize Samples"))
   {
     runRegularizeSamples();
@@ -277,6 +280,9 @@ void WLOP::run()
 		return;
 	}
 
+	cout << "3" << endl;
+
+
 	if (para->getBool("Run Show Pick Distribution"))
 	{
 		runShowPickDistribution();
@@ -294,7 +300,7 @@ void WLOP::run()
 		runProgressiveNeighborhood();
 		return;
 	}
-
+	cout << "3 1" << endl;
 	if (para->getBool("Run Inner Points Classification"))
 	{
 		innerpointsClassification();
@@ -314,6 +320,8 @@ void WLOP::run()
 		return;
 	}
 
+	cout << "3 2" << endl;
+
 	if (para->getBool("Run Smooth Neighborhood"))
 	{
 		runComputeAverageDistThreshold();
@@ -327,6 +335,7 @@ void WLOP::run()
 		return;
 	}
 
+	cout << "4" << endl;
 
 	if (para->getBool("Run Move Backward"))
 	{
@@ -377,6 +386,8 @@ void WLOP::run()
 		return;
 	}
 
+	cout << "5" << endl;
+
 	if (para->getBool("Compute Eigen Directions"))
 	{
 		if (para->getBool("Run Skel WLOP"))
@@ -404,6 +415,7 @@ void WLOP::run()
 		return;
 	}
 
+	cout << "6" << endl;
 
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
@@ -415,6 +427,7 @@ void WLOP::run()
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
+		cout << "run iterate" << endl;
 		iterate();
 		
 		nTimeIterated ++;
