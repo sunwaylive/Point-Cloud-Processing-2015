@@ -424,6 +424,14 @@ void MainWindow::saveFile()
 			area->dataMgr.savePly(file, *area->dataMgr.getCurrentSamples());
 		}
 
+		if (global_paraMgr.glarea.getBool("Show Dual Samples"))
+		{
+			//area->dataMgr.eraseRemovedSamples();
+			file.replace(".ply", "_dual.ply");
+			area->dataMgr.savePly(file, *area->dataMgr.getCurrentDualSamples());
+			file.replace("_dual.ply", ".ply");
+		}
+
 		if (file.endsWith("ply") && !area->dataMgr.isOriginalEmpty())
 		{
 			file.replace(".ply", "_original.ply");
@@ -431,6 +439,14 @@ void MainWindow::saveFile()
 		}
 
 		return;
+	}
+
+	if (global_paraMgr.glarea.getBool("Show Dual Samples"))
+	{
+		//area->dataMgr.eraseRemovedSamples();
+		file.replace(".ply", "_dual.ply");
+		area->dataMgr.savePly(file, *area->dataMgr.getCurrentDualSamples());
+		file.replace("_dual.ply", ".ply");
 	}
 
 	if (file.endsWith("ply") && !area->dataMgr.isSamplesEmpty())

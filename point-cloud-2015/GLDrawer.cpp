@@ -174,9 +174,10 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
   	{
   		return cBlue;
   	}
+
 	if (v.is_skel_virtual && bUseConfidenceColor)
   	{
-  		return cGreen;
+  		return cGray;
   	}
 
 

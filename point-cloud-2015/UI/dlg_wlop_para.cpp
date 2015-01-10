@@ -1252,7 +1252,7 @@ void WlopParaDlg::oneKEY()
 
 
 
-		applyComputeConfidence();
+		//applyComputeConfidence();
 
 
 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
@@ -1275,6 +1275,8 @@ void WlopParaDlg::oneKEY()
 			}
 		}
 
+		//applyComputeConfidence();
+		applyComputeConfidence();
 		applyRegularizeNormals();
 		applyWlop();
 	}

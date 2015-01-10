@@ -793,7 +793,8 @@ void GLArea::changeColor(QString paraName)
   {
     return;
   }
-  
+	
+
 	qcolor = QColorDialog::getColor(qcolor);
 
 	if(qcolor.isValid()){
@@ -1954,9 +1955,10 @@ void GLArea::removePickPoint()
 			if(pickList[i] < 0 || pickList[i] >= samples->vert.size())
 				continue;
 
-			CVertex &v = samples->vert[pickList[i]]; 
-			samples->vert.erase(samples->vert.begin() + v.m_index);
-      dual_samples->vert.erase(dual_samples->vert.begin() + v.m_index);
+			CVertex v = samples->vert[pickList[i]]; 
+			int idx = v.m_index;
+			samples->vert.erase(samples->vert.begin() + idx);
+			dual_samples->vert.erase(dual_samples->vert.begin() + idx);
 		}
 	}
 	else

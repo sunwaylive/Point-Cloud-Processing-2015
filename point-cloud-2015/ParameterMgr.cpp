@@ -288,7 +288,7 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichDouble("Progressive Min KNN", 20));
 	wLop.addParam(new RichDouble("Progressive Max KNN", 2000));
-	wLop.addParam(new RichBool("Run Progressive Neighborhood", true));
+	wLop.addParam(new RichBool("Run Progressive Neighborhood", false));
 
 	wLop.addParam(new RichBool("Run Ellipsoid Fitting", false));
 	wLop.addParam(new RichBool("Run MAT LOP", false));
@@ -304,31 +304,31 @@ void ParameterMgr::initWLopParameter()
 
 
 	//new parameters:
-	wLop.addParam(new RichDouble("Average Closest Dist", 0.05));
+	wLop.addParam(new RichDouble("Average Closest Dist", 0.02301));
 
-	wLop.addParam(new RichDouble("Search Dual Index Para", 1.5));
+	wLop.addParam(new RichDouble("Search Dual Index Para", 2.1));
 	wLop.addParam(new RichBool("Use Progressive Search Index", true));
 
 
 	//void WLOP::runComputeConfidence()
 	wLop.addParam(new RichBool("Run Estimate Average Dist Threshold", false));
-	wLop.addParam(new RichBool("Use Average Dist Threshold", false));
+	wLop.addParam(new RichBool("Use Average Dist Threshold", true));
 
 
-	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.00));
-	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.70));
-	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
+	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.11889));
+	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.50000));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 355));
 
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
-	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.5));
+	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
 	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 5.8));//no need?
 
 
 	//void WLOP::runRegularizeNormals()
 	wLop.addParam(new RichDouble("Density Confidence Segment Threshold", 0.8));
-	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.95));
-	wLop.addParam(new RichBool("Use Confidence To Combine Normal", true));
+	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.95000));
+	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
@@ -390,8 +390,8 @@ void ParameterMgr::initSkeletonParameter()
 
 	//step1
 	skeleton.addParam(new RichDouble("Combine Too Close Threshold", 0.01));
-	skeleton.addParam(new RichDouble("Sigma KNN", 66));//this one is hard to determine, should be small for narrow region, but will lead to unnecessary small branches
-	skeleton.addParam(new RichDouble("Eigen Feature Identification Threshold", 0.901));
+	skeleton.addParam(new RichDouble("Sigma KNN", 16));//this one is hard to determine, should be small for narrow region, but will lead to unnecessary small branches
+	skeleton.addParam(new RichDouble("Eigen Feature Identification Threshold", 0.95));
 
 	//step2
 	skeleton.addParam(new RichDouble("Branches Search Angle", 25));
@@ -441,7 +441,7 @@ void ParameterMgr::initNormalSmootherParameter()
 {
 	norSmooth.addParam(new RichString("Algorithm Name", "NormalSmooth") );
 
-	norSmooth.addParam(new RichInt("PCA KNN", 15));
+	norSmooth.addParam(new RichInt("PCA KNN", 9));
 	norSmooth.addParam(new RichDouble("CGrid Radius", grid_r));
 	norSmooth.addParam(new RichDouble("Sharpe Feature Bandwidth Sigma", 90));
 	norSmooth.addParam(new RichBool("Run Anistropic PCA", false));
@@ -459,7 +459,7 @@ void ParameterMgr::initUpsamplingParameter()
 	upsampling.addParam(new RichString("Algorithm Name", "Upsampling") );
 
 	upsampling.addParam(new RichDouble("CGrid Radius", 0.08) );
-	upsampling.addParam(new RichInt("Number of Add Point", 50000) );
+	upsampling.addParam(new RichInt("Number of Add Point", 5000) );
 	upsampling.addParam(new RichDouble("Feature Sigma", 90));
 
 	upsampling.addParam(new RichBool("Using Threshold Process", true) );
