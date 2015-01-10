@@ -1833,9 +1833,12 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 //  					{
 //  						new_pos[i] = sim_point;
 //  					}
-					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*3.0))
+					else if (dual_v.eigen_confidence > 0.92 && dlink_length < (average_dist*5.0))
 					{
+
 						new_pos[i] = sim_point;
+						v.is_skel_branch = true;
+						//cout << "tubular" << endl;
 					}
 // 					else if (dist_avg < dist_sim) // this is new
 // 					{
@@ -1879,7 +1882,23 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 				}
 				else if (average_weight_sum[i] > 1e-20)
 				{
-					new_pos[i] = average[i] / average_weight_sum[i];
+					if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*3.0))
+					{
+						Point3f sim_point = samples_similarity[i];
+						double dist_sim = GlobalFun::computeEulerDist(v.P(), sim_point);
+						if (dist_sim > save_move_threshold_along_normal && (sim_point - v.P())*v.N() > 0)
+						{
+							sim_point = v.P();
+						}
+
+						new_pos[i] = sim_point;
+						v.is_skel_branch = true;
+						//cout << "tubular" << endl;
+					}
+					else
+					{
+						new_pos[i] = average[i] / average_weight_sum[i];
+					}
 				}
 			}
 			else if (average_weight_sum[i] > 1e-20)
@@ -2342,6 +2361,13 @@ void WLOP::runComputeAverageDistThreshold()
 
 void WLOP::runComputeConfidence()
 {
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		v.eigen_confidence = 1.0;
+	}
+	return;
+
 	double original_knn = para->getDouble("Original Confidence KNN");
 
 	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runRegularizeNormals()");
