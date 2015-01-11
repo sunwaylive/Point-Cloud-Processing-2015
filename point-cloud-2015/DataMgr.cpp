@@ -383,8 +383,14 @@ double DataMgr::getInitRadiuse()
 		}
 	}
 
- 
-  global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(init_radius));
+	double current_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+	if (current_radius < 0 || global_paraMgr.glarea.getBool("Show Skeleton"))
+	{
+		global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(init_radius));
+	}
+
+
+
   global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(init_radius));
 
 	return init_radius;

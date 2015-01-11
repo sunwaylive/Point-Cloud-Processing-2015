@@ -13,7 +13,7 @@ ParameterMgr::ParameterMgr(void)
 		return;
 	}
 
-	grid_r = 0.2;
+	grid_r = -0.2;
 
 
 	initDataMgrParameter();

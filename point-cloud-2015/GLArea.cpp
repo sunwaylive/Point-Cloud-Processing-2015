@@ -1389,8 +1389,8 @@ void GLArea::saveView(QString fileName)
 	//Point3d cut_pos = samples->vert[0].P();
 	
 
-	outfile << global_paraMgr.data.getDouble("CGrid Radius") << endl;
-
+	outfile << global_paraMgr.wLop.getDouble("CGrid Radius") << endl;
+	cout << "save radius:" << global_paraMgr.wLop.getDouble("CGrid Radius") << endl;
 
 	//outfile << cut_pos[0] << " " << cut_pos[1] << " " << cut_pos[2] << endl;	
 	outfile << -1 << " " << -1 << " " << -1 << endl;	
@@ -1448,7 +1448,13 @@ void GLArea::saveView(QString fileName)
 	}
 
 	outfile << global_paraMgr.glarea.getDouble("Radius Ball Transparency");
+
+
+	//new parameters 2015-1-11
 	
+
+
+
 	outfile.close();
 }
 
@@ -1465,6 +1471,7 @@ void GLArea::loadView(QString fileName)
 	double radius;
 	infile >> radius;
 	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(radius));
+	cout << "load radius: " << radius << endl;
 
 	infile >> temp >> temp >> temp;
 
@@ -1516,7 +1523,7 @@ void GLArea::loadView(QString fileName)
 	if (!infile.eof())
 	{
 		infile >> temp;
-		global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp));
+		//global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp));
 
 		infile >> temp;
 		//global_paraMgr.setGlobalParameter("Local Density Radius", DoubleValue(temp));
@@ -1552,18 +1559,22 @@ void GLArea::loadView(QString fileName)
 	{
 		double init_radius;
 		infile >> init_radius;
-		if (init_radius > 0)
-		{
-			global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(init_radius));
-		}
-		else
-		{
-			global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(global_paraMgr.wLop.getDouble("CGrid Radius")));
-		}
+// 		if (init_radius > 0)
+// 		{
+// 			global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(init_radius));
+// 		}
+// 		else
+// 		{
+// 			global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(global_paraMgr.wLop.getDouble("CGrid Radius")));
+// 		}
 	}
 
 	infile >> temp;
 	global_paraMgr.glarea.setValue("Radius Ball Transparency", DoubleValue(temp));
+
+	
+	
+	//new parameters 2015-1-11
 
 
 	infile.close();
