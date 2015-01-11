@@ -130,6 +130,8 @@ private:
 	QColor feature_color;
 	QColor normal_color;
 	QColor dlink_color;
+	QColor backface_color;
+
 
 	GLColor pick_color;
 

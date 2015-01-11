@@ -61,6 +61,9 @@ class WlopParaDlg : public QFrame
 		void Save_Move_Dist_Along_Normal_Para(double _val);
 		void Big_Repulsion_Power(double _val);
 
+		void Protect_Small_Tubular_Para(double _val);
+		void Protect_High_Confidence_Para(double _val);
+
 
 		void isDensity(bool _val);
 		void isPca(bool _val);

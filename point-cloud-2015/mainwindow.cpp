@@ -898,7 +898,9 @@ void MainWindow::originalColor()
 
 void MainWindow::backGroundColor()
 {
-	area->changeColor("Background Color");
+	//area->changeColor("Background Color");
+	area->changeColor("Backface Color");
+
 	area->updateGL();
 }
 

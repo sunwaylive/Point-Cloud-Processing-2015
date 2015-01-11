@@ -36,6 +36,7 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	original_dot_size = para->getDouble("Original Dot Size");
 	normal_color = para->getColor("Normal Line Color");
 	dlink_color = para->getColor("DLink Color");
+	backface_color = para->getColor("Backface Color");
 
 	feature_color = para->getColor("Feature Color");
 	pick_color = para->getColor("Pick Point Color");
@@ -337,9 +338,11 @@ void GLDrawer::drawCircle(const CVertex& v, bool is_back)
 	glNormal3f(normal[0], normal[1], normal[2]);
 	glBegin(GL_POLYGON);
 
+	GLColor color2(backface_color);
+
 	if (is_back)
 	{
-		glColor4f(cBlack.r, cBlack.g, cBlack.b, 1);
+		glColor4f(color2.r, color2.g, color2.b, 1);
 	}
 	else
 	{

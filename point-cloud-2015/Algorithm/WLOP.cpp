@@ -1835,16 +1835,12 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 						new_pos[i] = sim_point;
 						v.is_skel_virtual = true;
-						//cout << "tubular" << endl;
+
 					}
-				else if (v.eigen_confidence > 0.83)
-				{
-					new_pos[i] = avg_point;
-				}
-// 					else if (dist_avg < dist_sim) // this is new
-// 					{
-// 						new_pos[i] = avg_point;
-// 					}
+					else if (v.eigen_confidence > 0.83)
+					{
+						new_pos[i] = avg_point;
+					}
 					else if (dist < radius_threshold)
 					{
 						if (use_confidence_to_combine && v.eigen_confidence > 0)

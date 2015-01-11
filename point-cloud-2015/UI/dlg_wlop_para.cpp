@@ -117,8 +117,11 @@ void WlopParaDlg::initConnects()
 	connect(ui->Save_Move_Dist_Along_Normal_Para, SIGNAL(valueChanged(double)), this, SLOT(Save_Move_Dist_Along_Normal_Para(double)));
 	connect(ui->Big_Repulsion_Power, SIGNAL(valueChanged(double)), this, SLOT(Big_Repulsion_Power(double)));
 
+	connect(ui->Protect_Small_Tubular_Para, SIGNAL(valueChanged(double)), this, SLOT(Protect_Small_Tubular_Para(double)));
+	connect(ui->Protect_High_Confidence_Para, SIGNAL(valueChanged(double)), this, SLOT(Protect_High_Confidence_Para(double)));
+
 	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para1(bool)));
-	connect(ui->eigen_neighbor_para1, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para2(bool)));
+	connect(ui->eigen_neighbor_para2, SIGNAL(clicked(bool)), this, SLOT(get_eigen_neighbor_para2(bool)));
 
 	connect(ui->Use_Average_Dist_Threshold, SIGNAL(clicked(bool)), this, SLOT(use_Average_Dist_Threshold(bool)));
 	connect(ui->Use_Confidence_To_Combine_Normal, SIGNAL(clicked(bool)), this, SLOT(use_Confidence_To_Combine_Normal(bool)));
@@ -263,6 +266,8 @@ bool WlopParaDlg::initWidgets()
 	ui->Save_Move_Dist_Along_Normal_Para->setValue(m_paras->wLop.getDouble("Save Move Dist Along Normal Para"));
 	ui->Big_Repulsion_Power->setValue(m_paras->wLop.getDouble("Big Repulsion Power"));
 
+	ui->Protect_Small_Tubular_Para->setValue(m_paras->wLop.getDouble("Protect Small Tubular Para"));
+	ui->Protect_High_Confidence_Para->setValue(m_paras->wLop.getDouble("Protect High Confidence Para"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -476,6 +481,17 @@ void WlopParaDlg::Big_Repulsion_Power(double _val)
 {
 	m_paras->wLop.setValue("Big Repulsion Power", DoubleValue(_val));
 }
+
+void WlopParaDlg::Protect_Small_Tubular_Para(double _val)
+{
+	m_paras->wLop.setValue("Protect Small Tubular Para", DoubleValue(_val));
+}
+
+void WlopParaDlg::Protect_High_Confidence_Para(double _val)
+{
+	m_paras->wLop.setValue("Protect High Confidence Para", DoubleValue(_val));
+}
+
 
 void WlopParaDlg::isDensity(bool _val)
 {

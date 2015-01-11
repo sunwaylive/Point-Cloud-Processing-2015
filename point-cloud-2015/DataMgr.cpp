@@ -389,8 +389,6 @@ double DataMgr::getInitRadiuse()
 		global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(init_radius));
 	}
 
-
-
   global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(init_radius));
 
 	return init_radius;

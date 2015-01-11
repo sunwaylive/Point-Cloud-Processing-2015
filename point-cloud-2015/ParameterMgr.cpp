@@ -174,6 +174,7 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichColor("Pick Point Color", QColor(128, 128, 0) ));
 	drawer.addParam(new RichColor("Pick Point DNN Color", QColor(0, 0, 155) ));
 	drawer.addParam(new RichColor("DLink Color", QColor(0, 0, 0)));
+	drawer.addParam(new RichColor("Backface Color", QColor(5, 5, 5)));
 
 
 	drawer.addParam(new RichColor("Skeleton Bone Color", QColor(200, 0, 0) ));
@@ -199,11 +200,6 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Repulsion Mu", 0.50));
 	wLop.addParam(new RichDouble("Repulsion Mu2", 0.10));
 	wLop.addParam(new RichDouble("Dual Radius", 0.33));
-
-	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
-	wLop.addParam(new RichDouble("Local Neighbor Size For Inner Points", 0.040));
-	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.060));
-	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.7));
 
 	wLop.addParam(new RichDouble("Local Angle Threshold", 45));
 
@@ -302,6 +298,12 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Compute Eigen Neighborhood", false));
 
 
+	// generating inner points
+	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
+	wLop.addParam(new RichDouble("Local Neighbor Size For Inner Points", 0.040));
+	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.060));
+	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.7));
+
 
 	//new parameters:
 	wLop.addParam(new RichDouble("Average Closest Dist", 0.02301));
@@ -331,10 +333,13 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
-
-
 	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.3));
 	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
+
+	wLop.addParam(new RichDouble("Protect Small Tubular Para", 0.18));
+	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.83));
+
+
 
 	wLop.addParam(new RichBool("Only Do Repuslion", false));
 	wLop.addParam(new RichBool("Only Do Avergage", false));
