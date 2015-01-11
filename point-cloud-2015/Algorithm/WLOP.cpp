@@ -416,7 +416,7 @@ void WLOP::run()
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
 		runComputeAverageDistThreshold();
-		//runComputeConfidence();
+		runComputeConfidence();
 		return;
 	}
 
@@ -1825,21 +1825,22 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 					double dist = GlobalFun::computeEulerDist(avg_point, sim_point);
 
- 					if (v.eigen_confidence > 0.93)
- 					{
- 						new_pos[i] = avg_point;
- 					}
+
 //  					else if (v.eigen_confidence < 0.4)
 //  					{
 //  						new_pos[i] = sim_point;
 //  					}
-					else if (dual_v.eigen_confidence > 0.92 && dlink_length < (average_dist*5.0))
+					if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*1.8))
 					{
 
 						new_pos[i] = sim_point;
-						v.is_skel_branch = true;
+						v.is_skel_virtual = true;
 						//cout << "tubular" << endl;
 					}
+				else if (v.eigen_confidence > 0.83)
+				{
+					new_pos[i] = avg_point;
+				}
 // 					else if (dist_avg < dist_sim) // this is new
 // 					{
 // 						new_pos[i] = avg_point;
@@ -1849,7 +1850,18 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
 						{
 							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
-							new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1 - v.eigen_confidence);
+							if (v.eigen_confidence > 0.99)
+							{
+								new_pos[i] = avg_point;
+							}
+							else if (v.eigen_confidence < 0.1)
+							{
+								new_pos[i] = sim_point;
+							}
+							else
+							{
+								new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1 - v.eigen_confidence);
+							}
 						}
 						else
 						{
@@ -1914,6 +1926,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 			else
 			{
 				cout << "maybe no neighbor for repulsion" << endl;
+				v.is_skel_virtual = true;
 			}
 
 			if (repulsion_weight_sum[i] > 1e-20)
@@ -2361,16 +2374,17 @@ void WLOP::runComputeAverageDistThreshold()
 
 void WLOP::runComputeConfidence()
 {
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		v.eigen_confidence = 1.0;
-	}
-	return;
+ 	for (int i = 0; i < samples->vert.size(); i++)
+ 	{
+ 		CVertex& v = samples->vert[i];
+ 		v.eigen_confidence = 0.0;
+ 	}
+// 	return;
+	cout << "comput confidence" << endl;
 
 	double original_knn = para->getDouble("Original Confidence KNN");
 
-	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runRegularizeNormals()");
+	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runComputeConfidence()");
 	
 	bool use_dist_threshold = para->getBool("Use Average Dist Threshold");
 	//bool use_dist_threshold = use_ellipsoid_weight;
@@ -2385,6 +2399,7 @@ void WLOP::runComputeConfidence()
 
 	//ofstream outfile("average_neighbor_dist.txt");
 	int cnt_hole = 0;
+	double min_dist = 10000;
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
@@ -2395,9 +2410,9 @@ void WLOP::runComputeConfidence()
 		{
 			CVertex& t = original->vert[v.neighbors[j]];
 
-			double dist2 = (v.P() - t.P()).SquaredNorm();
+			//double dist2 = (v.P() - t.P()).SquaredNorm();
 			//double dist_diff = exp(dist2 * iradius16);
-			double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+			//double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
 
 			sum_dist += GlobalFun::computeEulerDist(v.P(), t.P())/* * normal_diff*/;
 			//sum_dist = + dist2 * normal_diff;
@@ -2409,43 +2424,52 @@ void WLOP::runComputeConfidence()
 		if (sum_weight > 0)
 		{
 			v.eigen_confidence = sum_dist / sum_weight;
+			if (min_dist > v.eigen_confidence)
+			{
+				min_dist = v.eigen_confidence;
+			}
 		}
 		else
 		{
 			cout << "NO neighbor???" << endl;
 			v.eigen_confidence = 1;
 		}
-
-		if (use_dist_threshold)
-		{
-			if (v.eigen_confidence < theshold)
-			{
-				v.eigen_confidence = 0;
-			}
-			else
-			{
-				cnt_hole++;
-			}
-		}
-
 		v.nearest_neighbor_dist = v.eigen_confidence;
 		//outfile << v.nearest_neighbor_dist << endl;
 	}
 	cout << "how many hole points in compute confidence?: " << cnt_hole << endl;
 
 
+
+	if (use_dist_threshold)
+	{
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+
+			if (v.eigen_confidence < theshold)
+			{
+				v.eigen_confidence = min_dist;
+			}
+			else
+			{
+				cnt_hole++;
+			}
+		}
+	}
+
 	GlobalFun::normalizeConfidence(samples->vert, 0);
 
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
-		v.neighbors.clear();
+		//v.neighbors.clear();
 		//v.eigen_confidence = 1 - v.eigen_confidence;
 
 		if (use_dist_threshold)
 		{
-			//v.eigen_confidence = 1 - v.eigen_confidence;
-			v.eigen_confidence = pow(1 - v.eigen_confidence, 2);
+			v.eigen_confidence = 1 - v.eigen_confidence;
+			//v.eigen_confidence = pow(1 - v.eigen_confidence, 2);
 		}
 		else
 		{
@@ -2455,11 +2479,12 @@ void WLOP::runComputeConfidence()
 	}
 	GlobalFun::normalizeConfidence(samples->vert, 0);
 
-	if (use_dist_threshold)
-	{
-		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
-		GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius"));
-	}
+ 	if (use_dist_threshold)
+ 	{
+ 		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 2.0, samples->bbox);
+ 		GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius"));
+ 		GlobalFun::normalizeConfidence(samples->vert, 0);
+ 	}
 
 	//ofstream outfile2("average_neighbor_dist2.txt");
 // 	for (int i = 0; i < samples->vert.size(); i++)
@@ -4461,8 +4486,6 @@ void WLOP::runRegularizeNormals()
 				v.N() *= -1;
 			}
 
-// 			v.is_skel_virtual = false;
-// 			v.is_skel_branch = false;
 			continue;
 		}
 
@@ -4476,7 +4499,7 @@ void WLOP::runRegularizeNormals()
 // 
 // 			tubular_points++;
 // 
-// 			//v.is_skel_virtual = true;
+
 // 
 //  		}
 //  		else

@@ -69,8 +69,8 @@ void ParameterMgr::initGlareaParameter()
 	
 	glarea.addParam(new RichBool("Show Samples", false) );
 	glarea.addParam(new RichBool("Show Samples Quad", false) );
-	glarea.addParam(new RichBool("Show Samples Dot", true) );
-	glarea.addParam(new RichBool("Show Samples Circle", false) );
+	glarea.addParam(new RichBool("Show Samples Dot", false) );
+	glarea.addParam(new RichBool("Show Samples Circle", true) );
 	glarea.addParam(new RichBool("Show Samples Sphere", false) );
 
   glarea.addParam(new RichBool("Show Dual Samples", true) );
@@ -312,12 +312,12 @@ void ParameterMgr::initWLopParameter()
 
 	//void WLOP::runComputeConfidence()
 	wLop.addParam(new RichBool("Run Estimate Average Dist Threshold", false));
-	wLop.addParam(new RichBool("Use Average Dist Threshold", true));
+	wLop.addParam(new RichBool("Use Average Dist Threshold", false));
 
 
 	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.11889));
 	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.50000));
-	wLop.addParam(new RichDouble("Original Confidence KNN", 355));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 155));
 
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
@@ -338,7 +338,7 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichBool("Only Do Repuslion", false));
 	wLop.addParam(new RichBool("Only Do Avergage", false));
-	wLop.addParam(new RichBool("Use Confidence To Merge", true));
+	wLop.addParam(new RichBool("Use Confidence To Merge", false));
 
 
 }

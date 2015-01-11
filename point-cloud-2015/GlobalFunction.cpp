@@ -156,6 +156,8 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 		return;
 	}
 
+	cout << "1" << endl;
+
 	int					nPts;					// actual number of data points
 	ANNpointArray		dataPts;				// data points
 	ANNpoint			queryPt;				// query point
@@ -179,6 +181,8 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 	dataPts = annAllocPts(maxPts, dim);			// allocate data points
 	nnIdx = new ANNidx[k];						// allocate near neigh indices
 	dists = new ANNdist[k];						// allocate near neighbor dists
+
+	cout << "2" << endl;
 
 	nPts = datapts.size();									// read data points
 
@@ -224,8 +228,13 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 		}
 	}
 
+	cout << "3" << endl;
+
 	annDeallocPt(queryPt);					// deallocate query point
 	annDeallocPts(dataPts);			// deallocate data points
+
+	cout << "4" << endl;
+
 	delete [] nnIdx;							// clean things up
 	delete [] dists;
 	delete kdTree;
@@ -1055,7 +1064,7 @@ vector<double> GlobalFun::smoothConfidences(CMesh *mesh, double radius)
 			continue;
 		}
 
-		v.eigen_confidence = 0.0;
+		//v.eigen_confidence = 0.0;
 
 		double sum_confidence = 0;
 		double weight_sum = 0;
@@ -1070,7 +1079,10 @@ vector<double> GlobalFun::smoothConfidences(CMesh *mesh, double radius)
 			weight_sum += w;
 		}
 
-		v.eigen_confidence += sum_confidence / weight_sum;
+		if (weight_sum > 1e-10)
+		{
+			v.eigen_confidence = sum_confidence / weight_sum;
+		}
 		//v.eigen_confidence = 0;
 	}
 

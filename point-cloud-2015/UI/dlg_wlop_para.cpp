@@ -943,6 +943,16 @@ void WlopParaDlg::applyComputeConfidence()
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(false));
+
+	CMesh* samples;
+	samples = area->dataMgr.getCurrentSamples();
+	ofstream outfile("eigen_confidence.txt");
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		outfile << v.eigen_confidence << endl;
+	}
+	outfile.close();
 }
 
 void WlopParaDlg::applyComputeDistribution()
@@ -1247,14 +1257,10 @@ void WlopParaDlg::oneKEY()
 	{
 		m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
 		m_paras->wLop.setValue("Need Similarity", BoolValue(true));
-		//m_paras->wLop.setValue("Use Confidence", BoolValue(true));
+		m_paras->wLop.setValue("Use Confidence", BoolValue(true));
 		m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
 		m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
-
-
-
 		//applyComputeConfidence();
-
 
 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
 		CMesh* samples;
@@ -1276,14 +1282,23 @@ void WlopParaDlg::oneKEY()
 			}
 		}
 
-		//applyComputeConfidence();
+		applyComputeConfidence();
 		//applyComputeConfidence();
 		applyRegularizeNormals();
 		applyWlop();
 
 		cout << "finish one key" << endl;
+
+
 	}
 
-
-
+// 	CMesh* samples;
+// 	samples = area->dataMgr.getCurrentSamples();
+// 	fstream outfile("eigen_confidence.txt");
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		outfile << v.eigen_confidence << endl;
+// 	}
+// 	outfile.close();
 }
