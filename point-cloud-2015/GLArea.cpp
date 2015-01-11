@@ -1709,7 +1709,7 @@ void GLArea::wheelEvent(QWheelEvent *e)
 				}
 				global_paraMgr.drawer.setValue("Sample Dot Size", DoubleValue(size_temp));
 			}
-			else if(para->getBool("Show Samples") &&  para->getBool("Show Samples Quad") )
+			else if (para->getBool("Show Samples") && (para->getBool("Show Samples Quad") || para->getBool("Show Samples Circle")))
 			{
 				size_temp = global_paraMgr.drawer.getDouble("Sample Draw Width") * change;
 				if(size_temp < 0)
@@ -1737,6 +1737,11 @@ void GLArea::wheelEvent(QWheelEvent *e)
 					size_temp = 1;
 				}
 				global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(size_temp));
+			}
+			else if (para->getBool("Show Original") && para->getBool("Show Original Circle") && !para->getBool("Show Dual Samples"))
+			{
+				size_temp = global_paraMgr.drawer.getDouble("Original Draw Width");
+				global_paraMgr.drawer.setValue("Original Draw Width", DoubleValue(size_temp * change));
 			}
 			else
 			{

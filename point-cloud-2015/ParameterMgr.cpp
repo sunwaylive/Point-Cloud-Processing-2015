@@ -157,7 +157,7 @@ void ParameterMgr::initDrawerParameter()
 
 
 	drawer.addParam(new RichDouble("Original Draw Width", 0.0010));
-	drawer.addParam(new RichDouble("Sample Draw Width", 0.001));
+	drawer.addParam(new RichDouble("Sample Draw Width", 0.01));
 	drawer.addParam(new RichDouble("Dual Sample Draw Width", 0.010));
 
 	drawer.addParam(new RichDouble("Sample Dot Size", 6));
