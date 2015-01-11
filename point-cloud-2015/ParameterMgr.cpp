@@ -67,7 +67,7 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichBool("Show Normal", false) );
 	
-	glarea.addParam(new RichBool("Show Samples", false) );
+	glarea.addParam(new RichBool("Show Samples", true) );
 	glarea.addParam(new RichBool("Show Samples Quad", false) );
 	glarea.addParam(new RichBool("Show Samples Dot", false) );
 	glarea.addParam(new RichBool("Show Samples Circle", true) );
@@ -115,7 +115,8 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichPoint3f("Light Position", vcg::Point3f(-4.0, -4.0, -4.0)));
 	glarea.addParam(new RichColor("Light Ambient Color", QColor(44, 44, 44)));
-	glarea.addParam(new RichColor("Light Diffuse Color", QColor(164, 241, 101)));
+	//glarea.addParam(new RichColor("Light Diffuse Color", QColor(164, 241, 101)));
+	glarea.addParam(new RichColor("Light Diffuse Color", QColor(200, 200, 200)));
 	glarea.addParam(new RichColor("Light Specular Color", QColor(255, 255, 255)));
 
 	//glarea.addParam(new RichPoint3f("Light Position", vcg::Point3f(4.0, 4.0, 4.0)));
@@ -307,7 +308,6 @@ void ParameterMgr::initWLopParameter()
 
 	//new parameters:
 	wLop.addParam(new RichDouble("Average Closest Dist", 0.02301));
-
 	wLop.addParam(new RichDouble("Search Dual Index Para", 2.1));
 	wLop.addParam(new RichBool("Use Progressive Search Index", true));
 

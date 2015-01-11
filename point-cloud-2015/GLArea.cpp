@@ -1447,11 +1447,45 @@ void GLArea::saveView(QString fileName)
 		outfile << global_paraMgr.skeleton.getDouble("CGrid Radius") << endl;
 	}
 
-	outfile << global_paraMgr.glarea.getDouble("Radius Ball Transparency");
+	outfile << global_paraMgr.glarea.getDouble("Radius Ball Transparency") << endl;
 
 
 	//new parameters 2015-1-11
+	outputColor(outfile, global_paraMgr.drawer.getColor("DLink Color"));
+	outputColor(outfile, global_paraMgr.drawer.getColor("Backface Color"));
+
+	outfile << global_paraMgr.drawer.getDouble("Original Draw Width") << endl;
+	outfile << global_paraMgr.drawer.getDouble("Dual Sample Draw Width") << endl;
+	outfile << global_paraMgr.drawer.getDouble("Dual Sample Dot Size") << endl;
 	
+	
+	outfile << global_paraMgr.wLop.getDouble("Original Averaging KNN") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Increasing Step Size") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Local Neighbor Size For Inner Points") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Local Neighbor Size For Surface Points") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Inner Points Cooling Parameter") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Local Angle Threshold") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Eigen Neighborhood Para1") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Eigen Neighborhood Para2") << endl;
+	
+	outfile << global_paraMgr.wLop.getDouble("Average Closest Dist") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Average Dist To Input Threshold") << endl;
+	
+	outfile << global_paraMgr.wLop.getDouble("Original Confidence KNN") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Similarity Term Neighbor Para") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Density Confidence Segment Threshold") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Eigen Directional Threshold") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Save Move Dist Along Normal Para") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Big Repulsion Power") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Protect Small Tubular Para") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Protect High Confidence Para") << endl;
+
+	outfile << global_paraMgr.norSmooth.getInt("PCA KNN") << endl;
+	outfile << global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma") << endl;
+	outfile << global_paraMgr.upsampling.getDouble("Feature Sigma") << endl;
+	outfile << global_paraMgr.upsampling.getDouble("Dist Threshold") << endl;
+	outfile << global_paraMgr.skeleton.getDouble("Sigma KNN") << endl;
+	outfile << global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold") << endl;
 
 
 
@@ -1572,9 +1606,46 @@ void GLArea::loadView(QString fileName)
 	infile >> temp;
 	global_paraMgr.glarea.setValue("Radius Ball Transparency", DoubleValue(temp));
 
-	
-	
-	//new parameters 2015-1-11
+	if (!infile.eof())
+	{
+		//new parameters 2015-1-11
+		global_paraMgr.drawer.setValue("DLink Color", ColorValue(inputColor(infile)));
+		global_paraMgr.drawer.setValue("Backface Color", ColorValue(inputColor(infile)));
+
+
+		infile >> temp; global_paraMgr.drawer.setValue("Original Draw Width", DoubleValue(temp));
+		infile >> temp; global_paraMgr.drawer.setValue("Dual Sample Draw Width", DoubleValue(temp));
+		infile >> temp; global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(temp));
+
+		infile >> temp; global_paraMgr.wLop.setValue("Original Averaging KNN", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Inner Points Cooling Parameter", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Local Angle Threshold", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Eigen Neighborhood Para1", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Eigen Neighborhood Para2", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Average Closest Dist", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Average Dist To Input Threshold", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Original Confidence KNN", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Similarity Term Neighbor Para", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Density Confidence Segment Threshold", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Eigen Directional Threshold", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Save Move Dist Along Normal Para", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Big Repulsion Power", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Protect Small Tubular Para", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Protect High Confidence Para", DoubleValue(temp));
+
+		infile >> temp; global_paraMgr.norSmooth.setValue("PCA KNN", IntValue(temp));
+		infile >> temp; global_paraMgr.norSmooth.setValue("Sharpe Feature Bandwidth Sigma", DoubleValue(temp));
+		infile >> temp; global_paraMgr.upsampling.setValue("Feature Sigma", DoubleValue(temp));
+		infile >> temp; global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(temp));
+		infile >> temp; global_paraMgr.skeleton.setValue("Sigma KNN", DoubleValue(temp));
+		infile >> temp; global_paraMgr.skeleton.setValue("Eigen Feature Identification Threshold", DoubleValue(temp));
+
+	}
+
+
 
 
 	infile.close();
