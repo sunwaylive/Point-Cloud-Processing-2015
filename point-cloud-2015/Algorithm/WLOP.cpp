@@ -1842,16 +1842,19 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 //  					{
 //  						new_pos[i] = sim_point;
 //  					}
-					if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*1.8))
+					if (0)
+					{
+					}
+					else if (v.eigen_confidence > 0.83)
+					{
+						new_pos[i] = avg_point;
+					}
+					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*2.8))
 					{
 
 						new_pos[i] = sim_point;
 						v.is_skel_virtual = true;
 
-					}
-					else if (v.eigen_confidence > 0.83)
-					{
-						new_pos[i] = avg_point;
 					}
 					else if (dist < radius_threshold)
 					{

@@ -63,6 +63,7 @@ void MainWindow::initWidgets()
 	ui.actionShow_Cloest_Dual->setChecked(paras->glarea.getBool("Show Cloest Dual Connection"));
 	ui.actionShow_Target->setChecked(paras->glarea.getBool("Show Target Samples"));
 	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
+	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Multiply Pick Point"));
 
 
 }
@@ -121,6 +122,7 @@ void MainWindow::initConnect()
   connect(ui.actionShow_Connection,SIGNAL(toggled(bool)),this,SLOT(showConnection(bool)));
   connect(ui.actionPick_Dual,SIGNAL(toggled(bool)),this,SLOT(pickDualPoints(bool)));
 	connect(ui.actionShow_Eigens, SIGNAL(toggled(bool)), this, SLOT(showEigenDirections(bool)));
+	connect(ui.actionMultiple_Pick, SIGNAL(toggled(bool)), this, SLOT(multiplPick(bool)));
 
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
@@ -980,6 +982,12 @@ void MainWindow::cleanPick()
 void MainWindow::showConfidenceColor(bool _val)
 {
 	global_paraMgr.drawer.setValue("Show Confidence Color", BoolValue(_val));
+	area->updateGL();
+}
+
+void MainWindow::multiplPick(bool _val)
+{
+	global_paraMgr.glarea.setValue("Multiply Pick Point", BoolValue(_val));
 	area->updateGL();
 }
 

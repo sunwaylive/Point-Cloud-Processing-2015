@@ -94,7 +94,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Target Dual Samples", true));
 	glarea.addParam(new RichBool("Show Correspondences", false));
 
-	glarea.addParam(new RichBool("Show Eigen Directions", true));
+	glarea.addParam(new RichBool("Show Eigen Directions", false));
 
 
 	glarea.addParam(new RichBool("Show Bounding Box", false));
@@ -175,7 +175,7 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichColor("Pick Point Color", QColor(128, 128, 0) ));
 	drawer.addParam(new RichColor("Pick Point DNN Color", QColor(0, 0, 155) ));
 	drawer.addParam(new RichColor("DLink Color", QColor(0, 0, 0)));
-	drawer.addParam(new RichColor("Backface Color", QColor(5, 5, 5)));
+	drawer.addParam(new RichColor("Backface Color", QColor(175, 175, 175)));
 
 
 	drawer.addParam(new RichColor("Skeleton Bone Color", QColor(200, 0, 0) ));

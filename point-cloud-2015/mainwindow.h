@@ -110,6 +110,7 @@ private slots:
 	void setOriginalType(QAction * action);
 
 	void showConfidenceColor(bool _val);
+	void multiplPick(bool _val);
 
 
 private slots:

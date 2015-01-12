@@ -166,6 +166,7 @@
      <addaction name="actionReorient_Pick"/>
      <addaction name="actionClean_Pick"/>
      <addaction name="actionSpray_Erase"/>
+     <addaction name="actionMultiple_Pick"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -297,6 +298,7 @@
    <addaction name="actionShow_Original_Dot"/>
    <addaction name="actionShow_Original_Circle"/>
    <addaction name="actionOriginal_Color"/>
+   <addaction name="actionMultiple_Pick"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -867,6 +869,14 @@
    </property>
    <property name="text">
     <string>Show Eigens</string>
+   </property>
+  </action>
+  <action name="actionMultiple_Pick">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Multiple Pick</string>
    </property>
   </action>
  </widget>

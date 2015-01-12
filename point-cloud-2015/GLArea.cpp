@@ -1,4 +1,4 @@
-#include "GLArea.h"
+﻿#include "GLArea.h"
 
 GLArea::GLArea(QWidget *parent): QGLWidget(/*QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer |QGL::SampleBuffers),*/ parent),
 	               para(global_paraMgr.getGlareaParameterSet()),
@@ -146,7 +146,7 @@ void GLArea::paintGL()
 {
 	if (show_something)
 	{
-		cout << "show something: " << something++ << endl;
+		cout << "show something: 1 " << something++ << endl;
 	}
 	paintMutex.lock();{
 
@@ -196,6 +196,7 @@ void GLArea::paintGL()
 	if (takeSnapTile)
 	{
 		setView();// high resolution snapshot
+		something = false;
 	}
 
 	drawLightBall();
@@ -220,6 +221,12 @@ void GLArea::paintGL()
 
 	if (dataMgr.isSamplesEmpty() && dataMgr.isOriginalEmpty())
 	{
+		if (show_something)
+		{
+			cout << "empty！";
+		}
+		show_something = false;
+
 		goto PAINT_RETURN;
 	}
 
@@ -252,7 +259,7 @@ void GLArea::paintGL()
 
 	if (show_something)
 	{
-		cout << "show something: " << something++ << endl;
+		cout << "show something: 2 " << something++ << endl;
 	}
 
   if(para->getBool("Show Dual Samples"))
@@ -272,7 +279,7 @@ void GLArea::paintGL()
 
 	if (show_something)
 	{
-		cout << "show something: " << something++ << endl;
+		cout << "show something: 3 " << something++ << endl;
 	}
 
 	if (para->getBool("Show Target Samples"))
@@ -316,40 +323,40 @@ void GLArea::paintGL()
 
 	if (show_something)
 	{
-		cout << "show something: " << something++ << endl;
+		cout << "show something: 4 " << something++ << endl;
 	}
 
 	if (para->getBool("Show Eigen Directions"))
 	{
-		//glDrawer.drawEigenDirections(dataMgr.getCurrentDualSamples());
-
-		CVertex v;
-		if (!pickList.empty() && pickList[0] >= 0)
-		{
-			int id = pickList[0];
-			if (id >= 0 && id < dataMgr.getCurrentDualSamples()->vert.size())
-			{
-				v = dataMgr.getCurrentDualSamples()->vert[id];
-			}
-			else
-			{
-				v = dataMgr.getCurrentDualSamples()->vert[0];
-			}
-		}
-		else
-		{
-			v = dataMgr.getCurrentDualSamples()->vert[0];
-		}
-		glDrawer.drawEigenDirectionsOfone(v);
-
-//  		glw.m = dataMgr.getCurrentEllipsoid();
-//  		glw.Draw(GLW::DMSmooth, GLW::CMPerMesh, GLW::TMNone);
+// 		//glDrawer.drawEigenDirections(dataMgr.getCurrentDualSamples());
+// 
+// 		CVertex v;
+// 		if (!pickList.empty() && pickList[0] >= 0)
+// 		{
+// 			int id = pickList[0];
+// 			if (id >= 0 && id < dataMgr.getCurrentDualSamples()->vert.size())
+// 			{
+// 				v = dataMgr.getCurrentDualSamples()->vert[id];
+// 			}
+// 			else
+// 			{
+// 				v = dataMgr.getCurrentDualSamples()->vert[0];
+// 			}
+// 		}
+// 		else
+// 		{
+// 			v = dataMgr.getCurrentDualSamples()->vert[0];
+// 		}
+// 		glDrawer.drawEigenDirectionsOfone(v);
+// 
+// //  		glw.m = dataMgr.getCurrentEllipsoid();
+// //  		glw.Draw(GLW::DMSmooth, GLW::CMPerMesh, GLW::TMNone);
 
 	}
 
 	if (show_something)
 	{
-		cout << "show something: " << something++ << endl;
+		cout << "show something: 5 " << something++ << endl;
 	}
 
 
@@ -430,9 +437,9 @@ void GLArea::paintGL()
   	}
 
 
-		if (show_something)
+		if (show_something )
 		{
-			cout << "show something: Pick Dual Point" << something++ << endl;
+			cout << "show something: Pick Dual Point 6" << something++ << endl;
 		}
 
 
@@ -500,7 +507,7 @@ void GLArea::paintGL()
 
 	if (show_something)
 	{
-		cout << "show something: final" << something++ << endl;
+		cout << "show something: final 7 " << something++ << endl;
 
 	}
 
@@ -660,6 +667,8 @@ void GLArea::openByDrop(QString fileName)
     dataMgr.loadXYZN(fileName);
   }
 
+	show_something = true;
+	cout << "finish open " << endl; 
 	initAfterOpenFile();
 	updateGL();
 }
