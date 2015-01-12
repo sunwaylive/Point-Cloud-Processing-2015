@@ -350,6 +350,9 @@ void WLOP::run()
 	if (para->getBool("Run Self WLOP"))
 	{
 		runSelfWLOP();
+
+		nTimeIterated++;
+		cout << "Iterated: " << nTimeIterated << endl;
 		return;
 	}
 
@@ -689,22 +692,22 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			if (need_density && !original_density.empty())
 			{
-// 				if (i < 2)
-// 				{
-// 					cout << "need_original_density" << endl;
-// 				}
+ 				if (i < 2 && j < 5)
+ 				{
+					cout << "need_original_density " << original_density[t.m_index]  << endl;
+ 				}
 
 				w *= original_density[t.m_index];
 			}
 
-			if (L2 /*|| use_elliptical_neighbor*/ /*|| use_self_wlop*/)
-			{
-				if (i < 2)
-				{
-					cout << "L2L2L2L2L2" << endl;
-				}
-				w = 1.0;
-			}
+// 			if (L2 /*|| use_elliptical_neighbor*/ /*|| use_self_wlop*/)
+// 			{
+// 				if (i < 2)
+// 				{
+// 					cout << "L2L2L2L2L2" << endl;
+// 				}
+// 				w = 1.0;
+// 			}
 
 // 			if (need_anti_normal)
 // 			{
@@ -909,8 +912,12 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 			double rep = w * pow(1.0 / len, repulsion_power);
 			//double rep = w;
 
-			if (need_density)
+			if (1)//2015
 			{
+				if (i<2 && j<3)
+				{
+					cout << "sample density: " << samples_density[t.m_index] << endl;
+				}
 				rep *= samples_density[t.m_index];
 			}
 
@@ -1414,7 +1421,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 }
 
 
-void WLOP::computeDensity(bool isOriginal, double radius)
+void WLOP::computeDensity(bool isOriginal, double radius, CMesh* samples, CMesh* original)
 {
 	CMesh* mesh;
 	if (isOriginal)
@@ -1458,6 +1465,11 @@ void WLOP::computeDensity(bool isOriginal, double radius)
 			if (isOriginal)
 			{
 				original_density[i] += den;
+// 
+// 				if (i<2 && j <2)
+// 				{
+// 					cout << "density::::" << den << endl;
+// 				}
 			}
 			else
 			{
@@ -1559,7 +1571,7 @@ double WLOP::iterate()
 			time.start("Compute Original Density");
 			original_density.assign(original->vn, 0);
 
-			computeDensity(true, para->getDouble("CGrid Radius") * local_density_para);
+			computeDensity(true, para->getDouble("CGrid Radius") * local_density_para, samples, original);
 			time.end();
 		}
 	}
@@ -1567,7 +1579,7 @@ double WLOP::iterate()
 	if (para->getBool("Need Compute Density"))
 	{
 		time.start("Compute Density For Sample");
-		computeDensity(false, para->getDouble("CGrid Radius"));
+		computeDensity(false, para->getDouble("CGrid Radius"), samples, original);
 		time.end();
 	}
 
@@ -3467,10 +3479,15 @@ void WLOP::runSkelWlop()
 
 		if (nTimeIterated == 0)
 		{
+			GlobalFun::computeBallNeighbors(original, NULL,
+				para->getDouble("CGrid Radius"), original->bbox);
+
+			//cout << endl  << "compute original_density original_density original_density" << endl;
 			original_density.assign(original->vn, 0);
 			if (para->getBool("Need Compute Density"))
 			{
-				computeDensity(true, para->getDouble("CGrid Radius"));
+				cout << "compute density!!" << endl;
+				computeDensity(true, para->getDouble("CGrid Radius") /**0.5*/, samples, original);
 			}
 		}
 		time.end();
@@ -3491,7 +3508,7 @@ void WLOP::runSkelWlop()
 			original_density.assign(original->vn, 0);
 			if (para->getBool("Need Compute Density"))
 			{
-				computeDensity(true, para->getDouble("CGrid Radius"));
+				computeDensity(true, para->getDouble("CGrid Radius"), samples, original);
 			}
 			time.end();
 		}
@@ -3500,8 +3517,6 @@ void WLOP::runSkelWlop()
 		GlobalFun::computeBallNeighbors(samples, original,
 			para->getDouble("CGrid Radius"), box);
 		time.end();
-
-
 	}
 	
 
@@ -3526,7 +3541,7 @@ void WLOP::runSkelWlop()
 	{
 		
 		time.start("Compute Density For Sample");
-		computeDensity(false, repulsion_radius);
+		computeDensity(false, para->getDouble("CGrid Radius") *0.5, samples, original);
 		time.end();
 	}
 
@@ -3726,7 +3741,7 @@ void WLOP::runDragWlop()
   if (para->getBool("Need Compute Density"))
   {
     time.start("Compute Density For Sample");
-    computeDensity(false, para->getDouble("CGrid Radius"));
+    computeDensity(false, para->getDouble("CGrid Radius"), samples, original);
     time.end();
   }
 
@@ -7574,7 +7589,8 @@ void WLOP::runComputeEigenDirections(CMesh* dual_samples, CMesh* samples)
  	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
 
-	if (!para->getBool("WLOP test bool"))
+	//if (!para->getBool("WLOP test bool"))
+	if (1)//2015 no time for this
 	{
 		for (int i = 0; i < dual_samples->vert.size(); i++)
 		{

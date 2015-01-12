@@ -81,7 +81,7 @@ private:
 	void computeDLinkRepulsionTerm(CMesh* samples);
 
 
-	void computeDensity(bool isOriginal, double radius);
+	void computeDensity(bool isOriginal, double radius, CMesh* samples, CMesh* original);
 	void recomputePCA_Normal();
 
   void stepForward();

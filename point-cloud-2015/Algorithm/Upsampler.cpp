@@ -267,6 +267,8 @@ void Upsampler::computeEigenVerctorForRendering()
 // find the max dist of minimum dist between midpoint and their neighbors,return its index using para
 double Upsampler::findMaxMidpoint(CVertex & v, int & neighbor_index)
 {	
+	bool trick_for_closeby_surface = para->getBool("Use Upsample For Closeby Surface");
+
 	double G_value = para->getDouble("Edge Parameter");
 	int nb_size = v.neighbors.size();
 	double bestDist = -1; //
@@ -281,6 +283,16 @@ double Upsampler::findMaxMidpoint(CVertex & v, int & neighbor_index)
 	{
 		CVertex & t = samples->vert[v.neighbors[i]];
 		midPoint = (v.P() + t.P()) / 2.0;
+
+		if (trick_for_closeby_surface)
+		{
+			//if (GlobalFun::computeRealAngleOfTwoVertor(v.N(), t.N()) > 90 )
+			if (v.N() * t.N() < 0 )
+			{
+				//cout << "skip" << endl ;
+				continue;
+			}
+		}
 
 		Point3f vm = v.N();
 		Point3f tm = t.N();
@@ -776,6 +788,32 @@ void Upsampler::recomputeAllNeighbors()
 
 	GlobalFun::computeBallNeighbors(samples, NULL, 
 		para->getDouble("CGrid Radius"), samples->bbox);
+
+	bool trick_for_closeby_surface = para->getBool("Use Upsample For Closeby Surface");
+	
+	if (trick_for_closeby_surface)
+	{
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			vector<int> new_neighbors;
+			for (int j = 0; j < v.neighbors.size(); j++)
+			{
+				CVertex& t = samples->vert[v.neighbors[j]];
+
+				if (v.N() * t.N() > 0)
+				{
+					new_neighbors.push_back(v.neighbors[j]);
+				}
+			}
+
+			v.neighbors = new_neighbors;
+			if (v.neighbors.empty())
+			{
+				cout << "become empty neighbor" << endl;
+			}
+		}
+	}
 
 	cout << "recomputeAllNeighbors end "<< endl;
 }

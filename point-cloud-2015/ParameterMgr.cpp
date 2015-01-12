@@ -484,6 +484,7 @@ void ParameterMgr::initUpsamplingParameter()
 	upsampling.addParam(new RichBool("Use Max Theta Psi Method", false));
 	upsampling.addParam(new RichBool("Use Sigma Threshold Method", true));
 	upsampling.addParam(new RichBool("Use No Psi Method", false));
+	upsampling.addParam(new RichBool("Use Upsample For Closeby Surface", true));
 
 	upsampling.addParam(new RichDouble("Upsample Radius", grid_r * 0.5) );
 	upsampling.addParam(new RichBool("Use Proj New Term", false));

@@ -36,7 +36,7 @@ GLArea::GLArea(QWidget *parent): QGLWidget(/*QGLFormat(QGL::DoubleBuffer | QGL::
 	cout << sizeof(v) << endl;
 	loadDefaultModel();
 
-	show_something = false;
+	show_something = true;
 	something = 0;
 }
 
@@ -508,6 +508,13 @@ void GLArea::paintGL()
   glDepthMask(GL_TRUE);
   lightOnOff(para->getBool("Light On or Off"));
 
+	if (show_something)
+	{
+		cout << "show something: final" << something++ << endl;
+		show_something = false;
+		something = 0;
+	}
+
 	glPopMatrix();
 	glPopMatrix();
 
@@ -531,12 +538,7 @@ void GLArea::paintGL()
 
 	}
 
-	if (show_something)
-	{
-		cout << "show something: final" << something++ << endl;
-		show_something = false;
-		something = 0;
-	}
+
 
 PAINT_RETURN:
 	paintMutex.unlock();
@@ -1854,6 +1856,10 @@ void GLArea::wheelEvent(QWheelEvent *e)
 
 		case  Qt::AltModifier:
 			size_temp = global_paraMgr.data.getDouble("CGrid Radius");
+			if (size_temp < 1e-20)
+			{
+				size_temp = 0.05;
+			}
 			global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(size_temp * change));
       global_paraMgr.setGlobalParameter("Initial Radius", DoubleValue(size_temp * change));
 
