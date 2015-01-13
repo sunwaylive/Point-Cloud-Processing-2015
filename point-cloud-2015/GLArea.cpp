@@ -1164,6 +1164,12 @@ void GLArea::saveSnapshot()
 		emit needUpdateStatus();
 	
 		para->setValue("Snapshot Index", DoubleValue(snape_idx));
+
+		QString skel_file_name = QString(QString(".\\snapfile\\")) + ss.basename + QString(".skel");
+		dataMgr.saveSkeletonAsSkel(skel_file_name);
+
+		skel_file_name.replace(".skel", ".View");
+		saveView(skel_file_name);
 	}
 
 	takeSnapTile = true;
@@ -1215,6 +1221,7 @@ void GLArea::runWlop()
 				&& !global_paraMgr.wLop.getBool("Run Compute Confidence"))
 			{
 				saveSnapshot();
+
 			}
 
 		}
@@ -1505,6 +1512,7 @@ void GLArea::saveView(QString fileName)
 	outfile << global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold") << endl;
 
 	outfile << global_paraMgr.wLop.getDouble("Data Outweigh Similarity Para") << endl;
+	outfile << global_paraMgr.wLop.getDouble("Confidence Power") << endl;
 
 
 	outfile.close();
@@ -1663,6 +1671,8 @@ void GLArea::loadView(QString fileName)
 
 
 		infile >> temp; global_paraMgr.wLop.setValue("Data Outweigh Similarity Para", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("Confidence Power", DoubleValue(temp));
+
 	}
 
 

@@ -2494,6 +2494,7 @@ void WLOP::runComputeConfidence()
 	}
 
 	GlobalFun::normalizeConfidence(samples->vert, 0);
+	double confidenc_power = para->getDouble("Confidence Power");
 
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
@@ -2508,7 +2509,7 @@ void WLOP::runComputeConfidence()
 		}
 		else
 		{
-			v.eigen_confidence = pow(1 - v.eigen_confidence, 2);
+			v.eigen_confidence = pow(1 - v.eigen_confidence, confidenc_power);
 		}
 		
 	}

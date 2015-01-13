@@ -117,6 +117,9 @@ void WlopParaDlg::initConnects()
 	connect(ui->Save_Move_Dist_Along_Normal_Para, SIGNAL(valueChanged(double)), this, SLOT(Save_Move_Dist_Along_Normal_Para(double)));
 	connect(ui->Big_Repulsion_Power, SIGNAL(valueChanged(double)), this, SLOT(Big_Repulsion_Power(double)));
 
+	connect(ui->Confidence_Power, SIGNAL(valueChanged(double)), this, SLOT(Confidence_Power(double)));
+	connect(ui->Data_Outweigh_Similarity_Para, SIGNAL(valueChanged(double)), this, SLOT(Data_Outweigh_Similarity_Para(double)));
+
 	connect(ui->Protect_Small_Tubular_Para, SIGNAL(valueChanged(double)), this, SLOT(Protect_Small_Tubular_Para(double)));
 	connect(ui->Protect_High_Confidence_Para, SIGNAL(valueChanged(double)), this, SLOT(Protect_High_Confidence_Para(double)));
 
@@ -268,6 +271,9 @@ bool WlopParaDlg::initWidgets()
 
 	ui->Protect_Small_Tubular_Para->setValue(m_paras->wLop.getDouble("Protect Small Tubular Para"));
 	ui->Protect_High_Confidence_Para->setValue(m_paras->wLop.getDouble("Protect High Confidence Para"));
+
+	ui->Confidence_Power->setValue(m_paras->wLop.getDouble("Confidence Power"));
+	ui->Data_Outweigh_Similarity_Para->setValue(m_paras->wLop.getDouble("Data Outweigh Similarity Para"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -492,6 +498,15 @@ void WlopParaDlg::Protect_High_Confidence_Para(double _val)
 	m_paras->wLop.setValue("Protect High Confidence Para", DoubleValue(_val));
 }
 
+void WlopParaDlg::Confidence_Power(double _val)
+{
+	m_paras->wLop.setValue("Confidence Power", DoubleValue(_val));
+}
+
+void WlopParaDlg::Data_Outweigh_Similarity_Para(double _val)
+{
+	m_paras->wLop.setValue("Data Outweigh Similarity Para", DoubleValue(_val));
+}
 
 void WlopParaDlg::isDensity(bool _val)
 {
@@ -1241,9 +1256,9 @@ void WlopParaDlg::applyMoveSample()
 
 void WlopParaDlg::applyMoveSkel()
 {
-	m_paras->wLop.setValue("Run Move Skel", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Move Skel", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Move Skel", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Move Skel", BoolValue(false));
 }
 
 void WlopParaDlg::applyComputeEigenDirections()

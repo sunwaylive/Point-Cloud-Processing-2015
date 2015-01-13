@@ -110,7 +110,7 @@ void ParameterMgr::initGlareaParameter()
 
 
   glarea.addParam(new RichDouble("Picked Index", 0));
-	glarea.addParam(new RichBool("Show Cloest Dual Connection", false));
+	glarea.addParam(new RichBool("Show Cloest Dual Connection", true));
 
 	glarea.addParam(new RichBool("GLarea Busying", false) );
   glarea.addParam(new RichBool("Algorithom Stop", false) );
@@ -327,6 +327,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.50000));
 	wLop.addParam(new RichDouble("Original Confidence KNN", 155));
 
+	wLop.addParam(new RichDouble("Confidence Power", 3.0));
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
@@ -346,10 +347,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));
 	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.90));
 
-	wLop.addParam(new RichDouble("Data Outweigh Similarity Para", 1.5));
-
-
-
+	wLop.addParam(new RichDouble("Data Outweigh Similarity Para", 1.0));
 
 	wLop.addParam(new RichBool("Only Do Repuslion", false));
 	wLop.addParam(new RichBool("Only Do Avergage", false));

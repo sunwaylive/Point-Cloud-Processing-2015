@@ -64,6 +64,10 @@ class WlopParaDlg : public QFrame
 		void Protect_Small_Tubular_Para(double _val);
 		void Protect_High_Confidence_Para(double _val);
 
+		void Confidence_Power(double _val);
+		void Data_Outweigh_Similarity_Para(double _val);
+
+
 
 		void isDensity(bool _val);
 		void isPca(bool _val);
