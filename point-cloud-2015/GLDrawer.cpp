@@ -42,6 +42,8 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	pick_color = para->getColor("Pick Point Color");
 
 	bUseConfidenceColor = global_paraMgr.drawer.getBool("Show Confidence Color");
+	bUseSegmentaionColor = global_paraMgr.drawer.getBool("Show Segmentation Color");
+
 	sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
 	iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
 
@@ -170,17 +172,33 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
 // 	}
 
+	if (v.is_boundary && v.is_fixed_original && bUseSegmentaionColor)
+	{
+		//return cBlue;
+		return cBlack;
+	}
 
-	if (v.is_skel_branch && bUseConfidenceColor)
+	if (v.is_skel_branch && bUseSegmentaionColor)
   	{
   		return cBlue;
   	}
 
-	if (v.is_skel_virtual && bUseConfidenceColor)
+	if (v.is_skel_virtual && bUseSegmentaionColor)
   	{
   		return cGray;
   	}
 
+	if (v.is_boundary && bUseSegmentaionColor)
+	{
+		//return cBlue;
+		return cOrange;
+	}
+
+	if (v.is_fixed_original && bUseSegmentaionColor)
+	{
+		//return cBlue;
+		return cGreen;
+	}
 
 	if (v.is_boundary && bUseConfidenceColor)
    {

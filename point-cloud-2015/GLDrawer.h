@@ -143,6 +143,8 @@ private:
 	double skel_branch_size;
 
 	bool bUseConfidenceColor;
+	bool bUseSegmentaionColor;
+
 
 	int prevPickIndex;
 	Point3f curr_pick;

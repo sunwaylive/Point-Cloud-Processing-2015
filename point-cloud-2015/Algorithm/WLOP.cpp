@@ -747,10 +747,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			else
 			if (use_tangent /*&& !use_confidence*/)
 			{
-				if (i < 2)
-				{
-					cout << "use_tangent use_tangent use_tangent" << endl;
-				}
+// 				if (i < 2)
+// 				{
+// 					cout << "use_tangent use_tangent use_tangent" << endl;
+// 				}
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
 			}
@@ -1359,19 +1359,19 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 			double dist_diff = exp(dist2 * iradius16);
 
 			double sign_dist = t.skel_radius - v.skel_radius;
-			double length_dist = abs(sign_dist);
-			if (sign_dist > length_threshold_dist)
-			{
-				continue;
-			}
+			//double length_dist = abs(sign_dist);
+// 			if (sign_dist > length_threshold_dist * 2)
+// 			{
+// 				continue;
+// 			}
 // 
-// 			double length_dist = v.skel_radius - t.skel_radius;
-// 			double length_dist2 = length_dist *length_dist;
-// 			double length_diff = exp(dist2 * iradius16_length);
+ 			double length_dist = v.skel_radius - t.skel_radius;
+ 			double length_dist2 = length_dist *length_dist;
+ 			double length_diff = exp(dist2 * iradius16_length);
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
-			weight = direction_diff * dist_diff /** length_diff*/;
+			weight = direction_diff * dist_diff * length_diff;
 
 
 			if (use_confidence && t.eigen_confidence > 1e-5)
@@ -1757,6 +1757,9 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 	bool use_confidence_to_combine = para->getBool("Use Confidence To Merge");
 
+	double protect_small_tubular_radius_para = para->getDouble("Protect Small Tubular Para");
+	double protect_high_confidence_para = para->getDouble("Protect High Confidence Para");
+
 	Point3f c;
 
 	vector<Point3f> new_pos(samples->vert.size());
@@ -1773,6 +1776,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 		double dlink_length = sqrt(diff.SquaredNorm());
 
 		c = v.P();
+
+		//save_move_threshold_along_normal = dlink_length * para->getDouble("Save Move Dist Along Normal Para");
 
 		if (v.is_fixed_sample)
 		{
@@ -1842,20 +1847,28 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 //  					{
 //  						new_pos[i] = sim_point;
 //  					}
+					v.is_skel_virtual = false;
+					v.is_boundary = false;
+					v.is_skel_branch = false;
+					v.is_fixed_original = false;
+
 					if (0)
 					{
 					}
-					else if (v.eigen_confidence > 0.83)
-					{
-						new_pos[i] = avg_point;
-					}
-					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*2.8))
+					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*protect_small_tubular_radius_para))
 					{
 
 						new_pos[i] = sim_point;
-						v.is_skel_virtual = true;
+						v.is_skel_virtual = true; // gray
 
 					}
+					else if (v.eigen_confidence > protect_high_confidence_para)
+					{
+						new_pos[i] = avg_point;
+						v.is_skel_branch = true; // blue
+
+					}
+
 					else if (dist < radius_threshold)
 					{
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
@@ -1872,33 +1885,43 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 							else
 							{
 								new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1 - v.eigen_confidence);
+
+								v.is_boundary = true; //orange
 							}
 						}
 						else
 						{
-							if (dist_avg < dist_sim)
+							if (dist_avg < dist_sim * 13.0)
 							{
 								new_pos[i] = avg_point;
+
+								v.is_boundary = true; //orange
+								v.is_fixed_original = true; // green // black
 
 							}
 							else
 							{
 								new_pos[i] = sim_point;
-
+								v.is_fixed_original = true; // green
 							}
 							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
 						}
 					}
 					else
 					{
-						if (dist_avg < dist_sim)
+						if (dist_avg < dist_sim * 13.0)
 						{
 							new_pos[i] = avg_point;
+
+							v.is_boundary = true; //orange
+							v.is_fixed_original = true; // green // black
 
 						}
 						else
 						{
 							new_pos[i] = sim_point;
+
+							v.is_fixed_original = true; // green 
 
 						}
 					}
@@ -4503,6 +4526,16 @@ void WLOP::runRegularizeNormals()
 			continue;
 		}
 
+		if (use_confidence && dual_v.eigen_confidence < 0.95)
+		{
+			if (dir.Normalize() * v.N() < 0)
+			{
+				v.N() *= -1;
+			}
+
+			continue;
+		}
+
 		//v.N() = dir.Normalize();
 // 		if (dual_v.eigen_confidence > eigen_directional_threshold)
 //  		{
@@ -6112,7 +6145,7 @@ void WLOP::runProgressiveNeighborhood()
 	int max_knn = para->getDouble("Progressive Max KNN");
 	int step_size = 1;
 	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, max_knn, false, "runProgressiveNeighborhood KNN");
-
+	//
 	bool use_tangent = para->getBool("Use Tangent Vector");
 
 	int pick_index = global_paraMgr.glarea.getDouble("Picked Index");

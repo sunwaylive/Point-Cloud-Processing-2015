@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1321</width>
+    <width>1311</width>
     <height>573</height>
    </rect>
   </property>
@@ -40,7 +40,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1321</width>
+     <width>1311</width>
      <height>21</height>
     </rect>
    </property>
@@ -117,6 +117,7 @@
      <addaction name="actionDiffuse_Color"/>
      <addaction name="actionSpecular_Color"/>
      <addaction name="actionShow_Individual_Color"/>
+     <addaction name="actionShow_Segment_Color"/>
     </widget>
     <widget class="QMenu" name="menuSample_Render">
      <property name="title">
@@ -167,6 +168,7 @@
      <addaction name="actionClean_Pick"/>
      <addaction name="actionSpray_Erase"/>
      <addaction name="actionMultiple_Pick"/>
+     <addaction name="actionRandom_Erase"/>
     </widget>
     <widget class="QMenu" name="menuSkeleton_Render">
      <property name="title">
@@ -245,6 +247,7 @@
    <addaction name="separator"/>
    <addaction name="actionShow_Sample_Circle"/>
    <addaction name="actionShow_Sample_Dot"/>
+   <addaction name="actionShow_Sample_Sphere"/>
    <addaction name="actionSwitch_Sample_DualSample"/>
    <addaction name="actionShow_Target"/>
   </widget>
@@ -280,6 +283,7 @@
    <addaction name="action_Dual_Dot"/>
    <addaction name="action_Dual_Sphere"/>
    <addaction name="actionShow_Picked_Neighbor"/>
+   <addaction name="actionShow_Segment_Color"/>
   </widget>
   <widget class="QToolBar" name="toolBar_2">
    <property name="windowTitle">
@@ -299,6 +303,7 @@
    <addaction name="actionShow_Original_Circle"/>
    <addaction name="actionOriginal_Color"/>
    <addaction name="actionMultiple_Pick"/>
+   <addaction name="actionRandom_Erase"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -877,6 +882,22 @@
    </property>
    <property name="text">
     <string>Multiple Pick</string>
+   </property>
+  </action>
+  <action name="actionRandom_Erase">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Random Erase</string>
+   </property>
+  </action>
+  <action name="actionShow_Segment_Color">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Segment Color</string>
    </property>
   </action>
  </widget>

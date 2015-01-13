@@ -106,6 +106,9 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Radius Use Pick", true));
 	glarea.addParam(new RichBool("Show Red Radius Line", true));
 	glarea.addParam(new RichBool("Multiply Pick Point", false) );
+	glarea.addParam(new RichBool("Random Erase", false));
+
+
   glarea.addParam(new RichDouble("Picked Index", 0));
 	glarea.addParam(new RichBool("Show Cloest Dual Connection", false));
 
@@ -148,13 +151,16 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Use Pick Mode2", false) );
 	drawer.addParam(new RichBool("Skeleton Light", true));
 	drawer.addParam(new RichBool("Show Individual Color", false));
+
 	drawer.addParam(new RichBool("Use Color From Normal", false));
   drawer.addParam(new RichBool("Use Differ Branch Color", false));
 	drawer.addParam(new RichBool("Show Confidence Color", false));
+	drawer.addParam(new RichBool("Show Segmentation Color", false));
+
 	drawer.addParam(new RichBool("Show Feature Color", true));
 
 
-  drawer.addParam(new RichBool("Draw Picked Point Neighbor", true));
+  drawer.addParam(new RichBool("Draw Picked Point Neighbor", false));
 
 
 	drawer.addParam(new RichDouble("Original Draw Width", 0.0010));
@@ -324,7 +330,7 @@ void ParameterMgr::initWLopParameter()
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
-	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 5.8));//no need?
+	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 0.5));//no need?
 
 
 	//void WLOP::runRegularizeNormals()
@@ -333,11 +339,11 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
-	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.3));
+	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.2));
 	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
-
-	wLop.addParam(new RichDouble("Protect Small Tubular Para", 0.18));
-	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.83));
+	//
+	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));
+	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.90));
 
 
 

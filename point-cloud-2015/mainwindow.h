@@ -112,6 +112,9 @@ private slots:
 	void showConfidenceColor(bool _val);
 	void multiplPick(bool _val);
 
+	void randomErasePick(bool _val);
+	void ShowSegmentColor(bool _val);
+
 
 private slots:
 	void sampleColor();

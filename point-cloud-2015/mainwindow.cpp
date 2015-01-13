@@ -65,6 +65,8 @@ void MainWindow::initWidgets()
 	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
 	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Multiply Pick Point"));
 
+	ui.actionRandom_Erase->setChecked(paras->glarea.getBool("Random Erase"));
+	ui.actionShow_Segment_Color->setChecked(paras->drawer.getBool("Show Segmentation Color"));
 
 }
 
@@ -124,6 +126,8 @@ void MainWindow::initConnect()
 	connect(ui.actionShow_Eigens, SIGNAL(toggled(bool)), this, SLOT(showEigenDirections(bool)));
 	connect(ui.actionMultiple_Pick, SIGNAL(toggled(bool)), this, SLOT(multiplPick(bool)));
 
+	connect(ui.actionRandom_Erase, SIGNAL(toggled(bool)), this, SLOT(randomErasePick(bool)));
+	connect(ui.actionShow_Segment_Color, SIGNAL(toggled(bool)), this, SLOT(ShowSegmentColor(bool)));
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
@@ -988,6 +992,18 @@ void MainWindow::showConfidenceColor(bool _val)
 void MainWindow::multiplPick(bool _val)
 {
 	global_paraMgr.glarea.setValue("Multiply Pick Point", BoolValue(_val));
+	area->updateGL();
+}
+
+void MainWindow::randomErasePick(bool _val)
+{
+	global_paraMgr.glarea.setValue("Random Erase", BoolValue(_val));
+	area->updateGL();
+}
+
+void MainWindow::ShowSegmentColor(bool _val)
+{
+	global_paraMgr.drawer.setValue("Show Segmentation Color", BoolValue(_val));
 	area->updateGL();
 }
 

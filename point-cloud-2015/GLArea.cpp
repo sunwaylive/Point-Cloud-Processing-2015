@@ -2097,6 +2097,7 @@ void GLArea::removePickPoint()
 {
 	CMesh* samples = dataMgr.getCurrentSamples();
   CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+	bool use_random_erase = para->getBool("Random Erase");
 
 	CMesh::VertexIterator vi;
 	int j = 0;
@@ -2106,9 +2107,14 @@ void GLArea::removePickPoint()
 		vi->neighbors.clear();
 	}
 
+	int step_size = 2;
+	if (!use_random_erase)
+	{
+		step_size = 1;
+	}
 	if (!para->getBool("Multiply Pick Point"))
 	{
-		for(int i = 0; i < pickList.size(); i+=5) 
+		for (int i = 0; i < pickList.size(); i += step_size)
 		{
 			if(pickList[i] < 0 || pickList[i] >= samples->vert.size())
 				continue;
@@ -2121,7 +2127,7 @@ void GLArea::removePickPoint()
 	}
 	else
 	{		
-		for (int i = 0; i < pickList.size(); i+= 2)
+		for (int i = 0; i < pickList.size(); i += step_size)
 		{
 			samples->vert[pickList[i]].is_skel_ignore = true;
       dual_samples->vert[pickList[i]].is_skel_ignore = true;
