@@ -330,13 +330,14 @@ void ParameterMgr::initWLopParameter()
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
-	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 0.5));//no need?
+	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 3.5));//no need?
 
 
 	//void WLOP::runRegularizeNormals()
 	wLop.addParam(new RichDouble("Density Confidence Segment Threshold", 0.8));
-	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.95000));
+	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.65000));
 	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
+
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.2));
@@ -344,6 +345,9 @@ void ParameterMgr::initWLopParameter()
 	//
 	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));
 	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.90));
+
+	wLop.addParam(new RichDouble("Data Outweigh Similarity Para", 1.5));
+
 
 
 

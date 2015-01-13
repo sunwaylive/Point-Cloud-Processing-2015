@@ -1504,6 +1504,7 @@ void GLArea::saveView(QString fileName)
 	outfile << global_paraMgr.skeleton.getDouble("Sigma KNN") << endl;
 	outfile << global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold") << endl;
 
+	outfile << global_paraMgr.wLop.getDouble("Data Outweigh Similarity Para") << endl;
 
 
 	outfile.close();
@@ -1660,6 +1661,8 @@ void GLArea::loadView(QString fileName)
 		infile >> temp; global_paraMgr.skeleton.setValue("Sigma KNN", DoubleValue(temp));
 		infile >> temp; global_paraMgr.skeleton.setValue("Eigen Feature Identification Threshold", DoubleValue(temp));
 
+
+		infile >> temp; global_paraMgr.wLop.setValue("Data Outweigh Similarity Para", DoubleValue(temp));
 	}
 
 

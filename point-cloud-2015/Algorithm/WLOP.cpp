@@ -1759,6 +1759,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 	double protect_small_tubular_radius_para = para->getDouble("Protect Small Tubular Para");
 	double protect_high_confidence_para = para->getDouble("Protect High Confidence Para");
+	double data_outweigh_simimlarity_para = para->getDouble("Data Outweigh Similarity Para");
 
 	Point3f c;
 
@@ -1891,7 +1892,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						}
 						else
 						{
-							if (dist_avg < dist_sim * 13.0)
+							if (dist_avg < dist_sim * data_outweigh_simimlarity_para)
 							{
 								new_pos[i] = avg_point;
 
@@ -1909,7 +1910,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					}
 					else
 					{
-						if (dist_avg < dist_sim * 13.0)
+						if (dist_avg < dist_sim * data_outweigh_simimlarity_para)
 						{
 							new_pos[i] = avg_point;
 
@@ -4526,7 +4527,7 @@ void WLOP::runRegularizeNormals()
 			continue;
 		}
 
-		if (use_confidence && dual_v.eigen_confidence < 0.95)
+		if (use_confidence && dual_v.eigen_confidence < eigen_directional_threshold)
 		{
 			if (dir.Normalize() * v.N() < 0)
 			{
