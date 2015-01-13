@@ -1208,9 +1208,15 @@ void GLArea::runWlop()
     }
 
 		runPointCloudAlgorithm(wlop);
+
 		if (para->getBool("SnapShot Each Iteration"))
 		{
-			saveSnapshot();
+			if (!global_paraMgr.wLop.getBool("Run Regularize Normals")
+				&& !global_paraMgr.wLop.getBool("Run Compute Confidence"))
+			{
+				saveSnapshot();
+			}
+
 		}
 
 // 		int sleep_time = 100;
