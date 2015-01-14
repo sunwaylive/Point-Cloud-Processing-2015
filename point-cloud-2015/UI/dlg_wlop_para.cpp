@@ -1344,26 +1344,27 @@ void WlopParaDlg::oneKEY()
 
 	}
 
-
-	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-	CMesh* samples;
-	samples = area->dataMgr.getCurrentSamples();
-	vector<Point3f> remember_normal(samples->vert.size());
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		remember_normal[i] = samples->vert[i].N();
-	}
-	vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
-	pca_para.fittingAdjNum = knn;
-	vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		if (v.N() * remember_normal[i] < 0)
-		{
-			v.N() *= -1;
-		}
-	}
+	//system("Pause");
+// 	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+// 	CMesh* samples;
+// 	samples = area->dataMgr.getCurrentSamples();
+// 	vector<Point3f> remember_normal(samples->vert.size());
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		remember_normal[i] = samples->vert[i].N();
+// 	}
+// 	vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+// 	pca_para.fittingAdjNum = knn;
+// 	vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		if (v.N() * remember_normal[i] < 0)
+// 		{
+// 			v.N() *= -1;
+// 		}
+// 		v.recompute_m_render();
+// 	}
 
 // 	CMesh* samples;
 // 	samples = area->dataMgr.getCurrentSamples();

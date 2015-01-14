@@ -71,6 +71,9 @@ private:
 
 	vector<Point3f> computeNewSamplePositions(int& error_x);
 
+	//void smoothingDecisions();
+	vector<double> decisions;
+
 	void computeAverageTerm(CMesh* samples, CMesh* original);
   void computeAverageAddSampleTerm(CMesh* samples, CMesh* original);
 

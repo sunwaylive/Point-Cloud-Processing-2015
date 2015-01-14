@@ -1213,18 +1213,11 @@ void GLArea::runWlop()
       break;
     }
 
+
+		
 		runPointCloudAlgorithm(wlop);
 
-		if (para->getBool("SnapShot Each Iteration"))
-		{
-			if (!global_paraMgr.wLop.getBool("Run Regularize Normals")
-				&& !global_paraMgr.wLop.getBool("Run Compute Confidence"))
-			{
-				saveSnapshot();
 
-			}
-
-		}
 
 // 		int sleep_time = 100;
 // 		QTime dieTime = QTime::currentTime().addMSecs(sleep_time);
@@ -1235,6 +1228,40 @@ void GLArea::runWlop()
 		update();
 		updateGL();
     emit needUpdateStatus();
+
+
+
+// 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+// 		CMesh* samples;
+// 		samples = dataMgr.getCurrentSamples();
+// 		vector<Point3f> remember_normal(samples->vert.size());
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			remember_normal[i] = samples->vert[i].N();
+// 		}
+// 		vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+// 		pca_para.fittingAdjNum = knn;
+// 		vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			CVertex& v = samples->vert[i];
+// 			if (v.N() * remember_normal[i] < 0)
+// 			{
+// 				v.N() *= -1;
+// 			}
+// 		}
+	}
+
+
+	if (para->getBool("SnapShot Each Iteration"))
+	{
+		if (!global_paraMgr.wLop.getBool("Run Regularize Normals")
+			&& !global_paraMgr.wLop.getBool("Run Compute Confidence"))
+		{
+			saveSnapshot();
+
+		}
+
 	}
 
 // 	CMesh* samples = dataMgr.getCurrentSamples();
@@ -1272,7 +1299,7 @@ void GLArea::runWlop()
 	
 	cout << "wloppppppppppppppppppppppppppppp 3" << endl;
 
-	show_something = true;
+	//show_something = true;
 }
 
 void GLArea::runSkeletonization_linear()
