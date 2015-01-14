@@ -1265,7 +1265,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double iradius16 = -4.0 / radius2;
 	double iradius16_perpend = -4.0 / radius2;
 
-	double length_threshold_dist = para->getDouble("CGrid Radius") * length_threshold;
+	double length_threshold_dist = para->getDouble("CGrid Radius") /** length_threshold*/;
 	double length_threshold_dist2 = length_threshold_dist * length_threshold_dist;
 	double iradius16_length = -4.0 / length_threshold_dist2;
 
@@ -1360,14 +1360,14 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 			double sign_dist = t.skel_radius - v.skel_radius;
 			//double length_dist = abs(sign_dist);
-// 			if (sign_dist > length_threshold_dist * 2)
-// 			{
-// 				continue;
-// 			}
+ 			if (sign_dist > length_threshold_dist)
+ 			{
+ 				continue;
+ 			}
 // 
-//  			double length_dist = v.skel_radius - t.skel_radius;
-//  			double length_dist2 = length_dist *length_dist;
-//  			double length_diff = exp(dist2 * iradius16_length);
+  			double length_dist = v.skel_radius - t.skel_radius;
+  			double length_dist2 = length_dist *length_dist;
+  			double length_diff = exp(dist2 * iradius16_length);
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);

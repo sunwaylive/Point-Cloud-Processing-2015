@@ -306,10 +306,10 @@ void ParameterMgr::initWLopParameter()
 
 
 	// generating inner points
-	wLop.addParam(new RichDouble("Increasing Step Size", 0.003));
+	wLop.addParam(new RichDouble("Increasing Step Size", 0.01));
 	wLop.addParam(new RichDouble("Local Neighbor Size For Inner Points", 0.040));
-	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.060));
-	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.7));
+	wLop.addParam(new RichDouble("Local Neighbor Size For Surface Points", 0.1));
+	wLop.addParam(new RichDouble("Inner Points Cooling Parameter", 0.5));
 
 
 	//new parameters:
@@ -331,17 +331,17 @@ void ParameterMgr::initWLopParameter()
 
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
-	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 3.5));//no need?
+	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 4.5));//no need?
 
 
 	//void WLOP::runRegularizeNormals()
 	wLop.addParam(new RichDouble("Density Confidence Segment Threshold", 0.8));
-	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.65000));
+	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.55000));
 	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
 
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
-	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.2));
+	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.35));
 	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
 	//
 	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));

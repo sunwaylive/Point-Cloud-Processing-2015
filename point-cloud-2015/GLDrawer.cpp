@@ -991,7 +991,7 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 		CVertex& dual_v = dual_samples->vert[index];
     //CVertex& dual_v = samples->vert[v.dual_index];
  	
-		if (bUseConfidenceColor)
+		if (0/*bUseConfidenceColor*/)
 		{
 			Point3f diff = v.P() - dual_v.P();
 			double proj_dist = diff * v.N();
