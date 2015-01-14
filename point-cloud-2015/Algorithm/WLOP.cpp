@@ -1306,7 +1306,8 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		GlobalFun::computeBallNeighbors(dual_samples, NULL, radius, samples->bbox);
 	}
 
-	
+	double length_threshold_percentage = para->getDouble("Similarity Length Outlier Threshold");
+
 
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
@@ -1371,10 +1372,10 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 			double sign_dist = t.skel_radius - v.skel_radius;
 			//double length_dist = abs(sign_dist);
- 			if (sign_dist > length_threshold_dist)
- 			{
- 				continue;
- 			}
+//  			if (sign_dist > length_threshold_dist)
+//  			{
+//  				continue;
+//  			}
 // 
   			double length_dist = v.skel_radius - t.skel_radius;
   			double length_dist2 = length_dist *length_dist;
@@ -1383,10 +1384,10 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
 			
-			if (similarity_KNN > 2)
-			{
-				direction_diff = 1.0;
-			}
+// 			if (similarity_KNN > 2)
+// 			{
+// 				direction_diff = 1.0;
+// 			}
 			
 			weight = direction_diff * dist_diff /** length_diff*/;
 
