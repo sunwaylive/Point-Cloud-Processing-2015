@@ -1425,8 +1425,10 @@ void GLArea::saveView(QString fileName)
 	outfile << global_paraMgr.drawer.getDouble("Normal Line Width") << endl;
 	outfile << global_paraMgr.drawer.getDouble("Normal Line Length") << endl;
 
-	outfile << rotate_pos[0] << " " << rotate_pos[1] << " " << rotate_pos[2] << " " << endl;
-	outfile << rotate_normal[0] << " " << rotate_normal[1] << " " << rotate_normal[2] << " " << endl;
+// 	outfile << rotate_pos[0] << " " << rotate_pos[1] << " " << rotate_pos[2] << " " << endl;
+// 	outfile << rotate_normal[0] << " " << rotate_normal[1] << " " << rotate_normal[2] << " " << endl;
+	outfile << 0.0 << " " << 0.0 << " " << rotate_pos[2] << " " << endl;
+	outfile << 0.0 << " " << 0.0 << " " << 1.0  << " " << endl;
 
 	outfile << global_paraMgr.drawer.getDouble("Original Dot Size") << endl;
 

@@ -1856,6 +1856,13 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					if (0)
 					{
 					}
+
+					else if (v.eigen_confidence > protect_high_confidence_para)
+					{
+						new_pos[i] = avg_point;
+						v.is_skel_branch = true; // blue
+
+					}
 					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*protect_small_tubular_radius_para))
 					{
 
@@ -1863,13 +1870,6 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						v.is_skel_virtual = true; // gray
 
 					}
-					else if (v.eigen_confidence > protect_high_confidence_para)
-					{
-						new_pos[i] = avg_point;
-						v.is_skel_branch = true; // blue
-
-					}
-
 					else if (dist < radius_threshold)
 					{
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
