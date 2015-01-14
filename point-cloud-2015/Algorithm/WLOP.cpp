@@ -1377,9 +1377,9 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 //  				continue;
 //  			}
 // 
-  			double length_dist = v.skel_radius - t.skel_radius;
-  			double length_dist2 = length_dist *length_dist;
-  			double length_diff = exp(dist2 * iradius16_length);
+//   			double length_dist = v.skel_radius - t.skel_radius;
+//   			double length_dist2 = length_dist *length_dist;
+// 				double length_diff = exp(length_dist2 * iradius16_length);
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
@@ -1874,7 +1874,12 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					if (0)
 					{
 					}
+					else if (v.eigen_confidence > protect_high_confidence_para)
+					{
+						new_pos[i] = avg_point;
+						v.is_skel_branch = true; // blue
 
+					}
 					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*protect_small_tubular_radius_para))
 					{
 
@@ -1882,12 +1887,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						v.is_skel_virtual = true; // gray
 
 					}
-					else if (v.eigen_confidence > protect_high_confidence_para)
-					{
-						new_pos[i] = avg_point;
-						v.is_skel_branch = true; // blue
 
-					}
+
 					else if (dist < radius_threshold)
 					{
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
