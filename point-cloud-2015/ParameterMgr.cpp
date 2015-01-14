@@ -332,6 +332,7 @@ void ParameterMgr::initWLopParameter()
 	//void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	wLop.addParam(new RichDouble("Similarity Term Neighbor Para", 1.50000));
 	wLop.addParam(new RichDouble("Similarity Length Outlier Threshold", 4.5));//no need?
+	wLop.addParam(new RichDouble("KNN For Similarity", 25));//no need?
 
 
 	//void WLOP::runRegularizeNormals()

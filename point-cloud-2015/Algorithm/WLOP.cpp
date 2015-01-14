@@ -1272,6 +1272,8 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
+	int similarity_KNN = para->getDouble("KNN For Similarity");
+
 	bool use_confidence = para->getBool("Use Confidence");
 	if (use_confidence)
 	{
@@ -1293,8 +1295,17 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	}
 
 	// compute neighbor from dual points
-	GlobalFun::computeBallNeighbors(samples, NULL, radius, samples->bbox);
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, radius, samples->bbox);
+	if (similarity_KNN > 2)
+	{
+		GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, similarity_KNN, false, "Similarity KNN");
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, similarity_KNN, false, "Similarity KNN");
+	}
+	else
+	{
+		GlobalFun::computeBallNeighbors(samples, NULL, radius, samples->bbox);
+		GlobalFun::computeBallNeighbors(dual_samples, NULL, radius, samples->bbox);
+	}
+
 	
 
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -1371,6 +1382,12 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
 			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
+			
+			if (similarity_KNN > 2)
+			{
+				direction_diff = 1.0;
+			}
+			
 			weight = direction_diff * dist_diff /** length_diff*/;
 
 
@@ -1857,17 +1874,17 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					{
 					}
 
-					else if (v.eigen_confidence > protect_high_confidence_para)
-					{
-						new_pos[i] = avg_point;
-						v.is_skel_branch = true; // blue
-
-					}
 					else if (dual_v.eigen_confidence > 0.95 && dlink_length < (average_dist*protect_small_tubular_radius_para))
 					{
 
 						new_pos[i] = sim_point;
 						v.is_skel_virtual = true; // gray
+
+					}
+					else if (v.eigen_confidence > protect_high_confidence_para)
+					{
+						new_pos[i] = avg_point;
+						v.is_skel_branch = true; // blue
 
 					}
 					else if (dist < radius_threshold)
