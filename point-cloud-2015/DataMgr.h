@@ -56,7 +56,10 @@ public:
 	void downSamplesByNum(bool use_random_downsample = true);
 	void subSamples();
 
-	void normalizeROSA_Mesh(CMesh& mesh);
+	Point3f normalizeROSA_Mesh(CMesh& mesh);
+
+	void normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f box);
+
 	Box3f normalizeAllMesh();
 
 	void eraseRemovedSamples();

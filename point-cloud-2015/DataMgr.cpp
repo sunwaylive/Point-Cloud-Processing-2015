@@ -609,9 +609,48 @@ void DataMgr::savePly(QString fileName, CMesh& mesh)
 //	}
 //}
 
-void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
+void DataMgr::normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f mid_point)
 {
 	if (mesh.vert.empty()) return;
+
+	Box3f box = mesh.bbox;
+
+	mesh.bbox.SetNull();
+	float max_x = abs((box.min - box.max).X());
+	float max_y = abs((box.min - box.max).Y());
+	float max_z = abs((box.min - box.max).Z());
+	float max_length = max_x > max_y ? max_x : max_y;
+	max_length = max_length > max_z ? max_length : max_z;
+
+	Box3f box_temp;
+	for (int i = 0; i < mesh.vert.size(); i++)
+	{
+		Point3f& p = mesh.vert[i].P();
+
+		p /= max_length;
+
+		mesh.vert[i].N().Normalize();
+		box_temp.Add(p);
+	}
+
+// 	Point3f mid_point = (box_temp.min + box_temp.max) / 2.0;
+// 	mid_point = (box.min + box.max) / 2.0;
+
+
+	mesh.bbox.SetNull();
+	for (int i = 0; i < mesh.vert.size(); i++)
+	{
+		Point3f& p = mesh.vert[i].P();
+		p -= mid_point;
+		p *= 2.0;
+		mesh.bbox.Add(p);
+	}
+}
+
+
+Point3f DataMgr::normalizeROSA_Mesh(CMesh& mesh)
+{
+	//if (mesh.vert.empty()) return;
 
 	//mesh.bbox.SetNull();
 	Box3f box = mesh.bbox;
@@ -636,6 +675,8 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 	}
 
 	Point3f mid_point = (box_temp.min + box_temp.max) / 2.0;
+	//mid_point = (box.min + box.max) / 2.0;
+
 
 	mesh.bbox.SetNull();
 	for (int i = 0; i < mesh.vert.size(); i++)
@@ -646,6 +687,7 @@ void DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 		mesh.bbox.Add(p);
 	}
 
+	return mid_point;
 }
 
 //Box3f DataMgr::normalizeAllMesh()
@@ -709,10 +751,14 @@ Box3f DataMgr::normalizeAllMesh()
 
 	samples.bbox = box;
 	dual_samples.bbox = box;
+	original.bbox = box;
 
-	normalizeROSA_Mesh(samples);
+	Point3f mid = normalizeROSA_Mesh(samples);
   normalizeROSA_Mesh(dual_samples);
-	normalizeROSA_Mesh(original);
+	normalizeROSA_MeshForOriginal(original, mid);
+
+
+	
 
 	recomputeBox();
 	getInitRadiuse();
