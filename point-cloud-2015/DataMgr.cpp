@@ -410,7 +410,7 @@ void DataMgr::downSamplesByNum(bool use_random_downsample)
 
 	double radius = para->getDouble("CGrid Radius");
 	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
-	GlobalFun::computeBilateralConfidence(&original, radius, sigma);
+	//GlobalFun::computeBilateralConfidence(&original, radius, sigma);
 	cout << "GlobalFun::computeBilateralConfidence" << endl;
 
 	int want_sample_num = para->getDouble("Down Sample Num");

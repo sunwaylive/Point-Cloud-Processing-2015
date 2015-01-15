@@ -20,6 +20,9 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	useFeatureColor = para->getBool("Show Feature Color");
   useDifferBranchColor = para->getBool("Use Differ Branch Color");
 
+	showRadius = global_paraMgr.glarea.getBool("Show Radius");
+
+
 	original_draw_width = para->getDouble("Original Draw Width");
 	sample_draw_width = para->getDouble("Sample Draw Width");
 	dual_sample_draw_width = para->getDouble("Dual Sample Draw Width");
@@ -216,10 +219,10 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return cBlue;
 	}
 
-// 	if (v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
-// 	{
-// 		return cGreen;
-// 	}
+	if (showRadius && v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
+ 	{
+ 		return cGreen;
+ 	}
 
   if (v.is_dual_sample /*|| v.is_fixed_sample*/ )
   {

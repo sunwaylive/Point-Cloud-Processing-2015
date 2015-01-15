@@ -109,6 +109,7 @@ private:
 	bool useNormalColor;
 	bool useFeatureColor;
   bool useDifferBranchColor;
+	bool showRadius;
 
 	double original_draw_width;
 	double sample_draw_width;
