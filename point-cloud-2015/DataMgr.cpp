@@ -1894,6 +1894,21 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 }
 
 
+void DataMgr::replaceMesh(CMesh& src_mesh, CMesh& target_mesh, bool isOriginal)
+{
+	clearCMesh(target_mesh);
+	for (int i = 0; i < src_mesh.vert.size(); i++)
+	{
+		CVertex v = src_mesh.vert[i];
+		v.bIsOriginal = isOriginal;
+		v.m_index = i;
+		target_mesh.vert.push_back(v);
+	}
+	target_mesh.vn = src_mesh.vn;
+	target_mesh.bbox = src_mesh.bbox;
+}
+
+
 void DataMgr::replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual)
 {
   clearCMesh(target_mesh);
@@ -1906,6 +1921,15 @@ void DataMgr::replaceMeshDual(CMesh& src_mesh, CMesh& target_mesh, bool is_dual)
   }
   target_mesh.vn = src_mesh.vn;
   target_mesh.bbox = src_mesh.bbox;
+}
+
+
+void DataMgr::switchSampleOriginal()
+{
+	CMesh temp_mesh;
+	replaceMesh(original, temp_mesh, false);
+	replaceMesh(samples, original, true);
+	replaceMesh(temp_mesh, samples, false);
 }
 
 void DataMgr::switchSampleDualSample()

@@ -59,6 +59,7 @@
     <addaction name="actionImport_Image"/>
     <addaction name="actionSave_View"/>
     <addaction name="actionSwitch_Sample_DualSample"/>
+    <addaction name="actionSwitch_Sample_Original"/>
     <addaction name="actionAdd_Samples_To_Original"/>
    </widget>
    <widget class="QMenu" name="menuAlgorithom">
@@ -305,6 +306,7 @@
    <addaction name="actionMultiple_Pick"/>
    <addaction name="actionRandom_Erase"/>
    <addaction name="actionSnap_Each_Iteration"/>
+   <addaction name="actionSwitch_Sample_Original"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -899,6 +901,11 @@
    </property>
    <property name="text">
     <string>Show Segment Color</string>
+   </property>
+  </action>
+  <action name="actionSwitch_Sample_Original">
+   <property name="text">
+    <string>Switch Sample Original</string>
    </property>
   </action>
  </widget>

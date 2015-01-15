@@ -144,6 +144,7 @@ void MainWindow::initConnect()
 
 	connect(ui.actionErase_Pick,SIGNAL(triggered()),this,SLOT(removePickPoints()));
   connect(ui.actionSwitch_Sample_DualSample,SIGNAL(triggered()),this,SLOT(switchSampleDualSample()));
+	connect(ui.actionSwitch_Sample_Original, SIGNAL(triggered()), this, SLOT(switchSampleOriginal()));
 
 
   connect(ui.actionReorient_Pick, SIGNAL(triggered()), this, SLOT(reorientPick()));
@@ -980,6 +981,14 @@ void MainWindow::switchSampleDualSample()
   area->dataMgr.switchSampleDualSample();
   area->updateUI();
 }
+
+void MainWindow::switchSampleOriginal()
+{
+	area->cleanPickPoints();
+	area->dataMgr.switchSampleOriginal();
+	area->updateUI();
+}
+
 
 void MainWindow::reorientPick()
 {

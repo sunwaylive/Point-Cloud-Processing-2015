@@ -66,6 +66,7 @@ class WlopParaDlg : public QFrame
 
 		void Confidence_Power(double _val);
 		void Data_Outweigh_Similarity_Para(double _val);
+		void Similarity_KNN(double _val);
 
 
 
@@ -155,8 +156,6 @@ class WlopParaDlg : public QFrame
 
 	private:
 		bool run_backward_first;
-
-		
 
 		Ui::para_wlop * ui;
 		ParameterMgr * m_paras;

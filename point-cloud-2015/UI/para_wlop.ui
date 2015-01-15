@@ -1109,7 +1109,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>20</y>
+       <y>10</y>
        <width>152</width>
        <height>20</height>
       </rect>
@@ -1122,7 +1122,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>120</y>
+       <y>100</y>
        <width>211</width>
        <height>21</height>
       </rect>
@@ -1135,7 +1135,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>320</y>
+       <y>290</y>
        <width>301</width>
        <height>21</height>
       </rect>
@@ -1148,7 +1148,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>410</y>
+       <y>400</y>
        <width>301</width>
        <height>21</height>
       </rect>
@@ -1161,7 +1161,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>530</y>
+       <y>520</y>
        <width>331</width>
        <height>21</height>
       </rect>
@@ -1174,7 +1174,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>80</y>
+       <y>60</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1193,7 +1193,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>60</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1206,7 +1206,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>150</y>
+       <y>130</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1219,7 +1219,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>150</y>
+       <y>130</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1238,7 +1238,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>180</y>
+       <y>160</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1257,7 +1257,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>180</y>
+       <y>160</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1270,7 +1270,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>250</y>
+       <y>220</y>
        <width>311</width>
        <height>17</height>
       </rect>
@@ -1283,7 +1283,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>280</y>
+       <y>250</y>
        <width>221</width>
        <height>31</height>
       </rect>
@@ -1296,7 +1296,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>350</y>
+       <y>320</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1309,7 +1309,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>350</y>
+       <y>320</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1328,7 +1328,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>380</y>
+       <y>350</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1341,7 +1341,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>380</y>
+       <y>350</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1360,7 +1360,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>440</y>
+       <y>430</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1373,7 +1373,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>440</y>
+       <y>430</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1392,7 +1392,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>470</y>
+       <y>460</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1405,7 +1405,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>470</y>
+       <y>460</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1424,7 +1424,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>560</y>
+       <y>550</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1437,7 +1437,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>560</y>
+       <y>550</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1456,7 +1456,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>590</y>
+       <y>580</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1469,7 +1469,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>590</y>
+       <y>580</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1488,7 +1488,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>500</y>
+       <y>490</y>
        <width>311</width>
        <height>17</height>
       </rect>
@@ -1501,7 +1501,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>710</y>
+       <y>700</y>
        <width>311</width>
        <height>17</height>
       </rect>
@@ -1514,7 +1514,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>740</y>
+       <y>730</y>
        <width>311</width>
        <height>17</height>
       </rect>
@@ -1527,7 +1527,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>770</y>
+       <y>760</y>
        <width>311</width>
        <height>17</height>
       </rect>
@@ -1540,7 +1540,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>30</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1553,7 +1553,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>50</y>
+       <y>30</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1572,7 +1572,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>650</y>
+       <y>640</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1585,7 +1585,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>620</y>
+       <y>610</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1598,7 +1598,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>620</y>
+       <y>610</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1617,7 +1617,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>650</y>
+       <y>640</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1636,7 +1636,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>210</y>
+       <y>190</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1655,7 +1655,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>210</y>
+       <y>190</y>
        <width>141</width>
        <height>21</height>
       </rect>
@@ -1668,7 +1668,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>680</y>
+       <y>670</y>
        <width>111</width>
        <height>20</height>
       </rect>
@@ -1687,13 +1687,48 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>680</y>
+       <y>670</y>
        <width>141</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
       <string>Data_Outweigh_Similarity_Para</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="Similarity_KNN">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>380</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>5</number>
+     </property>
+     <property name="minimum">
+      <double>-1000000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_37">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>380</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Similarity KNN</string>
      </property>
     </widget>
    </widget>

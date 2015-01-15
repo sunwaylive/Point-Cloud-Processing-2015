@@ -117,6 +117,8 @@ void WlopParaDlg::initConnects()
 	connect(ui->Save_Move_Dist_Along_Normal_Para, SIGNAL(valueChanged(double)), this, SLOT(Save_Move_Dist_Along_Normal_Para(double)));
 	connect(ui->Big_Repulsion_Power, SIGNAL(valueChanged(double)), this, SLOT(Big_Repulsion_Power(double)));
 
+	connect(ui->Similarity_KNN, SIGNAL(valueChanged(double)), this, SLOT(Similarity_KNN(double)));
+
 	connect(ui->Confidence_Power, SIGNAL(valueChanged(double)), this, SLOT(Confidence_Power(double)));
 	connect(ui->Data_Outweigh_Similarity_Para, SIGNAL(valueChanged(double)), this, SLOT(Data_Outweigh_Similarity_Para(double)));
 
@@ -274,6 +276,8 @@ bool WlopParaDlg::initWidgets()
 
 	ui->Confidence_Power->setValue(m_paras->wLop.getDouble("Confidence Power"));
 	ui->Data_Outweigh_Similarity_Para->setValue(m_paras->wLop.getDouble("Data Outweigh Similarity Para"));
+
+	ui->Similarity_KNN->setValue(m_paras->wLop.getDouble("KNN For Similarity"));
 
 	
 	Qt::CheckState state = m_paras->wLop.getBool("Need Compute Density") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
@@ -506,6 +510,11 @@ void WlopParaDlg::Confidence_Power(double _val)
 void WlopParaDlg::Data_Outweigh_Similarity_Para(double _val)
 {
 	m_paras->wLop.setValue("Data Outweigh Similarity Para", DoubleValue(_val));
+}
+
+void WlopParaDlg::Similarity_KNN(double _val)
+{
+	m_paras->wLop.setValue("KNN For Similarity", DoubleValue(_val));
 }
 
 void WlopParaDlg::isDensity(bool _val)

@@ -1562,6 +1562,7 @@ void GLArea::saveView(QString fileName)
 
 	outfile << global_paraMgr.wLop.getDouble("Data Outweigh Similarity Para") << endl;
 	outfile << global_paraMgr.wLop.getDouble("Confidence Power") << endl;
+	outfile << global_paraMgr.wLop.getDouble("KNN For Similarity") << endl;
 
 
 	outfile.close();
@@ -1741,6 +1742,7 @@ void GLArea::loadView(QString fileName)
 
 		infile >> temp; global_paraMgr.wLop.setValue("Data Outweigh Similarity Para", DoubleValue(temp));
 		infile >> temp; global_paraMgr.wLop.setValue("Confidence Power", DoubleValue(temp));
+		infile >> temp; global_paraMgr.wLop.setValue("KNN For Similarity", DoubleValue(temp));
 
 	}
 

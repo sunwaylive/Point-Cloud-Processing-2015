@@ -62,6 +62,7 @@ private slots:
 
 	void removePickPoints();
   void switchSampleDualSample();
+	void switchSampleOriginal();
 
   void reorientPick();
   void cleanPick();
