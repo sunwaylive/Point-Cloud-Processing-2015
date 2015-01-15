@@ -417,9 +417,13 @@ void MainWindow::openImage()
 
 void MainWindow::saveFile()
 {
-	QString file = QFileDialog::getSaveFileName(this, "Save samples as", "", "*.ply *.sfl");
+	QString file = QFileDialog::getSaveFileName(this, "Save samples as", "", "*.ply");
 	if(!file.size()) return;
 
+	if (!file.endsWith(".ply"))
+	{
+		file += QString(".ply");
+	}
 	area->cleanPickPoints();
 
 	if (global_paraMgr.glarea.getBool("Show Original"))
@@ -540,6 +544,11 @@ void MainWindow::saveSkel()
 	QString file = QFileDialog::getSaveFileName(this, "Save samples as", "", "*.skel");
 	if(!file.size()) return;
 
+	if (!file.endsWith(".skel"))
+	{
+		file += QString(".skel");
+	}
+
 	if (global_paraMgr.glarea.getBool("Show Skeleton"))
 	{
 		//area->dataMgr.saveTargetSkeletonAsSkel(file);
@@ -552,6 +561,9 @@ void MainWindow::saveSkel()
 
 	file.replace(".skel", ".View");
 	area->saveView(file);
+
+	file.replace(".View", ".VPoint");
+	area->saveVPoint(file);
 
 	area->updateGL();
 }

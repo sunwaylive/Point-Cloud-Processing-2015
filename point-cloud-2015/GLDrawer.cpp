@@ -216,10 +216,10 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return cBlue;
 	}
 
-	if (v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
-	{
-		return cGreen;
-	}
+// 	if (v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
+// 	{
+// 		return cGreen;
+// 	}
 
   if (v.is_dual_sample /*|| v.is_fixed_sample*/ )
   {
@@ -324,7 +324,7 @@ void GLDrawer::drawSphere(const CVertex& v)
 
 	Point3f p = v.P();
 
-	glDrawSphere(p, color, radius, 20);
+	glDrawSphere(p, color, radius, 10);
 }
 
 void GLDrawer::drawCircle(const CVertex& v, bool is_back)

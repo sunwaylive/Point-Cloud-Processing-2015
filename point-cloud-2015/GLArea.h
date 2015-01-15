@@ -68,7 +68,11 @@ public:
 	void cleanPickPoints();
 
 	void saveView(QString fileName);
+	void saveVPoint(QString fileName);
+
 	void loadView(QString fileName);
+	void loadVPoint(QString fileName);
+
 	void outputColor(ostream& out, QColor& color);
 	QColor inputColor(istream& in);
 	void readRGBNormal(QString fileName);

@@ -643,6 +643,10 @@ void GLArea::openByDrop(QString fileName)
 	{
 		loadView(fileName);
 	}
+	if (fileName.endsWith("VPoint"))
+	{
+		loadVPoint(fileName);
+	}
 	if (fileName.endsWith("skel"))
 	{
 		if (fileName.contains("target"))
@@ -1256,7 +1260,8 @@ void GLArea::runWlop()
 	if (para->getBool("SnapShot Each Iteration"))
 	{
 		if (!global_paraMgr.wLop.getBool("Run Regularize Normals")
-			&& !global_paraMgr.wLop.getBool("Run Compute Confidence"))
+			&& !global_paraMgr.wLop.getBool("Run Compute Confidence")
+			&& !global_paraMgr.wLop.getBool("Run Move Backward"))
 		{
 			saveSnapshot();
 
@@ -1425,6 +1430,21 @@ QColor GLArea::inputColor(istream& in)
 	return color;
 }
 
+void GLArea::saveVPoint(QString fileName)
+{
+	QString file = fileName;
+	ofstream outfile(file.toStdString().c_str());
+
+	char viewStr[100];
+	trackball.ToAscii(viewStr);
+	cout << "saveView" << viewStr << endl;
+	outfile << viewStr << endl;
+
+	trackball_light.ToAscii(viewStr);
+	outfile << viewStr << endl;
+
+	outfile.close();
+}
 
 void GLArea::saveView(QString fileName)
 {
@@ -1545,6 +1565,26 @@ void GLArea::saveView(QString fileName)
 
 
 	outfile.close();
+}
+
+
+void GLArea::loadVPoint(QString fileName)
+{
+	ifstream infile(fileName.toStdString().c_str());
+	double temp;
+
+	string viewStr;
+	infile >> viewStr;
+
+	trackball.SetFromAscii(viewStr.c_str());
+
+	infile >> viewStr;
+	trackball_light.SetFromAscii(viewStr.c_str());
+
+	initLight();
+
+	infile.close();
+	emit needUpdateStatus();
 }
 
 void GLArea::loadView(QString fileName)
