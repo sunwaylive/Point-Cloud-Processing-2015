@@ -175,6 +175,12 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
 // 	}
 
+	if (v.is_boundary && bUseSegmentaionColor)
+	{
+		//return cBlue;
+		return cOrange;
+	}
+
 	if (v.is_boundary && v.is_fixed_original && bUseSegmentaionColor)
 	{
 		//return cBlue;
@@ -191,11 +197,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
   		return cGray;
   	}
 
-	if (v.is_boundary && bUseSegmentaionColor)
-	{
-		//return cBlue;
-		return cOrange;
-	}
+
 
 	if (v.is_fixed_original && bUseSegmentaionColor)
 	{

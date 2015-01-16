@@ -1979,7 +1979,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 			}
 			else
 			{
-				cout << "maybe no neighbor for repulsion" << endl;
+				//cout << "maybe no neighbor for repulsion" << endl;
 				v.is_skel_virtual = true;
 			}
 
@@ -7774,7 +7774,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 	double search_dual_index_para = para->getDouble("Search Dual Index Para");
 
 	cout << "computeDualIndex" << endl;
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius") * 3.0, dual_samples->bbox);
 	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -7803,11 +7803,16 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 		}
 
 		int max_iterate = 0;
-		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 5 )
+		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 20 )
 		{
 			current_idx = dual_idx;
 
 			CVertex dual_v2 = dual_samples->vert[current_idx];
+
+			if (dual_v2.neighbors.empty())
+			{
+				break;
+			}
 
 			double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
 			for (int j = 0; j < dual_v2.neighbors.size(); j++)
@@ -7825,6 +7830,14 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 
 		}
 
+
+// 		if (max_iterate > 80)
+// 		{
+// 			//v.is_skel_virtual = true;
+// 			v.is_boundary = true;
+// 			cout << "strange!!" << endl;
+// 
+// 		}
 		v.dual_index = dual_idx;
 	}
 
