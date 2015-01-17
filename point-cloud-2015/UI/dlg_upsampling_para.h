@@ -5,6 +5,7 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QWidget>
 #include <iostream>
+#include <QFileDialog>
 
 #include "..//GeneratedFiles/ui_upsampling_para.h"
 #include "ParameterMgr.h"
@@ -46,6 +47,8 @@ class UpsamplingParaDlg : public QFrame
 		void applyPlayVideo();
 
     void runPointsExtrapolation();
+
+		void loadVideoFiles();
 
 	private:
 		Ui::Upsampling_para * ui;

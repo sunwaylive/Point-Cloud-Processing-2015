@@ -47,6 +47,8 @@ void UpsamplingParaDlg::initConnects()
 	connect(ui->wlop_snapshot_resolution,SIGNAL(valueChanged(double)),this,SLOT(getSnapShotResolution(double)));
 	connect(ui->wlop_snapshot_index,SIGNAL(valueChanged(double)),this,SLOT(getSnapShotIndex(double)));
 
+	connect(ui->pushButton_load_video_files, SIGNAL(clicked()), this, SLOT(loadVideoFiles()));
+
 }
 
 bool UpsamplingParaDlg::initWidgets()
@@ -288,3 +290,131 @@ void UpsamplingParaDlg::applyPlayVideo()
 
 }
 
+
+struct naturalSortCompare {
+
+	inline bool isNumber(QChar c) {
+		return c >= '0' && c <= '9';
+	}
+
+	inline bool operator() (const QString& s1, const QString& s2) {
+		if (s1 == "" || s2 == "") return s1 < s2;
+
+		// Move to the first difference between the strings
+		int startIndex = -1;
+		int length = s1.length() > s2.length() ? s2.length() : s1.length();
+		for (int i = 0; i < length; i++) {
+			QChar c1 = s1[i];
+			QChar c2 = s2[i];
+			if (c1 != c2) {
+				startIndex = i;
+				break;
+			}
+		}
+
+		// If the strings are the same, exit now.
+		if (startIndex < 0) return s1 < s2;
+
+		// Now extract the numbers, if any, from the two strings.
+		QString sn1;
+		QString sn2;
+		bool done1 = false;
+		bool done2 = false;
+		length = s1.length() < s2.length() ? s2.length() : s1.length();
+
+		for (int i = startIndex; i < length; i++) {
+			if (!done1 && i < s1.length()) {
+				if (isNumber(s1[i])) {
+					sn1 += QString(s1[i]);
+				}
+				else {
+					done1 = true;
+				}
+			}
+
+			if (!done2 && i < s2.length()) {
+				if (isNumber(s2[i])) {
+					sn2 += QString(s2[i]);
+				}
+				else {
+					done2 = true;
+				}
+			}
+
+			if (done1 && done2) break;
+		}
+
+		// If none of the strings contain a number, use a regular comparison.
+		if (sn1 == "" && sn2 == "") return s1 < s2;
+
+		// If one of the strings doesn't contain a number at that position,
+		// we put the string without number first so that, for example,
+		// "example.bin" is before "example1.bin"
+		if (sn1 == "" && sn2 != "") return true;
+		if (sn1 != "" && sn2 == "") return false;
+
+		return sn1.toInt() < sn2.toInt();
+	}
+
+};
+
+void UpsamplingParaDlg::loadVideoFiles()
+{
+	QString file_location = QFileDialog::getExistingDirectory(this, "choose a directory...", "", QFileDialog::ShowDirsOnly);
+	if (!file_location.size())
+		return;
+
+	QDir dir(file_location);
+	if (!dir.exists())
+		return;
+
+	dir.setFilter(QDir::Files);
+	//dir.setSorting(QDir::Name);
+	dir.setSorting(QDir::LocaleAware);
+
+	global_paraMgr.glarea.setValue("Snapshot Index", DoubleValue(1.0));
+	global_paraMgr.glarea.setValue("SnapShot Each Iteration", BoolValue(true));
+
+
+	QFileInfoList list = dir.entryInfoList();
+	QStringList str_list;
+
+	for (int i = 0; i < list.size(); ++i)
+	{
+		QFileInfo fileInfo = list.at(i);
+		QString f_name = fileInfo.fileName();
+		str_list.push_back(f_name);
+
+	}
+
+
+	std::sort(str_list.begin(), str_list.end(), naturalSortCompare());
+
+	for (int i = 0; i < str_list.size(); ++i)
+	{
+		//QFileInfo fileInfo = list.at(i);
+		QString f_name = str_list.at(i);
+
+		if (!f_name.endsWith(".skel"))
+			continue;
+
+		f_name = file_location + "\\" + f_name;
+
+		cout << f_name.toStdString().c_str() << endl;
+
+		area->dataMgr.loadSkeletonFromSkel(f_name);
+
+		global_paraMgr.glarea.setValue("GLarea Busying", BoolValue(true));
+
+		area->dataMgr.recomputeQuad();
+
+		area->updateUI();
+		update();
+		area->updateGL();
+		emit area->needUpdateStatus();
+
+		area->saveSnapshot();
+
+		//Sleep(1500);
+	}
+}

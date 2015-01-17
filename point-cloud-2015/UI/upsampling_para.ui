@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -454,6 +454,19 @@
      </property>
      <property name="text">
       <string>snapshot index</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_load_video_files">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>280</y>
+       <width>161</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Load Video Files</string>
      </property>
     </widget>
    </widget>
