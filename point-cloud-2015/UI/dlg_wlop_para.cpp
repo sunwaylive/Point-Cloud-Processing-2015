@@ -984,15 +984,15 @@ void WlopParaDlg::applyComputeConfidence()
 	area->runWlop();
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(false));
 
-	CMesh* samples;
-	samples = area->dataMgr.getCurrentSamples();
-	ofstream outfile("eigen_confidence.txt");
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		outfile << v.eigen_confidence << endl;
-	}
-	outfile.close();
+// 	CMesh* samples;
+// 	samples = area->dataMgr.getCurrentSamples();
+// 	ofstream outfile("eigen_confidence.txt");
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		outfile << v.eigen_confidence << endl;
+// 	}
+// 	outfile.close();
 }
 
 void WlopParaDlg::applyComputeDistribution()

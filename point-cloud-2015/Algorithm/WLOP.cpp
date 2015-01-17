@@ -7773,8 +7773,25 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 	bool use_progressive_search = para->getBool("Use Progressive Search Index");
 	double search_dual_index_para = para->getDouble("Search Dual Index Para");
 
+	if (!global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+	{
+		cout << "use fixed index" << endl;
+
+		for (int i = 0; i < samples->vert.size(); i++)
+		{
+			CVertex& v = samples->vert[i];
+			CVertex& dual_v = dual_samples->vert[i];
+
+			v.dual_index = i;
+		}
+	}
+
+
 	cout << "computeDualIndex" << endl;
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius") * 3.0, dual_samples->bbox);
+	Timer timer;
+	timer.start("computeDualIndex");
+
+	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
 	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -7802,8 +7819,9 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 			}
 		}
 
+
 		int max_iterate = 0;
-		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 10 )
+		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 5 )
 		{
 			current_idx = dual_idx;
 
@@ -7840,6 +7858,8 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 // 		}
 		v.dual_index = dual_idx;
 	}
+
+	timer.end();
 
 
 }
