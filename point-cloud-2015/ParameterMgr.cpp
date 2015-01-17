@@ -134,6 +134,10 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("SnapShot Each Iteration", false));
 	glarea.addParam(new RichBool("No Snap Radius", true));
 
+	glarea.addParam(new RichBool("Need Snap Files", false));
+
+
+
 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
 

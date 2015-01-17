@@ -38,6 +38,13 @@ GLArea::GLArea(QWidget *parent): QGLWidget(/*QGLFormat(QGL::DoubleBuffer | QGL::
 
 	show_something = true;
 	something = 0;
+
+	need_rotate = false;
+	rotate_angle = 0.;
+	rotate_pos = Point3f(0, 0, 0);
+	rotate_normal = Point3f(1, 0, 0.);
+	rotate_delta = 1;
+	rotate_angle = 0.;
 }
 
 GLArea::~GLArea(void)
@@ -213,6 +220,11 @@ void GLArea::paintGL()
 	glPushMatrix();
 	glScalef(radius, radius, radius);
 	glTranslatef(c[0], c[1], c[2]);
+
+	glTranslatef(rotate_pos[0], rotate_pos[1], rotate_pos[2]);
+	glRotatef(rotate_angle, rotate_normal[0], rotate_normal[1], rotate_normal[2]);
+	glTranslatef(-rotate_pos[0], -rotate_pos[1], -rotate_pos[2]);
+
 
 	View<float> view;
 	view.GetView();
@@ -1169,11 +1181,15 @@ void GLArea::saveSnapshot()
 	
 		para->setValue("Snapshot Index", DoubleValue(snape_idx));
 
-		QString skel_file_name = QString(QString(".\\snapfile\\")) + ss.basename + QString(".skel");
-		dataMgr.saveSkeletonAsSkel(skel_file_name);
+		if (para->getBool("Need Snap Files"))
+		{
+			QString skel_file_name = QString(QString(".\\snapfile\\")) + ss.basename + QString(".skel");
+			dataMgr.saveSkeletonAsSkel(skel_file_name);
 
-		skel_file_name.replace(".skel", ".View");
-		saveView(skel_file_name);
+			skel_file_name.replace(".skel", ".View");
+			saveView(skel_file_name);
+		}
+
 	}
 
 	takeSnapTile = true;
@@ -1472,10 +1488,10 @@ void GLArea::saveView(QString fileName)
 	outfile << global_paraMgr.drawer.getDouble("Normal Line Width") << endl;
 	outfile << global_paraMgr.drawer.getDouble("Normal Line Length") << endl;
 
-// 	outfile << rotate_pos[0] << " " << rotate_pos[1] << " " << rotate_pos[2] << " " << endl;
-// 	outfile << rotate_normal[0] << " " << rotate_normal[1] << " " << rotate_normal[2] << " " << endl;
-	outfile << 0.0 << " " << 0.0 << " " << rotate_pos[2] << " " << endl;
-	outfile << 0.0 << " " << 0.0 << " " << 1.0  << " " << endl;
+ 	outfile << rotate_pos[0] << " " << rotate_pos[1] << " " << rotate_pos[2] << " " << endl;
+ 	outfile << rotate_normal[0] << " " << rotate_normal[1] << " " << rotate_normal[2] << " " << endl;
+//	outfile << 0.0 << " " << 0.0 << " " << rotate_pos[2] << " " << endl;
+//	outfile << 0.0 << " " << 0.0 << " " << 1.0  << " " << endl;
 
 	outfile << global_paraMgr.drawer.getDouble("Original Dot Size") << endl;
 
@@ -1564,6 +1580,8 @@ void GLArea::saveView(QString fileName)
 	outfile << global_paraMgr.wLop.getDouble("Confidence Power") << endl;
 	outfile << global_paraMgr.wLop.getDouble("KNN For Similarity") << endl;
 
+	outfile << global_paraMgr.glarea.getDouble("Sample Confidence Color Scale") << endl;
+	outfile << global_paraMgr.glarea.getDouble("Point ISO Value Shift") << endl;
 
 	outfile.close();
 }
@@ -1747,7 +1765,12 @@ void GLArea::loadView(QString fileName)
 	}
 
 
+	if (!infile.eof())
+	{
+		infile >> temp; global_paraMgr.glarea.setValue("Sample Confidence Color Scale", DoubleValue(temp));
+		infile >> temp; global_paraMgr.glarea.setValue("Point ISO Value Shift", DoubleValue(temp));
 
+	}
 
 	infile.close();
 	emit needUpdateStatus();
@@ -2481,35 +2504,38 @@ void GLArea::addRBGPick(int pick_index)
 	rotate_normal = mesh->vert[pick_index].N();
 	rotate_pos = mesh->vert[pick_index].P();
 
-
-	RGBPickList[RGB_counter++] = pick_index;
-
-	if(RGB_counter == 3)
-	{
-		cout << "constructRGBNormals" << endl;
-
-		vector<Point3f> normals;
-		for(int i = 0; i < 3; i++)
-		{
-			normals.push_back(mesh->vert[RGBPickList[i]].N());
-		}
-
-		RGB_normals.assign(3, Point3f(0.0, 0.0, 0.0));
-		RGB_normals[0] = normals[0];
-		RGB_normals[1] = normals[0] ^ normals[2];
-
-		if(RGB_normals[1] * normals[1] < 0)
-			RGB_normals[1] = -RGB_normals[1];
-
-		RGB_normals[2] = normals[0]	^ normals[1];
-		if(RGB_normals[2] * normals[2] < 0)
-			RGB_normals[2] = -RGB_normals[2];
+	cout << "PICK!!" << endl;
 
 
-		glDrawer.setRGBNormals(RGB_normals);
-		RGB_counter = 0;
-	}
+// 	RGBPickList[RGB_counter++] = pick_index;
+// 
+// 	if(RGB_counter == 3)
+// 	{
+// 		cout << "constructRGBNormals" << endl;
+// 
+// 		vector<Point3f> normals;
+// 		for(int i = 0; i < 3; i++)
+// 		{
+// 			normals.push_back(mesh->vert[RGBPickList[i]].N());
+// 		}
+// 
+// 		RGB_normals.assign(3, Point3f(0.0, 0.0, 0.0));
+// 		RGB_normals[0] = normals[0];
+// 		RGB_normals[1] = normals[0] ^ normals[2];
+// 
+// 		if(RGB_normals[1] * normals[1] < 0)
+// 			RGB_normals[1] = -RGB_normals[1];
+// 
+// 		RGB_normals[2] = normals[0]	^ normals[1];
+// 		if(RGB_normals[2] * normals[2] < 0)
+// 			RGB_normals[2] = -RGB_normals[2];
+// 
+// 
+// 		glDrawer.setRGBNormals(RGB_normals);
+// 		RGB_counter = 0;
+// 	}
 
+	emit needUpdateStatus();
 }
 
 void GLArea::readRGBNormal(QString fileName)
@@ -2576,4 +2602,31 @@ void GLArea::drawCorrespondences()
 		}
 
 	}
+}
+
+
+void GLArea::rotatingAnimation()
+{
+	if (-rotate_angle > 361)
+		return;
+
+	need_rotate = true;
+	//rotate_angle -= 1.7f;
+	rotate_angle -= 7.f;
+	updateGL();
+
+
+	cout << rotate_angle << endl;
+
+	double total_time = 6500;
+	double sleep_time = 45;
+	double delta = 360 / (total_time / sleep_time);
+	do
+	{
+		rotate_angle -= delta;
+		updateGL();
+		Sleep(sleep_time);
+	} while (-rotate_angle < 361);
+
+	rotate_angle += 360;
 }

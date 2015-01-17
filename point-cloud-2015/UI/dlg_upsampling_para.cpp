@@ -33,6 +33,9 @@ void UpsamplingParaDlg::initConnects()
 	connect(ui->using_threshol_process,SIGNAL(clicked(bool)),this,SLOT(setUsingThresholdProcess(bool)));
   connect(ui->use_constant_threshold,SIGNAL(clicked(bool)),this,SLOT(setUseConstantThreshold(bool)));
 
+	connect(ui->need_snap_files, SIGNAL(clicked(bool)), this, SLOT(needSnapFiles(bool)));
+
+
   connect(ui->threshold,SIGNAL(valueChanged(double)),this,SLOT(setThreshold(double)));
 	connect(ui->apply_add_point,SIGNAL(clicked()),this,SLOT(runAddPts()));
 	connect(ui->pushButton_Projection,SIGNAL(clicked()),this,SLOT(runProjection()));
@@ -48,6 +51,19 @@ void UpsamplingParaDlg::initConnects()
 	connect(ui->wlop_snapshot_index,SIGNAL(valueChanged(double)),this,SLOT(getSnapShotIndex(double)));
 
 	connect(ui->pushButton_load_video_files, SIGNAL(clicked()), this, SLOT(loadVideoFiles()));
+
+
+	connect(ui->rotate_center_X, SIGNAL(valueChanged(double)), this, SLOT(getRotateCenterX(double)));
+	connect(ui->rotate_center_Y, SIGNAL(valueChanged(double)), this, SLOT(getRotateCenterY(double)));
+	connect(ui->rotate_center_Z, SIGNAL(valueChanged(double)), this, SLOT(getRotateCenterZ(double)));
+	connect(ui->rotate_normal_X, SIGNAL(valueChanged(double)), this, SLOT(getRotateNormalX(double)));
+	connect(ui->rotate_normal_Y, SIGNAL(valueChanged(double)), this, SLOT(getRotateNormalY(double)));
+	connect(ui->rotate_normal_Z, SIGNAL(valueChanged(double)), this, SLOT(getRotateNormalZ(double)));
+	connect(ui->rotate_step, SIGNAL(valueChanged(double)), this, SLOT(getRotateStep(double)));
+	connect(ui->rotate_angle, SIGNAL(valueChanged(double)), this, SLOT(getRotateAngle(double)));
+
+	connect(ui->pushButton_rotate, SIGNAL(clicked()), this, SLOT(rotateStep()));
+	connect(ui->pushButton_rotate_around, SIGNAL(clicked()), this, SLOT(rotateAnimation()));
 
 }
 
@@ -67,11 +83,24 @@ bool UpsamplingParaDlg::initWidgets()
   state = m_paras->upsampling.getBool("Use Constant Threshold") ? (Qt::CheckState::Checked): (Qt::CheckState::Unchecked);
   ui->use_constant_threshold->setCheckState(state);
 
+	state = m_paras->glarea.getBool("Need Snap Files") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+	ui->need_snap_files->setCheckState(state);
+
 	ui->threshold->setValue(m_paras->upsampling.getDouble("Dist Threshold"));
 	ui->edge_paramete->setValue(m_paras->upsampling.getDouble("Edge Parameter"));
 
 	ui->wlop_snapshot_resolution->setValue(m_paras->glarea.getDouble("Snapshot Resolution"));
 	ui->wlop_snapshot_index->setValue(m_paras->glarea.getDouble("Snapshot Index"));
+
+
+	ui->rotate_center_X->setValue(area->rotate_pos.X());
+	ui->rotate_center_Y->setValue(area->rotate_pos.Y());
+	ui->rotate_center_Z->setValue(area->rotate_pos.Z());
+	ui->rotate_normal_X->setValue(area->rotate_normal.X());
+	ui->rotate_normal_Y->setValue(area->rotate_normal.Y());
+	ui->rotate_normal_Z->setValue(area->rotate_normal.Z());
+	ui->rotate_step->setValue(area->rotate_delta);
+	ui->rotate_angle->setValue(area->rotate_angle);
 	//update();
 	//repaint();
 	return true;
@@ -136,6 +165,12 @@ void UpsamplingParaDlg::setThreshold(double _val)
 void UpsamplingParaDlg::setUsingThresholdProcess(bool _val)
 {
 	m_paras->upsampling.setValue("Using Threshold Process", BoolValue(_val));
+}
+
+void UpsamplingParaDlg::needSnapFiles(bool _val)
+{
+	m_paras->glarea.setValue("Need Snap Files", BoolValue(_val));
+
 }
 
 void UpsamplingParaDlg::setUseConstantThreshold(bool _val)
@@ -417,4 +452,87 @@ void UpsamplingParaDlg::loadVideoFiles()
 
 		//Sleep(1500);
 	}
+}
+
+
+
+void UpsamplingParaDlg::getRotateCenterX(double _val)
+{
+	area->rotate_pos.X() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateCenterY(double _val)
+{
+	area->rotate_pos.Y() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateCenterZ(double _val)
+{
+	area->rotate_pos.Z() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateNormalX(double _val)
+{
+	area->rotate_normal.X() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateNormalY(double _val)
+{
+	area->rotate_normal.Y() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateNormalZ(double _val)
+{
+	area->rotate_normal.Z() = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateStep(double _val)
+{
+	area->rotate_delta = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getRotateAngle(double _val)
+{
+	area->rotate_angle = _val;
+	update(); area->update(); //area->updateGL();
+}
+
+
+void UpsamplingParaDlg::rotateStep()
+{
+	area->rotate_angle += area->rotate_delta;
+	if (area->rotate_angle >= 360)
+	{
+		area->rotate_angle -= 360;
+	}
+	initWidgets();
+	if (m_paras->glarea.getBool("SnapShot Each Iteration"))
+	{
+		area->saveSnapshot();
+	}
+	update(); area->update(); area->updateGL();
+}
+
+void UpsamplingParaDlg::rotateAnimation()
+{
+	if (m_paras->glarea.getBool("SnapShot Each Iteration"))
+	{
+		area->saveSnapshot();
+	}
+
+	int rotate_time = 360 / area->rotate_delta;
+	for (int i = 0; i < rotate_time; i++)
+	{
+		rotateStep();
+	}
+	update(); area->update(); area->updateGL();
+
+
 }

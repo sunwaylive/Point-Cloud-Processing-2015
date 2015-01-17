@@ -39,6 +39,9 @@ class UpsamplingParaDlg : public QFrame
 		void setUsingThresholdProcess(bool _val);
     void setUseConstantThreshold(bool _val);
 
+		void needSnapFiles(bool _val);
+
+
 		void getSnapShotResolution(double _val);
 		void getSnapShotIndex(double _val);
 		void getBeginIndex(double _val);
@@ -49,6 +52,19 @@ class UpsamplingParaDlg : public QFrame
     void runPointsExtrapolation();
 
 		void loadVideoFiles();
+
+
+		void getRotateCenterX(double _val);
+		void getRotateCenterY(double _val);
+		void getRotateCenterZ(double _val);
+		void getRotateNormalX(double _val);
+		void getRotateNormalY(double _val);
+		void getRotateNormalZ(double _val);
+		void getRotateStep(double _val);
+		void getRotateAngle(double _val);
+
+		void rotateStep();
+		void rotateAnimation();
 
 	private:
 		Ui::Upsampling_para * ui;

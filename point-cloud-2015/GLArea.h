@@ -149,8 +149,8 @@ private: // For snapshot
 	double snapDrawScal;
 	bool is_paintGL_locked;
 
-	Point3f rotate_normal;
-	Point3f rotate_pos;
+// 	Point3f rotate_normal;
+// 	Point3f rotate_pos;
 
 	//vcg::GlTrimesh<CMesh> glw;
 
@@ -158,6 +158,15 @@ public:
 	void saveSnapshot();
 
 	void changeColor(QString paraName);
+
+	//rotate
+	void rotatingAnimation();
+	float rotate_angle;
+	bool need_rotate;
+	Point3f rotate_normal;
+	Point3f rotate_pos;
+	double rotate_delta;
+
 
 private:
 	vcg::Trackball trackball;
