@@ -692,10 +692,10 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			if (need_density && !original_density.empty())
 			{
- 				if (i < 2 && j < 5)
- 				{
-					cout << "need_original_density " << original_density[t.m_index]  << endl;
- 				}
+//  				if (i < 2 && j < 5)
+//  				{
+// 					cout << "need_original_density " << original_density[t.m_index]  << endl;
+//  				}
 
 				w *= original_density[t.m_index];
 			}
@@ -912,12 +912,12 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 			double rep = w * pow(1.0 / len, repulsion_power);
 			//double rep = w;
 
-			if (1)//2015
+			if (need_density)//2015
 			{
-				if (i<2 && j<3)
-				{
-					cout << "sample density: " << samples_density[t.m_index] << endl;
-				}
+// 				if (i<2 && j<3)
+// 				{
+// 					cout << "sample density: " << samples_density[t.m_index] << endl;
+// 				}
 				rep *= samples_density[t.m_index];
 			}
 
@@ -1580,7 +1580,7 @@ double WLOP::iterate()
 	{
 		if (para->getBool("Need Compute Density"))
 		{
-			double local_density_para = 0.95;
+			double local_density_para = 1.0;
 			time.start("Original Original Neighbor Tree");
 			GlobalFun::computeBallNeighbors(original, NULL, 
 				para->getDouble("CGrid Radius") * local_density_para, original->bbox);
@@ -1654,7 +1654,7 @@ double WLOP::iterate()
 		time.start("Compute Similarity Term");
 		computeSampleSimilarityTerm(samples);
 		time.end();
-		cout << "similarity similarity similarity similarity similarity similarity similarity similarity" << endl;
+		//cout << "similarity similarity similarity similarity similarity similarity similarity similarity" << endl;
 	}
 
 	
@@ -7803,7 +7803,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 		}
 
 		int max_iterate = 0;
-		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 20 )
+		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 10 )
 		{
 			current_idx = dual_idx;
 

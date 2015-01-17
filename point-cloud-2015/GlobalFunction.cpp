@@ -156,7 +156,7 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 		return;
 	}
 
-	cout << "1" << endl;
+	//cout << "1" << endl;
 
 	int					nPts;					// actual number of data points
 	ANNpointArray		dataPts;				// data points
@@ -182,7 +182,7 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 	nnIdx = new ANNidx[k];						// allocate near neigh indices
 	dists = new ANNdist[k];						// allocate near neighbor dists
 
-	cout << "2" << endl;
+	//cout << "2" << endl;
 
 	nPts = datapts.size();									// read data points
 
@@ -228,12 +228,12 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 		}
 	}
 
-	cout << "3" << endl;
+	//cout << "3" << endl;
 
 	annDeallocPt(queryPt);					// deallocate query point
 	annDeallocPts(dataPts);			// deallocate data points
 
-	cout << "4" << endl;
+	//cout << "4" << endl;
 
 	delete [] nnIdx;							// clean things up
 	delete [] dists;
