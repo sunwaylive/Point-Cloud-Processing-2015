@@ -579,7 +579,7 @@ void GLArea::lightOnOff(bool _val)
 void GLArea::initAfterOpenFile()
 {
 	//dataMgr.downSamplesByNum();
-	//dataMgr.recomputeQuad();
+	dataMgr.recomputeQuad();
 	//initView();
   dataMgr.getInitRadiuse();
 	initSetting();

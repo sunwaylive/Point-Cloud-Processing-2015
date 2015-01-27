@@ -180,7 +180,7 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichColor("Background Color", QColor(255, 255, 255) ));
 	drawer.addParam(new RichColor("Normal Line Color", QColor(0, 0, 255) ));
 	drawer.addParam(new RichColor("Sample Point Color", QColor(255, 0, 0) ));
-	drawer.addParam(new RichColor("Original Point Color", QColor(48, 48, 48) ));
+	drawer.addParam(new RichColor("Original Point Color", QColor(22, 22, 22) ));
 	drawer.addParam(new RichColor("Feature Color", QColor(0, 0, 255) ));
 	drawer.addParam(new RichColor("Pick Point Color", QColor(128, 128, 0) ));
 	drawer.addParam(new RichColor("Pick Point DNN Color", QColor(0, 0, 155) ));

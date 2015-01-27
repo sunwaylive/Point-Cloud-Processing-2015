@@ -609,6 +609,13 @@ void DataMgr::savePly(QString fileName, CMesh& mesh)
 //	}
 //}
 
+
+void DataMgr::normalizeROSA_MeshForDual(CMesh& mesh, Point3f box)
+{
+
+
+}
+
 void DataMgr::normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f mid_point)
 {
 	if (mesh.vert.empty()) return;
@@ -754,7 +761,9 @@ Box3f DataMgr::normalizeAllMesh()
 	original.bbox = box;
 
 	Point3f mid = normalizeROSA_Mesh(samples);
-  normalizeROSA_Mesh(dual_samples);
+  //normalizeROSA_Mesh(dual_samples);
+	normalizeROSA_MeshForOriginal(dual_samples, mid);
+
 	normalizeROSA_MeshForOriginal(original, mid);
 
 
