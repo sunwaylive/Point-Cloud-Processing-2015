@@ -203,6 +203,9 @@ void NormalParaDlg::applyPCANormal()
 		 }
 
 	}
+
+	cout << "new normal estimation end " << endl;
+
 	area->dataMgr.recomputeQuad();
 	area->updateGL();
 }

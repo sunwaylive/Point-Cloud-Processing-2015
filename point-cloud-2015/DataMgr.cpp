@@ -142,9 +142,9 @@ void DataMgr::loadXYZN(QString fileName)
     }
 
 
-    for (int j=0; j<3; j++) {
-      infile >> v.N()[j];
-    }
+//     for (int j=0; j<3; j++) {
+//       infile >> v.N()[j];
+//     }
 
 // 		for (int j = 0; j < 3; j++) {
 // 			infile >> temp;
@@ -817,7 +817,7 @@ void DataMgr::recomputeQuad()
 		samples.vert[i].recompute_m_render();
 	}
 
-  for (int i = 0; i < samples.vert.size(); i++)
+	for (int i = 0; i < dual_samples.vert.size(); i++)
   {
     dual_samples.vert[i].recompute_m_render();
   }
