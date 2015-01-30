@@ -49,6 +49,17 @@ void ParameterMgr::setGlobalParameter(QString paraName,Value& val)
 		skeleton.setValue(paraName, val);
 	if (upsampling.hasParameter(paraName))
 		upsampling.setValue(paraName, val);
+
+	if (!glarea.hasParameter(paraName) && 
+		  !data.hasParameter(paraName) &&
+			!wLop.hasParameter(paraName) &&
+			!norSmooth.hasParameter(paraName) &&
+			!skeleton.hasParameter(paraName) &&
+			!upsampling.hasParameter(paraName) &&
+			!drawer.hasParameter(paraName))
+	{
+		std::cout << "out-of-dated para name: " << paraName.toStdString().c_str() << std::endl;
+	}
 }
 
 void ParameterMgr::initDataMgrParameter()
@@ -506,4 +517,145 @@ void ParameterMgr::initUpsamplingParameter()
   upsampling.addParam(new RichBool("Run Points Extrapolation", false));
 
 
+}
+
+
+void ParameterMgr::outputAllParameters(std::ostream& out)
+{
+	outputParameters(out, glarea);
+	outputParameters(out, data);
+	outputParameters(out, drawer);
+	outputParameters(out, wLop);
+	outputParameters(out, norSmooth);
+	outputParameters(out, skeleton);
+	outputParameters(out, upsampling);
+}
+
+void ParameterMgr::outputParameters(std::ostream& out, RichParameterSet& para_set)
+{
+	QList<RichParameter*> paramList = para_set.paramList;
+	QList<RichParameter*>::iterator iter;
+	for (iter = paramList.begin(); iter != paramList.end(); ++iter)
+	{
+		RichParameter* para = *iter;
+		QString name = para->name;
+		if (para->val->isString())
+		{
+			continue;
+		}
+		//out << '"' << name.toStdString().c_str() << '"' << "|";
+		out << name.toStdString().c_str() << "|";
+
+		if (para->val->isBool())
+		{
+			out << "BoolValue|" << para->val->getBool() << std::endl;
+		}
+		else if (para->val->isDouble())
+		{
+			out << "DoubleValue|" << para->val->getDouble() << std::endl;
+		}
+		else if (para->val->isInt())
+		{
+			out << "IntValue|" << para->val->getInt() << std::endl;
+		}
+		else if (para->val->isColor())
+		{
+			out << "ColorValue|" << para->val->getColor().red() << ","
+				                   << para->val->getColor().green() << "," 
+				                   << para->val->getColor().blue()  << std::endl;
+		}
+		else if (para->val->isPoint3f())
+		{
+			out << "Point3fValue|" << para->val->getPoint3f().X() << ","
+				                     << para->val->getPoint3f().Y()  << ","
+				                     << para->val->getPoint3f().Z() << std::endl;
+		}
+		else
+		{
+			std::cout << "unexpected type!!! " << std::endl;
+		}
+		//out << std::endl;
+		//out << para->val-> << endl;
+	}
+}
+
+
+void ParameterMgr::inputAllParameters(std::istream& in)
+{
+	QString qstr;
+	std::string str;
+	while (!in.eof())
+	{
+		//in.getline(str, 200);
+		std::getline(in, str, '\n');
+		qstr = str.c_str();
+		//std::cout << str.c_str() << std::endl << std::endl;
+
+		QStringList qlist = qstr.split("|");
+		QStringList::iterator iter;
+		if (qlist.size() != 3)
+		{
+			std::cout << " para file wrong formate! " << std::endl;
+			std::cout << str.c_str() << std::endl << std::endl;
+
+			continue;
+		}
+
+		QString para_name = qlist[0];
+		QString para_type = qlist[1];
+		QString para_value = qlist[2];
+
+		if (para_type == QString("BoolValue"))
+		{
+			bool b = para_value.toInt();
+			setGlobalParameter(para_name, BoolValue(b));
+		}
+		else if (para_type == QString("DoubleValue"))
+		{
+			double tmp = para_value.toDouble();
+			setGlobalParameter(para_name, DoubleValue(tmp));
+		}
+		else if (para_type == QString("IntValue"))
+		{
+			int tmp = para_value.toInt();
+			setGlobalParameter(para_name, IntValue(tmp));
+		}
+		else if (para_type == QString("ColorValue"))
+		{
+			QStringList color_list = para_value.split(",");
+			if (color_list.size() != 3)
+			{
+				std::cout << "wrong color!" << std::endl;
+				continue;
+			}
+			int r, g, b;
+			r = color_list[0].toInt();
+			g = color_list[1].toInt();
+			b = color_list[2].toInt();
+			QColor color;
+			color.setRgb(r, g, b);
+			setGlobalParameter(para_name, ColorValue(color));
+		}
+		else if (para_type == QString("Point3fValue"))
+		{
+			QStringList float_list = para_value.split(",");
+			if (float_list.size() != 3)
+			{
+				std::cout << "wrong point3f!" << std::endl;
+				continue;
+			}
+			float x, y, z;
+			x = float_list[0].toFloat();
+			y = float_list[1].toFloat();
+			z = float_list[2].toFloat();
+			Point3f pt(x, y, z);
+			
+			setGlobalParameter(para_name, Point3fValue(pt));
+		}
+		else
+		{
+			std::cout << "type: " << para_type.toStdString().c_str() << std::endl;
+		}
+
+	}
 }

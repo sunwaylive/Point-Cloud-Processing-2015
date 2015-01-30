@@ -659,6 +659,12 @@ void GLArea::openByDrop(QString fileName)
 	{
 		loadVPoint(fileName);
 	}
+	if (fileName.endsWith("paras"))
+	{
+		ifstream inpara(fileName.toStdString().c_str());
+		global_paraMgr.inputAllParameters(inpara);
+		inpara.close();
+	}
 	if (fileName.endsWith("skel"))
 	{
 		if (fileName.contains("target"))
@@ -687,6 +693,7 @@ void GLArea::openByDrop(QString fileName)
 	cout << "finish open " << endl; 
 	initAfterOpenFile();
 	updateGL();
+	emit needUpdateStatus();
 }
 
 void GLArea::loadDefaultModel()
@@ -1186,8 +1193,13 @@ void GLArea::saveSnapshot()
 			QString skel_file_name = QString(QString(".\\snapfile\\")) + ss.basename + QString(".skel");
 			dataMgr.saveSkeletonAsSkel(skel_file_name);
 
-			skel_file_name.replace(".skel", ".View");
-			saveView(skel_file_name);
+// 			skel_file_name.replace(".skel", ".View");
+// 			saveView(skel_file_name);
+
+			skel_file_name.replace(".skel", ".paras");
+			ifstream inpara(skel_file_name.toStdString().c_str());
+			global_paraMgr.inputAllParameters(inpara);
+			inpara.close();
 		}
 
 	}
@@ -1459,6 +1471,9 @@ void GLArea::saveVPoint(QString fileName)
 	trackball_light.ToAscii(viewStr);
 	outfile << viewStr << endl;
 
+	outfile << rotate_pos[0] << " " << rotate_pos[1] << " " << rotate_pos[2] << " " << endl;
+	outfile << rotate_normal[0] << " " << rotate_normal[1] << " " << rotate_normal[2] << " " << endl;
+
 	outfile.close();
 }
 
@@ -1601,6 +1616,18 @@ void GLArea::loadVPoint(QString fileName)
 	trackball_light.SetFromAscii(viewStr.c_str());
 
 	initLight();
+
+	if (!infile.eof())
+	{
+		Point3f r_pos, r_normal;
+		infile >> r_pos[0] >> r_pos[1] >> r_pos[2];
+		infile >> r_normal[0] >> r_normal[1] >> r_normal[2];
+
+		rotate_pos = r_pos;
+		rotate_normal = r_normal;
+	}
+
+
 
 	infile.close();
 	emit needUpdateStatus();

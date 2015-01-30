@@ -1,6 +1,7 @@
 #pragma once
 #include "Parameter.h"
 #include "CMesh.h"
+#include <iostream>
 
 class ParameterMgr
 {
@@ -17,6 +18,10 @@ public:
 
 	void setGlobalParameter(QString paraName,Value& val);
 	typedef enum {GLAREA, DATA, DRAWER, WLOP, NOR_SMOOTH, SKELETON, UPSAMPLING}ParaType;
+
+	void outputParameters(std::ostream& out, RichParameterSet& para_set);
+	void outputAllParameters(std::ostream& out);
+	void inputAllParameters(std::istream& in);
 
 private:
 	void initDataMgrParameter();

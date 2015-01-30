@@ -307,6 +307,7 @@
    <addaction name="actionRandom_Erase"/>
    <addaction name="actionSnap_Each_Iteration"/>
    <addaction name="actionSwitch_Sample_Original"/>
+   <addaction name="actionSave_View"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">

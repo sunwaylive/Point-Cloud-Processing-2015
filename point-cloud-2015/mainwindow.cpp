@@ -535,9 +535,18 @@ void MainWindow::saveSnapshot()
 
 void MainWindow::saveView()
 {
-	QString file = QFileDialog::getSaveFileName(this, "Select a ply file", "", "*.View");
-	if(!file.size()) return;
-	area->saveView(file);
+	ofstream outpara("outpara.paras");
+	global_paraMgr.outputAllParameters(outpara);
+	outpara.close();
+
+ 	QString file = QFileDialog::getSaveFileName(this, "Select a ply file", "", "*.VPoint");
+ 	if(!file.size()) return;
+ 	area->saveView(file);
+
+	file.replace(".VPoint", ".paras");
+	ifstream inpara(file.toStdString().c_str());
+	global_paraMgr.inputAllParameters(inpara);
+	inpara.close();
 }
 
 void MainWindow::saveSkel()
@@ -559,11 +568,16 @@ void MainWindow::saveSkel()
 	{
 		area->dataMgr.saveSkeletonAsSkel(file);
 	}
+// 
+// 	file.replace(".skel", ".View");
+// 	area->saveView(file);
 
-	file.replace(".skel", ".View");
-	area->saveView(file);
+	file.replace(".skel", ".paras");
+	ofstream outpara(file.toStdString().c_str());
+	global_paraMgr.outputAllParameters(outpara);
+	outpara.close();
 
-	file.replace(".View", ".VPoint");
+	file.replace(".paras", ".VPoint");
 	area->saveVPoint(file);
 
 	area->updateGL();
