@@ -225,10 +225,15 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 	if (showRadius && v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
  	{
- 		return cGreen;
+ 		return cOrange;
  	}
 
-  if (v.is_dual_sample /*|| v.is_fixed_sample*/ )
+	if (v.is_dual_sample /*|| v.is_fixed_sample*/)
+	{
+		return cGreen;
+	}
+
+  if (v.is_skel_point /*|| v.is_fixed_sample*/ )
   {
     return feature_color;
   }
@@ -291,7 +296,7 @@ void GLDrawer::drawDot(const CVertex& v)
 	{
 		size = original_dot_size;
 	}
-	else if (v.is_dual_sample)
+	else if (v.is_dual_sample || v.is_skel_point)
 	{
 		size = dual_sample_dot_size;
 	}
@@ -317,7 +322,7 @@ void GLDrawer::drawSphere(const CVertex& v)
 	{
 		radius = original_draw_width;
 	}
-	else if (v.is_dual_sample)
+	else if (v.is_dual_sample || v.is_skel_point)
 	{
 		radius = dual_sample_draw_width;
 	}
@@ -341,7 +346,7 @@ void GLDrawer::drawCircle(const CVertex& v, bool is_back)
 	{
 		radius = original_draw_width;
 	}
-	else if (v.is_dual_sample)
+	else if (v.is_dual_sample || v.is_skel_point)
 	{
 		radius = dual_sample_draw_width;
 	}
@@ -409,7 +414,7 @@ void GLDrawer::drawQuade(const CVertex& v)
 	{
 		h = original_draw_width;
 	}
-	else if (v.is_dual_sample)
+	else if (v.is_dual_sample || v.is_skel_point)
 	{
 		h = dual_sample_draw_width;
 	}

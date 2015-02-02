@@ -43,11 +43,8 @@ public:
 	CMesh* getCurrentSkelPoints();
 	CMesh* getCurrentTargetSamples();
 	CMesh* getCurrentTargetDualSamples();
-
 	CMesh* getCurrentOriginal();
-
 	CMesh* getCurrentEllipsoid();
-
 	Skeleton* getCurrentSkeleton();
 
 	void recomputeBox();
@@ -60,7 +57,6 @@ public:
 
 	void normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f box);
 	void normalizeROSA_MeshForDual(CMesh& mesh, Point3f box);
-
 
 	Box3f normalizeAllMesh();
 
@@ -97,8 +93,6 @@ public:
 	CMesh target_dual_samples;
 
 	Skeleton skeleton;
-	//cv::Mat image;
-
 	SphereSlots default_sphere;
 
 	RichParameterSet* para;

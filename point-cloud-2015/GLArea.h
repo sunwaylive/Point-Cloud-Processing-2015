@@ -151,8 +151,7 @@ private: // For snapshot
 
 // 	Point3f rotate_normal;
 // 	Point3f rotate_pos;
-
-	//vcg::GlTrimesh<CMesh> glw;
+//  vcg::GlTrimesh<CMesh> glw;
 
 public:
 	void saveSnapshot();

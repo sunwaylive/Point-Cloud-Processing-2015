@@ -91,8 +91,6 @@ class WlopParaDlg : public QFrame
 		void useEllipsoidWeight(bool _val);
 		void useEllipsoidRepulsion(bool _val);
 
-
-
 		void use_Average_Dist_Threshold(bool _val);
 		void use_Confidence_To_Combine_Normal(bool _val);
 		void use_Only_Do_Repuslion(bool _val);
@@ -105,12 +103,16 @@ class WlopParaDlg : public QFrame
 		void applyAnisotropicLop();
     void applyStepForward();
     void applyDualConnection();
+		void applySkelConnection();
+
 		void applyMatLOP();
 
 		void applyRunEstimateAverageDistThreshold();
 
 
 		void copySamplesToDualSamples();
+		void copyDualSamplesToSkel();
+
 
     void applySkelWlop();
     void applyDragWlop();

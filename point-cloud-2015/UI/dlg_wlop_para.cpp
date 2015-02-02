@@ -236,6 +236,8 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->Run_Estimate_Average_Dist_Threshold, SIGNAL(clicked()), this, SLOT(applyRunEstimateAverageDistThreshold()));
 
+	connect(ui->init_skel_points, SIGNAL(clicked()), this, SLOT(applySkelConnection()));
+
 }
 
 
@@ -712,20 +714,28 @@ void WlopParaDlg::copySamplesToDualSamples()
 		samples->vert[i].is_fixed_sample = false;
 
 		samples->vert[i].m_index = i;
-
-		if (i < 20)
-		{
-			cout << samples->vert[i].skel_radius << endl;
-		}
-		//samples->vert[i].skel_radius = -1;
-
-
 		dual_samples->vert[i] = samples->vert[i];
 		dual_samples->vert[i].is_dual_sample = true;
-		//dual_samples->vert[i].skel_radius = -1;
+	}
+	dual_samples->vn = dual_samples->vert.size();
+}
 
+
+void WlopParaDlg::copyDualSamplesToSkel()
+{
+	CMesh* skel_points = area->dataMgr.getCurrentSkelPoints();
+	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+	skel_points->vert.resize(dual_samples->vert.size());
+	for (int i = 0; i < dual_samples->vert.size(); i++)
+	{
+		dual_samples->vert[i].m_index = i;
+		skel_points->vert[i] = dual_samples->vert[i];
+		skel_points->vert[i].is_dual_sample = false;
+		skel_points->vert[i].is_skel_point = true;
 	}
 
+	skel_points->vn = skel_points->vert.size();
 }
 
 void WlopParaDlg::applyDualConnection()
@@ -745,54 +755,14 @@ void WlopParaDlg::applyDualConnection()
 		//dual_v.skel_radius = 0.0;
 	}
 
-// 	double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius") *0.5;
-// 
-// 	CMesh* dual_samples2 = area->dataMgr.getCurrentDualSamples();
-// 	for (int i = 0; i < dual_samples2->vert.size(); i++)
-// 	{
-// 		CVertex& dual_v = dual_samples2->vert[i];
-// 		dual_v.P() -= dual_v.N() * temp_radius;
-// 	}
-
-
 	return;
-
-
-//   CMesh* samples = area->dataMgr.getCurrentSamples();
-//   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-
-  GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::applyDualConnection()");
-  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 5, false, "WlopParaDlg::applyDualConnection()");
-
-  cout << "finished ANN " << endl;
-
-  //for (int i = 0; i < samples->vert.size(); i++)
-  //{
-  //  int dual_index = samples->vert[i].neighbors[0];
-  //  if (dual_index < 0 && dual_index >= dual_samples->vert.size())
-  //  {
-  //    dual_index = 0;
-  //  }
-  //  samples->vert[i].dual_index = dual_index;
-  //}
-
-  //for (int i = 0; i < dual_samples->vert.size(); i++)
-  //{
-  //  int dual_index = dual_samples->vert[i].neighbors[0];
-  //  if (dual_index < 0 && dual_index >= samples->vert.size())
-  //  {
-  //    dual_index = 0;
-  //  }
-  //  dual_samples->vert[i].dual_index = dual_index;
-  //}
-
-  for (int i = 0; i < dual_samples->vert.size(); i++)
-  {
-    dual_samples->vert[i].dual_index = i;
-  }
-
-  return;
 }
+
+void WlopParaDlg::applySkelConnection()
+{
+	copyDualSamplesToSkel();
+}
+
 
 
  void WlopParaDlg::applyDualWlop()

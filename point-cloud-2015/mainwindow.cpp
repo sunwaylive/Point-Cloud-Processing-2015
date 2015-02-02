@@ -64,6 +64,7 @@ void MainWindow::initWidgets()
 	ui.actionShow_Target->setChecked(paras->glarea.getBool("Show Target Samples"));
 	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
 	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Multiply Pick Point"));
+	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Show Skeltal Points"));
 
 	ui.actionRandom_Erase->setChecked(paras->glarea.getBool("Random Erase"));
 	ui.actionShow_Segment_Color->setChecked(paras->drawer.getBool("Show Segmentation Color"));
@@ -128,6 +129,7 @@ void MainWindow::initConnect()
 
 	connect(ui.actionRandom_Erase, SIGNAL(toggled(bool)), this, SLOT(randomErasePick(bool)));
 	connect(ui.actionShow_Segment_Color, SIGNAL(toggled(bool)), this, SLOT(ShowSegmentColor(bool)));
+	connect(ui.actionShow_Skeletal_Points, SIGNAL(toggled(bool)), this, SLOT(showSkeletalPoints(bool)));
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
@@ -604,6 +606,12 @@ void MainWindow::showEigenDirections(bool _val)
 	paras->glarea.setValue("Show Eigen Directions", BoolValue(_val));
 }
 
+void MainWindow::showSkeletalPoints(bool _val)
+{
+	paras->glarea.setValue("Show Skeltal Points", BoolValue(_val));
+}
+
+
 
 void MainWindow::showColorfulBranches(bool _val)
 {
@@ -1069,3 +1077,5 @@ void MainWindow::addSamplesToOriginal()
 	}
 	original->vn = original->vert.size();
 }
+
+

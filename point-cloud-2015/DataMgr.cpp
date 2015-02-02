@@ -286,14 +286,11 @@ CMesh* DataMgr::getCurrentSkelPoints()
 {
 	if (&skel_points == NULL)
 	{
-		//cout << "DataMgr::getCurrentSamples samples = NULL!!" <<endl;
 		return NULL;
 	}
 
 	if (skel_points.vert.empty())
 	{
-		//cout << "DataMgr::getCurrentSamples samples.vert.empty()!!" <<endl;
-		//return NULL;
 		return &skel_points;
 	}
 
@@ -344,6 +341,8 @@ void DataMgr::recomputeBox()
 {
 	samples.bbox.SetNull();
 	original.bbox.SetNull();
+	dual_samples.bbox.SetNull();
+	skel_points.bbox.SetNull();
 
 	CMesh::VertexIterator vi;
 	for(vi = samples.vert.begin(); vi != samples.vert.end(); ++vi) 
@@ -358,6 +357,16 @@ void DataMgr::recomputeBox()
 	for(vi = original.vert.begin(); vi != original.vert.end(); ++vi) 
 	{
 		original.bbox.Add(vi->P());
+	}
+
+	for (vi = dual_samples.vert.begin(); vi != dual_samples.vert.end(); ++vi)
+	{
+		dual_samples.bbox.Add(vi->P());
+	}
+
+	for (vi = skel_points.vert.begin(); vi != skel_points.vert.end(); ++vi)
+	{
+		skel_points.bbox.Add(vi->P());
 	}
 }
 
@@ -657,11 +666,7 @@ void DataMgr::normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f mid_point)
 
 Point3f DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 {
-	//if (mesh.vert.empty()) return;
-
-	//mesh.bbox.SetNull();
 	Box3f box = mesh.bbox;
-
 
 	mesh.bbox.SetNull();
 	float max_x = abs((box.min - box.max).X());
@@ -752,9 +757,8 @@ Box3f DataMgr::normalizeAllMesh()
 		{
 			box.Add(original.vert[i].P());
 		}
-		original.bbox =box;
+		//original.bbox =box;
 	}
-
 
 	samples.bbox = box;
 	dual_samples.bbox = box;
@@ -763,11 +767,8 @@ Box3f DataMgr::normalizeAllMesh()
 	Point3f mid = normalizeROSA_Mesh(samples);
   //normalizeROSA_Mesh(dual_samples);
 	normalizeROSA_MeshForOriginal(dual_samples, mid);
-
+	normalizeROSA_MeshForOriginal(skel_points, mid);
 	normalizeROSA_MeshForOriginal(original, mid);
-
-
-	
 
 	recomputeBox();
 	getInitRadiuse();
@@ -804,6 +805,8 @@ void DataMgr::clearData()
 	clearCMesh(original);
 	clearCMesh(samples);
   clearCMesh(dual_samples);
+	clearCMesh(skel_points);
+
 	clearCMesh(target_samples);
 	clearCMesh(target_dual_samples);
 
@@ -1150,7 +1153,14 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
 	}
 	strStream << endl;
 
-
+	strStream << "SkelPN " << skel_points.vert.size() << endl;
+	for (int i = 0; i < skel_points.vert.size(); i++)
+	{
+		CVertex& v = skel_points.vert[i];
+		strStream << v.P()[0] << "	" << v.P()[1] << "	" << v.P()[2] << "	";
+		strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
+	}
+	strStream << endl;
 
 	outfile.write( strStream.str().c_str(), strStream.str().size() ); 
 	outfile.close();
@@ -1890,6 +1900,27 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 		}
 	}
 
+	sem >> str;
+	if (str == "SkelPN")
+	{
+		cout << "load SkelPN" << endl;
+
+		sem >> num;
+		for (int i = 0; i < num; i++)
+		{
+			CVertex v;
+			v.bIsOriginal = false;
+			v.is_dual_sample = false;
+			v.is_skel_point = true;
+			v.m_index = i;
+			sem >> v.P()[0] >> v.P()[1] >> v.P()[2];
+			sem >> v.N()[0] >> v.N()[1] >> v.N()[2];
+			skel_points.vert.push_back(v);
+			skel_points.bbox.Add(v.P());
+		}
+		skel_points.vn = skel_points.vert.size();
+	}
+
  	clearCMesh(target_dual_samples);
  	clearCMesh(target_samples);
 
@@ -1960,7 +1991,6 @@ void DataMgr::switchSampleDualSample()
      CVertex& v = dual_samples.vert[i];
      v.is_dual_sample = true;
 //      v.is_fixed_sample = false;
-
    }
 
 //   replaceMeshDual(original, temp_mesh, false);

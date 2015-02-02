@@ -390,7 +390,6 @@ void WLOP::run()
 	{
 		runSkelWlop();
 		//runComputeEigenNeighborhood(samples, original);
-
 		return;
 	}
 

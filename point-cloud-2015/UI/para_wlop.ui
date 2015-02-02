@@ -23,25 +23,12 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
      <string>Tab 1</string>
     </attribute>
-    <widget class="QPushButton" name="normal_reform">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>650</y>
-       <width>101</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Normal reform</string>
-     </property>
-    </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
@@ -299,8 +286,8 @@
     <widget class="QPushButton" name="regularize_normals">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>610</y>
+       <x>180</x>
+       <y>530</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -322,38 +309,12 @@
       <string>WLOP</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="compute_distribution">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>690</y>
-       <width>111</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Compute Distribution</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="wlop_projection">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>490</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Projection</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="regularize_samples">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>610</y>
-       <width>131</width>
+       <y>530</y>
+       <width>121</width>
        <height>31</height>
       </rect>
      </property>
@@ -361,102 +322,24 @@
       <string>Regularize Samples</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="compute_correspondence">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>730</y>
-       <width>141</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Compute Correspondence</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="detect_kite_points">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>770</y>
-       <width>121</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Detect kite points</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="inner_clustering">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>690</y>
-       <width>101</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>inner clustering</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="step_forward">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>180</x>
        <y>450</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Step Forward</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="dual_drag_wlop">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>570</y>
        <width>101</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>Dual Drag WLOP</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="show_pick_distribution">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>730</y>
-       <width>121</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Show Pick Distribution</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="dual_wlop_apply">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>530</y>
-       <width>71</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Dual WLOP</string>
+      <string>Dlinks Smoothing</string>
      </property>
     </widget>
     <widget class="QPushButton" name="compute_confidence">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>650</y>
+       <x>180</x>
+       <y>490</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -465,24 +348,11 @@
       <string>Compute Confidence</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="anisotropic_lop_apply">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>570</y>
-       <width>101</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Anisotropic LOP</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="one_key">
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>770</y>
+       <y>620</y>
        <width>91</width>
        <height>31</height>
       </rect>
@@ -495,7 +365,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>810</y>
+       <y>570</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -507,14 +377,27 @@
     <widget class="QPushButton" name="move_skel">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>810</y>
+       <x>180</x>
+       <y>570</y>
        <width>121</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Move Skel</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="init_skel_points">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>620</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Init Skel Points</string>
      </property>
     </widget>
    </widget>
@@ -730,7 +613,7 @@
     <widget class="QPushButton" name="dual_connection">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>100</x>
        <y>300</y>
        <width>111</width>
        <height>31</height>
@@ -1766,6 +1649,136 @@
      </property>
      <property name="text">
       <string>Original Confidence KNN</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="dual_drag_wlop">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>110</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Dual Drag WLOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="dual_wlop_apply">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>70</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Dual WLOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="anisotropic_lop_apply">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>150</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Anisotropic LOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="inner_clustering">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>230</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>inner clustering</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="normal_reform">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>190</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Normal reform</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="show_pick_distribution">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>120</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show Pick Distribution</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="compute_distribution">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>80</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compute Distribution</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="compute_correspondence">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>160</y>
+       <width>141</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compute Correspondence</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="detect_kite_points">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>270</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Detect kite points</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="wlop_projection">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>310</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Projection</string>
      </property>
     </widget>
    </widget>

@@ -93,6 +93,7 @@ private slots:
 	void setNoSnapshotWithRadius(bool _val);
   void showColorfulBranches(bool _val);
 	void showEigenDirections(bool _val);
+	void showSkeletalPoints(bool _val);
 
 	void showTargets(bool _val);
 

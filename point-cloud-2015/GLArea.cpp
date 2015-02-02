@@ -289,6 +289,21 @@ void GLArea::paintGL()
       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
   }
 
+	if (para->getBool("Show Skeltal Points"))
+	{
+		if (para->getBool("Show Dual Samples Quad"))
+			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentSkelPoints());
+		if (para->getBool("Show Dual Samples Dot"))
+		{
+			lightOnOff(false);
+			glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentSkelPoints());
+		}
+		if (para->getBool("Show Dual Samples Circle"))
+			glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentSkelPoints());
+		if (para->getBool("Show Dual Samples Sphere"))
+			glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentSkelPoints());
+	}
+
 	if (show_something)
 	{
 		cout << "show something: 3 " << something++ << endl;
@@ -433,20 +448,13 @@ void GLArea::paintGL()
 		glDrawer.drawCurveSkeleton(*dataMgr.getCurrentSkeleton());
 	}
 
-//  	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box")) && !(takeSnapTile && para->getBool("No Snap Radius")))
-//  	{
-//  		Box3f box = dataMgr.getCurrentSamples()->bbox;
-//  		glBoxWire(box);
-//  
-//  		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
-//  	}
-  	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box") ))
-  	{
-  		Box3f box = dataMgr.getCurrentSamples()->bbox;
-  		glBoxWire(box);
-  
-  		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
-  	}
+//   	if ((para->getBool("Show Radius") || para->getBool("Show Bounding Box") ))
+//   	{
+//   		Box3f box = dataMgr.getCurrentSamples()->bbox;
+//   		glBoxWire(box);
+//   
+//   		CoordinateFrame(box.Diag() / 2.0).Render(this, NULL);
+//   	}
 
 
 		if (show_something )

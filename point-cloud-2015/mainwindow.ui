@@ -207,6 +207,7 @@
     <addaction name="actionShow_Cloest_Dual"/>
     <addaction name="actionShow_Target"/>
     <addaction name="actionShow_Eigens"/>
+    <addaction name="actionShow_Skeletal_Points"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -270,6 +271,7 @@
    <addaction name="actionShow_Samples"/>
    <addaction name="actionShow_Skeleton"/>
    <addaction name="actionShow_Dual"/>
+   <addaction name="actionShow_Skeletal_Points"/>
    <addaction name="actionShow_Connection"/>
    <addaction name="actionPick_Dual"/>
    <addaction name="separator"/>
@@ -907,6 +909,14 @@
   <action name="actionSwitch_Sample_Original">
    <property name="text">
     <string>Switch Sample Original</string>
+   </property>
+  </action>
+  <action name="actionShow_Skeletal_Points">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Skel Points</string>
    </property>
   </action>
  </widget>

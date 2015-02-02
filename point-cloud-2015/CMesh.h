@@ -70,11 +70,10 @@ public:
 	double eigen_value1;
 	double eigen_value2;
 
-
-
   bool is_skel_virtual; //in our papaer, we said bridge point instead of virtual point
 	bool is_skel_branch;
   bool is_fixed_original; 
+
   
   double skel_radius; // remember radius for branches
 	float nearest_neighbor_dist;
@@ -82,6 +81,8 @@ public:
   bool is_dual_sample;
   bool is_boundary;
 	
+	bool is_skel_point;
+
 public:
 	operator Point3f &()
 	{
@@ -110,6 +111,7 @@ public:
 		is_fixed_original(false),
 		is_dual_sample(false),
 		is_boundary(false),
+		is_skel_point(false),
 		nearest_neighbor_dist(0.0),
 		eigen_vector0(Point3f(1, 0, 0)),
 		eigen_vector1(Point3f(0, 1, 0)),

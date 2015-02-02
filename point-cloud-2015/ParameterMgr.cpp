@@ -92,6 +92,7 @@ void ParameterMgr::initGlareaParameter()
 
   glarea.addParam(new RichBool("Show Dual Connection", false) );
   glarea.addParam(new RichBool("Pick Dual Point", false) );
+	glarea.addParam(new RichBool("Show Skeltal Points", true));
 
 
 	glarea.addParam(new RichBool("Show Original", false) );
