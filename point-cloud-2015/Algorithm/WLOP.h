@@ -4,17 +4,12 @@
 #include "normal_extrapolation.h"
 #include <iostream>
 
-//#include <CGAL/wlop_simplify_and_regularize_point_set_test_AABB_tree.h>
-//#include <CGAL/tags.h>
 #include "Algorithm/pointcloud_normal.h"
 #include "eigenlib/Eigen/Eigen"
 
 using namespace std;
 using namespace vcg;
 
-//typedef Eigen::Matrix<float, 3, 3> Matrix33f;
-
-// better code is going to be in CGAL 
 class WLOP : public PointCloudAlgorithm
 {
 public:
@@ -104,6 +99,8 @@ private:
 	CMesh* samples;
 	CMesh* original;
   CMesh* dual_samples;
+	CMesh* skel_points;
+
 	CMesh* target_samples;
 	CMesh* target_dual_samples;
 

@@ -7,6 +7,9 @@ WLOP::WLOP(RichParameterSet* _para)
 	para = _para;
 	samples = NULL;
 	original = NULL;
+	dual_samples = NULL;
+	skel_points = NULL;
+
 	nTimeIterated = 0;
 	error_x = 0.0;
 }
@@ -20,6 +23,9 @@ void WLOP::clear()
 {
 	samples = NULL;
 	original = NULL;
+	dual_samples = NULL;
+	skel_points = NULL;
+
 }
 
 void WLOP::setFirstIterate()
@@ -46,14 +52,20 @@ void WLOP::setInput(DataMgr* pData)
 		default_sphere = pData->default_sphere;
 		CMesh* _samples = pData->getCurrentSamples();
 		CMesh* _original = pData->getCurrentOriginal();
+
 		target_samples = pData->getCurrentTargetSamples();
 		target_dual_samples = pData->getCurrentTargetDualSamples();
 
-		if (para->getBool("Run Skel WLOP") /*|| para->getBool("Run MAT LOP")*/)
-    {
-			_samples = pData->getCurrentDualSamples();
-			_original = pData->getCurrentSamples();
-    }
+// 		if (para->getBool("Run Skel WLOP"))
+//     {
+// 			_samples = pData->getCurrentDualSamples();
+// 			_original = pData->getCurrentSamples();
+//     }
+		if (para->getBool("Run Skel WLOP"))
+		{
+			_samples = pData->getCurrentSkelPoints();
+			_original = pData->getCurrentDualSamples();
+		}
 
 
 		if(_samples == NULL || _original == NULL)
@@ -65,7 +77,9 @@ void WLOP::setInput(DataMgr* pData)
 		error_x = 0.0;
 		samples = _samples;
 		original = _original;
+
     dual_samples = pData->getCurrentDualSamples();
+		skel_points = pData->getCurrentSkelPoints();
 
     if (para->getBool("Run Dual WLOP"))
     {
@@ -3233,11 +3247,6 @@ void WLOP::runEllipsoidFitting()
 
 
 
-
-
-
-
-
 void WLOP::runInnerPointsRegularization()
 {
 	cout << "runInnerPointsRegularization" << endl;
@@ -3304,12 +3313,6 @@ void WLOP::runInnerPointsRegularization()
 	vector<Point3f> regular_term(dual_samples->vert.size());
 
 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
-// 	repulsion_x.assign(samples->vn, vcg::Point3f(0, 0, 0));
-// 	repulsion_y.assign(samples->vn, vcg::Point3f(0, 0, 0));
-// 	repulsion_z.assign(samples->vn, vcg::Point3f(0, 0, 0));
-
-
-
 	repulsion_weight_sum.assign(samples->vn, 0);
 
 	//bool need_density = para->getBool("Need Compute Density");
