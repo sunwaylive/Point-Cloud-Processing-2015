@@ -370,6 +370,11 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Only Do Avergage", false));
 	wLop.addParam(new RichBool("Use Confidence To Merge", false));
 
+	//2015-2-2
+	wLop.addParam(new RichBool("Dual Samples Represent Inner Points", false));
+	wLop.addParam(new RichBool("Dual Samples Represent Skeltal Points", false));
+
+
 
 }
 

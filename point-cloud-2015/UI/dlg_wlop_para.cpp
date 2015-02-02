@@ -741,6 +741,7 @@ void WlopParaDlg::copyDualSamplesToSkel()
 void WlopParaDlg::applyDualConnection()
 {
 	copySamplesToDualSamples();
+	copyDualSamplesToSkel();
 
 	CMesh* samples = area->dataMgr.getCurrentSamples();
 	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
@@ -767,51 +768,52 @@ void WlopParaDlg::applySkelConnection()
 
  void WlopParaDlg::applyDualWlop()
  {
-	 global_paraMgr.glarea.setValue("Algorithom Stop", BoolValue(false));
-	 //applyWlop();
-	 area->runWlop();
-
-
-	 copySamplesToDualSamples();
-
- 	 double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
- 	 double dual_radius = global_paraMgr.wLop.getDouble("Dual Radius");
- 	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(dual_radius));
- 	 //applySkelWlop();
-	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
-	 area->runWlop();
-	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
- 	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
-
-
-
-   //double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
-   //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
-
-   //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
-   //area->runWlop();
-   //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
-
-   //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
-
-
-   //if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
-   //{
-   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
-   //  area->runWlop();
-   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
-   //}
-   //else
-   //{ 
-   //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
-   //  global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
-   //  calculation_thread.setArea(area);
-   //  calculation_thread.start();
-   //}
+// 	 global_paraMgr.glarea.setValue("Algorithom Stop", BoolValue(false));
+// 	 //applyWlop();
+// 	 area->runWlop();
+// 
+// 
+// 	 copySamplesToDualSamples();
+// 
+//  	 double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+//  	 double dual_radius = global_paraMgr.wLop.getDouble("Dual Radius");
+//  	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(dual_radius));
+//  	 //applySkelWlop();
+// 	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
+// 	 area->runWlop();
+// 	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
+//  	 global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+// 
+// 
+// 
+//    //double temp_radius = global_paraMgr.wLop.getDouble("CGrid Radius");
+//    //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+// 
+//    //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+//    //area->runWlop();
+//    //m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
+// 
+//    //global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(temp_radius));
+// 
+// 
+//    //if (global_paraMgr.glarea.getBool("SnapShot Each Iteration"))
+//    //{
+//    //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+//    //  area->runWlop();
+//    //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(false));
+//    //}
+//    //else
+//    //{ 
+//    //  m_paras->wLop.setValue("Run Dual WLOP", BoolValue(true));
+//    //  global_paraMgr.glarea.setValue("Running Algorithm Name", StringValue("WLOP"));
+//    //  calculation_thread.setArea(area);
+//    //  calculation_thread.start();
+//    //}
  }
 
  void WlopParaDlg::applySkelWlop()
  {
+	 
 	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(true));
 	 area->runWlop();
 	 m_paras->wLop.setValue("Run Skel WLOP", BoolValue(false));
@@ -865,6 +867,7 @@ void WlopParaDlg::applyAnisotropicLop()
 
 void WlopParaDlg::applyStepForward()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
   m_paras->wLop.setValue("Run Step Forward", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Step Forward", BoolValue(false));
@@ -874,27 +877,28 @@ void WlopParaDlg::applyStepForward()
 
 void WlopParaDlg::applyDragWlop()
 {
-	Point3f shift_direction = Point3f(0.0, 0.0, 1.0);
-	//Point3f shift_direction = Point3f(0.0, 1.0, 0.0);
-
-	double step_size = 0.1;
-
-	CMesh* target_samples = area->dataMgr.getCurrentTargetSamples();
-	CMesh* target_dual_samples = area->dataMgr.getCurrentTargetDualSamples();
-
-	for (int i = 0; i < target_samples->vert.size(); i++)
-	{
-		target_samples->vert[i].P() += shift_direction * step_size;
-		target_dual_samples->vert[i].P() += shift_direction * step_size;
-	}
-
-//   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(true));
-//   area->runWlop();
-//   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(false));
+// 	Point3f shift_direction = Point3f(0.0, 0.0, 1.0);
+// 	//Point3f shift_direction = Point3f(0.0, 1.0, 0.0);
+// 
+// 	double step_size = 0.1;
+// 
+// 	CMesh* target_samples = area->dataMgr.getCurrentTargetSamples();
+// 	CMesh* target_dual_samples = area->dataMgr.getCurrentTargetDualSamples();
+// 
+// 	for (int i = 0; i < target_samples->vert.size(); i++)
+// 	{
+// 		target_samples->vert[i].P() += shift_direction * step_size;
+// 		target_dual_samples->vert[i].P() += shift_direction * step_size;
+// 	}
+// 
+// //   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(true));
+// //   area->runWlop();
+// //   m_paras->wLop.setValue("Run Dual Drag WLOP", BoolValue(false));
 }
 
 void WlopParaDlg::applyRegularizeSamples()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
   m_paras->wLop.setValue("Run Regularize Samples", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Regularize Samples", BoolValue(false));
@@ -902,6 +906,7 @@ void WlopParaDlg::applyRegularizeSamples()
 
 void WlopParaDlg::applyRegularizeNormals()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Regularize Normals", BoolValue(false));
@@ -911,16 +916,16 @@ void WlopParaDlg::applyRegularizeNormals()
 
 void WlopParaDlg::applyDetectKitePoints()
 {
-	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Detect Kite Points", BoolValue(false));
 }
 
 void WlopParaDlg::applyProjection()
 {
-  m_paras->wLop.setValue("Run Projection", BoolValue(true));
-  area->runWlop();
-  m_paras->wLop.setValue("Run Projection", BoolValue(false));
+//   m_paras->wLop.setValue("Run Projection", BoolValue(true));
+//   area->runWlop();
+//   m_paras->wLop.setValue("Run Projection", BoolValue(false));
 }
 
 WlopParaDlg::~WlopParaDlg()
@@ -932,6 +937,7 @@ WlopParaDlg::~WlopParaDlg()
 
 void WlopParaDlg::applyNormalReform()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
   m_paras->wLop.setValue("Run Normal Reform", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Normal Reform", BoolValue(false));
@@ -940,6 +946,7 @@ void WlopParaDlg::applyNormalReform()
 
 void WlopParaDlg::applyComputeConfidence()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Compute Confidence", BoolValue(false));
@@ -980,23 +987,23 @@ void WlopParaDlg::applyComputeCorrespondence()
 
 void WlopParaDlg::applyShowPickDistribution()
 {
-	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Show Pick Distribution", BoolValue(false));
 }
 
 void WlopParaDlg::applyProgressiveNeighborhood()
 {
-	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Progressive Neighborhood", BoolValue(false));
 }
 
 void WlopParaDlg::applyInnerPointsClassification()
 {
-	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(false));
 }
 
 
@@ -1125,19 +1132,24 @@ void WlopParaDlg::applySmoothNeighborhood()
 
 void WlopParaDlg::applyMoveBackward()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+	
+	copyDualSamplesToSkel();
 }
 
 void WlopParaDlg::applySelfWLOP()
 {
 	if (run_backward_first)
 	{
+		m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
 		area->runWlop();
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 
+		m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 		m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
 		area->runWlop();
 		m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
@@ -1157,14 +1169,18 @@ void WlopParaDlg::applySelfWLOP()
 //   	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
 
 
-
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Self WLOP", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Self WLOP", BoolValue(false));
+
+	copyDualSamplesToSkel();
+
 }
 
 void WlopParaDlg::applyNormalSmoothing()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	if (run_backward_first)
 	{
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
@@ -1172,15 +1188,18 @@ void WlopParaDlg::applyNormalSmoothing()
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 	}
 
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
 	area->runWlop();
  	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(false));
 
+	copyDualSamplesToSkel();
 
 }
 
 void WlopParaDlg::applySelfPCA()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	if (run_backward_first)
 	{
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
@@ -1188,13 +1207,18 @@ void WlopParaDlg::applySelfPCA()
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 	}
 
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Self PCA", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Self PCA", BoolValue(false));
+
+	copyDualSamplesToSkel();
+
 }
 
 void WlopParaDlg::applySelfPorjection()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	if (run_backward_first)
 	{
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
@@ -1202,15 +1226,17 @@ void WlopParaDlg::applySelfPorjection()
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 	}
 
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(false));
 
-
+	copyDualSamplesToSkel();
 }
 
 void WlopParaDlg::applyComputeInitialNeighborhood()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
  	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(true));
  	area->runWlop();
  	m_paras->wLop.setValue("Run Compute Initial Neighborhood", BoolValue(false));
@@ -1218,9 +1244,9 @@ void WlopParaDlg::applyComputeInitialNeighborhood()
 
 void WlopParaDlg::applyMoveSample()
 {
-	m_paras->wLop.setValue("Run Move Sample", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Move Sample", BoolValue(false));
+// 	m_paras->wLop.setValue("Run Move Sample", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Move Sample", BoolValue(false));
 }
 
 void WlopParaDlg::applyMoveSkel()
@@ -1253,6 +1279,8 @@ void WlopParaDlg::oneKEY()
 	double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");
 	m_paras->wLop.setValue("Num Of Iterate Time", DoubleValue(1));
 
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+
 	for (int i = 0; i < iter_time; i++)
 	{
 		m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
@@ -1282,9 +1310,13 @@ void WlopParaDlg::oneKEY()
 			}
 		}
 
+		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyComputeConfidence();
-		//applyComputeConfidence();
+
+		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyRegularizeNormals();
+
+		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyWlop();
 
 
@@ -1313,35 +1345,7 @@ void WlopParaDlg::oneKEY()
 
 	}
 
-	//system("Pause");
-// 	int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
-// 	CMesh* samples;
-// 	samples = area->dataMgr.getCurrentSamples();
-// 	vector<Point3f> remember_normal(samples->vert.size());
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		remember_normal[i] = samples->vert[i].N();
-// 	}
-// 	vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
-// 	pca_para.fittingAdjNum = knn;
-// 	vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 		if (v.N() * remember_normal[i] < 0)
-// 		{
-// 			v.N() *= -1;
-// 		}
-// 		v.recompute_m_render();
-// 	}
 
-// 	CMesh* samples;
-// 	samples = area->dataMgr.getCurrentSamples();
-// 	fstream outfile("eigen_confidence.txt");
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 		outfile << v.eigen_confidence << endl;
-// 	}
-// 	outfile.close();
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+
 }

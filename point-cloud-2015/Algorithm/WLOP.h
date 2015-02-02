@@ -33,7 +33,7 @@ public:
 	
   void runSkelWlop();
   void runRegularizeSamples();
-  void runRegularizeNormals();
+  void runRegularizeNormals(CMesh* samples, CMesh* dual_samples);
 
 	void runComputeDistribution();
 	void runComputeCorrespondence();

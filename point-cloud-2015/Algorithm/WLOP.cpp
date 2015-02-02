@@ -56,17 +56,11 @@ void WLOP::setInput(DataMgr* pData)
 		target_samples = pData->getCurrentTargetSamples();
 		target_dual_samples = pData->getCurrentTargetDualSamples();
 
-// 		if (para->getBool("Run Skel WLOP"))
-//     {
-// 			_samples = pData->getCurrentDualSamples();
-// 			_original = pData->getCurrentSamples();
-//     }
 		if (para->getBool("Run Skel WLOP"))
 		{
 			_samples = pData->getCurrentSkelPoints();
 			_original = pData->getCurrentDualSamples();
 		}
-
 
 		if(_samples == NULL || _original == NULL)
 		{
@@ -80,6 +74,23 @@ void WLOP::setInput(DataMgr* pData)
 
     dual_samples = pData->getCurrentDualSamples();
 		skel_points = pData->getCurrentSkelPoints();
+
+		if (!para->getBool("Run Skel WLOP") && para->getBool("Dual Samples Represent Skeltal Points"))
+		{
+			cout << "Dual Samples Represent Skeltal Points" << endl;
+			dual_samples = pData->getCurrentSkelPoints();
+		}
+		else if (!para->getBool("Run Skel WLOP") && para->getBool("Dual Samples Represent Inner Points"))
+		{
+			cout << "Dual Samples Represent Inner Points" << endl;
+
+			dual_samples = pData->getCurrentDualSamples();
+		}
+		else if (!para->getBool("Run Skel WLOP"))
+		{
+			cout << "Be Carefull! Dual Samples Representation is not clear!!" << endl;
+			system("Pause");
+		}
 
     if (para->getBool("Run Dual WLOP"))
     {
@@ -250,7 +261,7 @@ void WLOP::run()
 
   if (para->getBool("Run Regularize Normals"))
   {
-    runRegularizeNormals();
+    runRegularizeNormals(samples, skel_points);
     return;
   }
 
@@ -1512,13 +1523,11 @@ double WLOP::iterate()
 	initVertexes(true);
 
 
-  if (!para->getBool("Use Adaptive Sample Neighbor"))
-  {
-    time.start("Sample Sample Neighbor Tree");
-    GlobalFun::computeBallNeighbors(samples, NULL, 
-      para->getDouble("CGrid Radius"), samples->bbox);
-    time.end();
-  }
+	time.start("Sample Sample Neighbor Tree");
+	GlobalFun::computeBallNeighbors(samples, NULL,
+		para->getDouble("CGrid Radius"), samples->bbox);
+	time.end();
+
 
 	if (nTimeIterated == 0) 
 	{
@@ -1579,21 +1588,12 @@ double WLOP::iterate()
 	computeRepulsionTerm(samples);
 	time.end();
 
-  bool need_sample_average_term = false;
-  if (para->getBool("Need Sample Average"))
-  {
-    time.start("Compute Repulsion Term");
-    computeSampleAverageTerm(samples);
-    time.end();
-    need_sample_average_term = true;
-  }
 
 	if (para->getBool("Need Similarity"))
 	{
 		time.start("Compute Similarity Term");
 		computeSampleSimilarityTerm(samples);
 		time.end();
-		//cout << "similarity similarity similarity similarity similarity similarity similarity similarity" << endl;
 	}
 
 	
@@ -2697,7 +2697,7 @@ void WLOP::runRegularizeSamples()
 
 
 
-void WLOP::runRegularizeNormals()
+void WLOP::runRegularizeNormals(CMesh* samples, CMesh* dual_samples)
 {
 	computeDualIndex(samples, dual_samples);
 
@@ -2775,116 +2775,6 @@ void WLOP::runRegularizeNormals()
 	cout << "!!how many tubular points in runRegularizeNormals? " << tubular_points << endl;
 
 	return;
-
-
-	if (use_kite_points)
-	{
-		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
-
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			CVertex dual_v2 = dual_samples->vert[i];
-
-			if (!v.is_boundary)
-			{
-				continue;
-			}
-
-			int neighbor_idx = v.neighbors[0];
-			//int neighbor_idx = i;
-			CVertex& dual_v = dual_samples->vert[neighbor_idx];
-			Point3f diff = v.P() - dual_v.P();
-			double proj_dist = diff * dual_v.eigen_vector0;
-			Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
-			Point3f dir = (v.P() - proj_p).Normalize();
-
-			if (dir*v.N() < 0)
-			{
-				v.N() = ((-dir + v.N()) / 2.0).Normalize();
-			}
-			else
-			{
-				v.N() = ((dir + v.N()) / 2.0).Normalize();
-			}
-		}
-	}
-	else
-	{
-		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-		double threshold = global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold");
-
-		for (int i = 0; i < dual_samples->vert.size(); i++)
-		{
-			CVertex& dual_v = dual_samples->vert[i];
-			dual_v.eigen_vector0.Normalize();
-			if (dual_v.eigen_confidence > threshold)
-			{
-				//cout << dual_v.eigen_confidence << endl;
-				dual_v.is_boundary = true;
-			}
-		}
-
-		//GlobalFun::computeAnnNeigbhors(samples->vert, dual_samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
-		//bool use_confidence = para->getBool("Use Confidence");
-		bool use_confidence = true;
-		//double threshold = global_paraMgr.skeleton.getDouble("Eigen Feature Identification Threshold");
-		double threshold1 = 0.95;
-
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			CVertex dual_v2 = dual_samples->vert[i];
-
-			if (!dual_v2.is_boundary)
-			{
-				continue;
-			}
-
-			int neighbor_idx = v.neighbors[0];
-			//int neighbor_idx = i;
-			CVertex& dual_v = dual_samples->vert[neighbor_idx];
-			Point3f diff = v.P() - dual_v.P();
-			double proj_dist = diff * dual_v.eigen_vector0;
-			Point3f proj_p = dual_v.P() + dual_v.eigen_vector0 * proj_dist;
-			Point3f dir = (v.P() - proj_p).Normalize();
-
-			//Point3f dir = (v.P() - dual_v.P()).Normalize();
-
-			if (use_confidence)
-			{
-				if (v.eigen_confidence < threshold1)
-				{
-					if (dir*v.N() < 0)
-					{
-						v.N() = ((-dir + v.N()) / 2.0).Normalize();
-					}
-					else
-					{
-						v.N() = ((dir + v.N()) / 2.0).Normalize();
-					}
-				}
-			}
-			else
-			{
-				if (dir*v.N() < 0)
-				{
-					v.N() = ((-dir + v.N()) / 2.0).Normalize();
-				}
-				else
-				{
-					v.N() = ((dir + v.N()) / 2.0).Normalize();
-				}
-			}
-
-		}
-	}
-
 }
 
 
@@ -3037,7 +2927,7 @@ void WLOP::runComputeDistribution()
 
 	if (use_closest_dual)
 	{
-		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "WlopParaDlg::runRegularizeNormals()");
+		GlobalFun::computeAnnNeigbhors(dual_samples->vert, samples->vert, 1, false, "");
 	}
 	//return;
 

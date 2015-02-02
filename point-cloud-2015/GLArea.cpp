@@ -344,8 +344,10 @@ void GLArea::paintGL()
 
 	if (para->getBool("Show Dual Connection"))
 	{
-		glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
-		glDrawer.drawDualSampleRelations(dataMgr.getCurrentTargetSamples(), dataMgr.getCurrentTargetDualSamples());
+		//glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentDualSamples());
+		glDrawer.drawDualSampleRelations(dataMgr.getCurrentSamples(), dataMgr.getCurrentSkelPoints());
+
+		//glDrawer.drawDualSampleRelations(dataMgr.getCurrentTargetSamples(), dataMgr.getCurrentTargetDualSamples());
 	}
 
 	if (show_something)
@@ -1338,6 +1340,10 @@ void GLArea::runWlop()
 	global_paraMgr.wLop.setValue("Run Anisotropic LOP", BoolValue(false));
 	global_paraMgr.wLop.setValue("Run Skel WLOP", BoolValue(false));
 	
+
+	global_paraMgr.wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));
+	global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+
 	cout << "wloppppppppppppppppppppppppppppp 3" << endl;
 
 	//show_something = true;

@@ -64,7 +64,7 @@ void MainWindow::initWidgets()
 	ui.actionShow_Target->setChecked(paras->glarea.getBool("Show Target Samples"));
 	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
 	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Multiply Pick Point"));
-	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Show Skeltal Points"));
+	ui.actionShow_Skeletal_Points->setChecked(paras->glarea.getBool("Show Skeltal Points"));
 
 	ui.actionRandom_Erase->setChecked(paras->glarea.getBool("Random Erase"));
 	ui.actionShow_Segment_Color->setChecked(paras->drawer.getBool("Show Segmentation Color"));
