@@ -869,16 +869,6 @@ void WlopParaDlg::applyDualConnection()
 	 m_paras->wLop.setValue("Run MAT LOP", BoolValue(false));
 
 	 CMesh* samples = area->dataMgr.getCurrentSamples();
-
-// 	 for (int i = 0; i < samples->vert.size(); i++)
-// 	 {
-// 		 CVertex& v = samples->vert[i];
-// 
-// 		 if (i < 50)
-// 		 {
-// 			 cout << "t t: " << v.eigen_confidence << endl;
-// 		 }
-// 	 }
  }
 
 void WlopParaDlg::applyAnisotropicLop()

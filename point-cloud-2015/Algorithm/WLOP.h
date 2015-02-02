@@ -37,28 +37,16 @@ public:
 	void computeNearestNeighborDist();
 	
   void runSkelWlop();
-  void runDragWlop();
   void runRegularizeSamples();
   void runRegularizeNormals();
-	void runDetectKitePoitns();
-
 
 	void runComputeDistribution();
-	void runEllipsoidFitting();
-
-
 	void runComputeCorrespondence();
 	vector<SphereSlots> computeDistributions(CMesh* samples, CMesh* dual_samples);
-
-
 	void updateSphereSlots(SphereSlots& sphere_slots, Point3f dir, double dist_weight);
 	double getSphereSlotsConfidence(SphereSlots& sphere_slots);
 	
-
-  void computeJointNeighborhood();
-	void runShowPickDistribution();
-
-	void runProgressiveNeighborhood();
+	void runEllipsoidFitting();
 
 protected:
 	WLOP(){}
@@ -70,8 +58,6 @@ private:
 	double iterate();
 
 	vector<Point3f> computeNewSamplePositions(int& error_x);
-
-	//void smoothingDecisions();
 	vector<double> decisions;
 
 	void computeAverageTerm(CMesh* samples, CMesh* original);
@@ -80,7 +66,6 @@ private:
   void computeSampleAverageTerm(CMesh* samples);
 	void computeSampleSimilarityTerm(CMesh* samples);
 	void computeRepulsionTerm(CMesh* samples);
-
 	void computeDLinkRepulsionTerm(CMesh* samples);
 
 
@@ -90,22 +75,8 @@ private:
   void stepForward();
 	void smoothSkelDistance();
 
-  void updateAdaptiveNeighbor();
-
   void runProjection();
 	void runComputeConfidence();
-	void runComputeInnerClusering();
-
-	void runComputeHoleConfidence();
-
-	void runMatLOP();
-
-
-	void addSamplesToOriginalTemporary();
-	void removeSamplesFromOriginal();
-
-	void innerpointsClassification();
-
 
 	void runInnerPointsRegularization();
 	void runSearchNeighborhood();
@@ -124,9 +95,6 @@ private:
 	void runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples);
 
 	void computeDualIndex(CMesh* samples, CMesh* dual_samples);
-
-
-
 	void runComputeAverageDistThreshold();
 
 private:
@@ -151,24 +119,17 @@ private:
 	vector<Point3f> repulsion;
 	vector<double>  repulsion_weight_sum;
 
-// 	vector<Point3f> repulsion_x;
-// 	vector<Point3f> repulsion_y;
-// 	vector<Point3f> repulsion_z;
-
 	vector<double> repulsion_x_length;
 	vector<double> repulsion_y_length;
 	vector<double> repulsion_z_length;
 
 
-	//Matrix33f matA;
-	//vector< Eigen::Matrix3f> repulsion_matA_set;
 	vector<Matrix33f> repulsion_matA_set;
 
   vector<Point3f> samples_average;
   vector<double>  samples_average_weight_sum;
 
 	vector<Point3f> samples_similarity;
-	//vector<double>  samples_similarity_weight_sum;
 
 	vector<Point3f> average;
 	vector<double>  average_weight_sum;
@@ -180,10 +141,6 @@ private:
 
   bool use_adaptive_mu;
   vector<bool> is_sample_close_to_original;
-
-  vector<int> pioneer_points_id;
-  vector<Point3f> pioneer_points_position;
-  vector< vector<Point3f>> pioneer_points_origininal;
 
 	SphereSlots default_sphere;
 	bool use_closest_dual;
