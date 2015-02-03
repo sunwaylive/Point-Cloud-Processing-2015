@@ -418,7 +418,13 @@ void WLOP::run()
 		return;
 	}
 
-	cout << "6" << endl;
+
+	if (para->getBool("Run Compute Dual Index"))
+	{
+		computeDualIndex(samples, dual_samples);
+		//runComputeEigenNeighborhood(samples, original);
+		return;
+	}
 
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
@@ -4247,6 +4253,8 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 
 			v.dual_index = i;
 		}
+
+		return;
 	}
 
 
@@ -4311,18 +4319,8 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 
 		}
 
-
-// 		if (max_iterate > 80)
-// 		{
-// 			//v.is_skel_virtual = true;
-// 			v.is_boundary = true;
-// 			cout << "strange!!" << endl;
-// 
-// 		}
 		v.dual_index = dual_idx;
 	}
 
 	timer.end();
-
-
 }

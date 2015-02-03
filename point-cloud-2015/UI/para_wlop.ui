@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>357</width>
+    <width>359</width>
     <height>957</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -34,7 +34,7 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>313</width>
+       <width>281</width>
        <height>440</height>
       </rect>
      </property>
@@ -192,13 +192,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="Need_original_combine_sample">
-        <property name="text">
-         <string>Need Original Combine Sample</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="Need_averaging_movement">
         <property name="text">
          <string>Need Averaging Movement</string>
@@ -220,27 +213,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="Use_Elliptical_Original_Neighbor">
-        <property name="text">
-         <string>Use_Elliptical_Original_Neighbor</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="Use_Adaptive_Mu">
-        <property name="text">
-         <string>Use_Adaptive_Mu</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="Use_KNN_Sample_Neighbor">
-        <property name="text">
-         <string>Use_Adaptive_Sample_Neighbor</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="Use_tangent_vector">
         <property name="text">
          <string>Use_tangent_vector</string>
@@ -254,27 +226,13 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="Use_original_Averaging_KNN">
-        <property name="text">
-         <string>Use_original_averaging KNN</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="Use_kite_points">
-        <property name="text">
-         <string>Use_Kite_Points</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
     <widget class="QPushButton" name="skel_wlop">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>490</y>
+       <y>500</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -286,8 +244,8 @@
     <widget class="QPushButton" name="regularize_normals">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>530</y>
+       <x>150</x>
+       <y>540</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -300,7 +258,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>450</y>
+       <y>460</y>
        <width>61</width>
        <height>31</height>
       </rect>
@@ -313,7 +271,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>530</y>
+       <y>540</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -325,8 +283,8 @@
     <widget class="QPushButton" name="step_forward">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>450</y>
+       <x>150</x>
+       <y>460</y>
        <width>101</width>
        <height>31</height>
       </rect>
@@ -338,8 +296,8 @@
     <widget class="QPushButton" name="compute_confidence">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>490</y>
+       <x>150</x>
+       <y>500</y>
        <width>111</width>
        <height>31</height>
       </rect>
@@ -351,8 +309,8 @@
     <widget class="QPushButton" name="one_key">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>620</y>
+       <x>150</x>
+       <y>630</y>
        <width>91</width>
        <height>31</height>
       </rect>
@@ -365,7 +323,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>570</y>
+       <y>580</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -377,8 +335,8 @@
     <widget class="QPushButton" name="move_skel">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>570</y>
+       <x>150</x>
+       <y>580</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -391,179 +349,13 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>620</y>
+       <y>630</y>
        <width>121</width>
        <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>Init Skel Points</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_2">
-    <attribute name="title">
-     <string>Tab 2</string>
-    </attribute>
-    <widget class="QPushButton" name="pushButton_progressive_neighborhood">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>90</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Optimize Neighborhood</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>20</y>
-       <width>152</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Progressive Min KNN</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>152</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Progressive Max KNN</string>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="progressive_min_knn">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>20</y>
-       <width>151</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="decimals">
-      <number>0</number>
-     </property>
-     <property name="minimum">
-      <double>0.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>1000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.010000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="progressive_max_knn">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>50</y>
-       <width>151</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="decimals">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <double>100000.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.100000000000000</double>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="inner_points_classification">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>250</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Inner points classification</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_ellipsoid_fitting">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>140</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Ellipsoid Fitting</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="mat_lop">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>190</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>MAT LOP</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_search_neighborhood">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>680</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Search Neighborhood</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_smooth_neighborhood">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>720</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Smooth  Neighborhood</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_regularize_inner_points">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>760</y>
-       <width>151</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Regularize Inner Points</string>
      </property>
     </widget>
    </widget>
@@ -1615,6 +1407,172 @@
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Tab 2</string>
+    </attribute>
+    <widget class="QPushButton" name="pushButton_progressive_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>90</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Optimize Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>152</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Progressive Min KNN</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>152</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Progressive Max KNN</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="progressive_min_knn">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>20</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>0</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="progressive_max_knn">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>50</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="inner_points_classification">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>250</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Inner points classification</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_ellipsoid_fitting">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>140</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ellipsoid Fitting</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="mat_lop">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>190</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MAT LOP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_search_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>680</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Search Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_smooth_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>720</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Smooth  Neighborhood</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_regularize_inner_points">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>760</y>
+       <width>151</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Regularize Inner Points</string>
+     </property>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
      <string>Page</string>
@@ -1779,6 +1737,84 @@
      </property>
      <property name="text">
       <string>Projection</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_kite_points">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>480</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Kite_Points</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_Adaptive_Mu">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>407</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Adaptive_Mu</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_KNN_Sample_Neighbor">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>430</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Adaptive_Sample_Neighbor</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Need_original_combine_sample">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>358</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Need Original Combine Sample</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_original_Averaging_KNN">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>457</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_original_averaging KNN</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_Elliptical_Original_Neighbor">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>384</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Elliptical_Original_Neighbor</string>
      </property>
     </widget>
    </widget>

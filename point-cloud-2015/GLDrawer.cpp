@@ -992,13 +992,13 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 		}
 
 		int index = i;
-// 		if (global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
-// 		{
-// 			if (v.dual_index > 0 && v.dual_index < dual_samples->vert.size())
-// 			{
-// 				index = v.dual_index;
-// 			}
-// 		}
+ 		if (global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+ 		{
+ 			if (v.dual_index >= 0 && v.dual_index < dual_samples->vert.size())
+ 			{
+ 				index = v.dual_index;
+ 			}
+ 		}
 
 		CVertex& dual_v = dual_samples->vert[index];
     //CVertex& dual_v = samples->vert[v.dual_index];

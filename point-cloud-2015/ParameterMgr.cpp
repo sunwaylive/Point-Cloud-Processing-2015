@@ -247,6 +247,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Compute Correspondence", false));
 	wLop.addParam(new RichBool("Run Detect Kite Points", false));
 	wLop.addParam(new RichBool("Run Inner Points Classification", false));
+	wLop.addParam(new RichBool("Run Compute Dual Index", false));
 
 
 	wLop.addParam(new RichBool("WLOP test bool", false));
