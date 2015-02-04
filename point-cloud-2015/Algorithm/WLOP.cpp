@@ -426,6 +426,18 @@ void WLOP::run()
 		return;
 	}
 
+	if (para->getBool("Run Tangential Motion"))
+	{
+		runTangentialMotion();
+		return;
+	}
+
+	if (para->getBool("Run DLength Adjustment"))
+	{
+		runDlengthAdjustment();
+		return;
+	}
+
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
 		runComputeAverageDistThreshold();
@@ -4323,4 +4335,15 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 	}
 
 	timer.end();
+}
+
+
+void WLOP::runTangentialMotion()
+{
+
+}
+
+void WLOP::runDlengthAdjustment()
+{
+
 }

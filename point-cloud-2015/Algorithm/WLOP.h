@@ -92,6 +92,9 @@ private:
 	void computeDualIndex(CMesh* samples, CMesh* dual_samples);
 	void runComputeAverageDistThreshold();
 
+	void runTangentialMotion();
+	void runDlengthAdjustment();
+
 private:
 	RichParameterSet* para;
 

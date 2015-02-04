@@ -375,7 +375,8 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Dual Samples Represent Inner Points", false));
 	wLop.addParam(new RichBool("Dual Samples Represent Skeltal Points", false));
 
-
+	wLop.addParam(new RichBool("Run Tangential Motion", false));
+	wLop.addParam(new RichBool("Run DLength Adjustment", false));
 
 }
 

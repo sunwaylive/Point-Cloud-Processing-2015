@@ -237,6 +237,9 @@ void WlopParaDlg::initConnects()
 	connect(ui->Run_Estimate_Average_Dist_Threshold, SIGNAL(clicked()), this, SLOT(applyRunEstimateAverageDistThreshold()));
 
 	connect(ui->init_skel_points, SIGNAL(clicked()), this, SLOT(applySkelConnection()));
+	
+	connect(ui->tangential_motion, SIGNAL(clicked()), this, SLOT(applyTangentialMotion()));
+	connect(ui->dlength_adjustment, SIGNAL(clicked()), this, SLOT(applyDLengthAdjustment()));
 
 }
 
@@ -659,6 +662,8 @@ void WlopParaDlg::use_Use_Confidence_To_Merge(bool _val)
 // apply
 void WlopParaDlg::applyWlop()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+
 	Timer timer;
 	timer.start("WWWWLLLLLOOOOOPPPP Time");
 	area->runWlop();
@@ -1256,6 +1261,21 @@ void WlopParaDlg::applyMoveSkel()
 // 	m_paras->wLop.setValue("Run Move Skel", BoolValue(false));
 }
 
+void WlopParaDlg::applyTangentialMotion()
+{
+	m_paras->wLop.setValue("Run Tangential Motion", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run Tangential Motion", BoolValue(false));
+}
+
+void WlopParaDlg::applyDLengthAdjustment()
+{
+	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(true));
+	area->runWlop();
+	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(false));
+}
+
+
 void WlopParaDlg::applyComputeEigenDirections()
 {
 	m_paras->wLop.setValue("Compute Eigen Directions", BoolValue(true));
@@ -1349,3 +1369,6 @@ void WlopParaDlg::oneKEY()
 	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
 
 }
+
+
+

@@ -156,6 +156,10 @@ class WlopParaDlg : public QFrame
 		void applyComputeInitialNeighborhood();
 		void oneKEY();
 
+		void applyTangentialMotion();
+		void applyDLengthAdjustment();
+
+
 	private:
 		bool run_backward_first;
 

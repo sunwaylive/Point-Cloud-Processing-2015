@@ -358,6 +358,32 @@
       <string>Init Skel Points</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="tangential_motion">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>710</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tangential Motion</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="dlength_adjustment">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>710</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DLength Adjustment</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_3">
     <attribute name="title">
