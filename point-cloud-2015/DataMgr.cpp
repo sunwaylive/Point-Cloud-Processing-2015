@@ -36,7 +36,15 @@ bool DataMgr::isSkeletonEmpty()
   return skeleton.isEmpty();
 }
 
+bool DataMgr::isDualSamplesEmpty()
+{
+	return dual_samples.vert.empty();
+}
 
+bool DataMgr::isSkeletalPointsEmpty()
+{
+	return skel_points.vert.empty();
+}
 
 
 void DataMgr::loadPlyToOriginal(QString fileName)

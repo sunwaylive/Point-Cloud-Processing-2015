@@ -644,7 +644,7 @@ void MainWindow::showClosestDualConnection(bool _val)
 {
 	global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 
-	if (_val)
+	if (_val && !area->dataMgr.isSkeletalPointsEmpty())
 	{
 		global_paraMgr.wLop.setValue("Run Compute Dual Index", BoolValue(true));
 		area->runWlop();

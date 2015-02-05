@@ -176,3 +176,6 @@ public:
 																WeightType type = Bilateral);
 
 };
+
+
+//m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));

@@ -274,22 +274,22 @@ void GLArea::paintGL()
 		cout << "show something: 2 " << something++ << endl;
 	}
 
-  if(para->getBool("Show Dual Samples"))
-  {
-		if (para->getBool("Show Dual Samples Quad"))
-      glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
-		if (para->getBool("Show Dual Samples Dot"))
-    {
-      lightOnOff(false);
-      glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
-    }
-		if (para->getBool("Show Dual Samples Circle"))
-      glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
-		if (para->getBool("Show Dual Samples Sphere"))
-      glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
-  }
+   if(para->getBool("Show Dual Samples") && !dataMgr.getCurrentDualSamples()->vert.empty())
+   {
+ 		if (para->getBool("Show Dual Samples Quad"))
+       glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentDualSamples());
+ 		if (para->getBool("Show Dual Samples Dot"))
+     {
+       lightOnOff(false);
+       glDrawer.draw(GLDrawer::DOT, dataMgr.getCurrentDualSamples());
+     }
+ 		if (para->getBool("Show Dual Samples Circle"))
+       glDrawer.draw(GLDrawer::CIRCLE, dataMgr.getCurrentDualSamples());	
+ 		if (para->getBool("Show Dual Samples Sphere"))
+       glDrawer.draw(GLDrawer::SPHERE, dataMgr.getCurrentDualSamples());	
+   }
 
-	if (para->getBool("Show Skeltal Points"))
+	if (para->getBool("Show Skeltal Points") && !dataMgr.getCurrentSkelPoints()->vert.empty())
 	{
 		if (para->getBool("Show Dual Samples Quad"))
 			glDrawer.draw(GLDrawer::QUADE, dataMgr.getCurrentSkelPoints());
@@ -2604,45 +2604,45 @@ void GLArea::drawCorrespondences()
 	double normal_width = global_paraMgr.drawer.getDouble("Normal Line Width");
 	double show_percentage = para->getDouble("Show Confidence Percentage");
 
-	if (para->getBool("Show Dual Samples"))
-	{
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			CVertex& dual_v = dual_samples->vert[i];
-
-			if (v.eigen_confidence < show_percentage)
-			{
-				continue;
-			}
-			int target_index = v.target_index;
-			if (target_index < 0)
-			{
-				continue;
-			}
-			CVertex& target_v = target_dual_samples->vert[target_index];
-			glDrawer.glDrawLine(dual_v.P(), target_v.P(), cBlue, normal_width);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			if (v.eigen_confidence < show_percentage)
-			{
-				continue;
-			}
-			int target_index = v.target_index;
-			if (target_index < 0)
-			{
-				continue;
-			}
-			CVertex& target_v = target_samples->vert[target_index];
-			glDrawer.glDrawLine(v.P(), target_v.P(), cYellow, normal_width);
-		}
-
-	}
+// 	if (para->getBool("Show Dual Samples"))
+// 	{
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			CVertex& v = samples->vert[i];
+// 			CVertex& dual_v = dual_samples->vert[i];
+// 
+// 			if (v.eigen_confidence < show_percentage)
+// 			{
+// 				continue;
+// 			}
+// 			int target_index = v.target_index;
+// 			if (target_index < 0)
+// 			{
+// 				continue;
+// 			}
+// 			CVertex& target_v = target_dual_samples->vert[target_index];
+// 			glDrawer.glDrawLine(dual_v.P(), target_v.P(), cBlue, normal_width);
+// 		}
+// 	}
+// 	else
+// 	{
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			CVertex& v = samples->vert[i];
+// 			if (v.eigen_confidence < show_percentage)
+// 			{
+// 				continue;
+// 			}
+// 			int target_index = v.target_index;
+// 			if (target_index < 0)
+// 			{
+// 				continue;
+// 			}
+// 			CVertex& target_v = target_samples->vert[target_index];
+// 			glDrawer.glDrawLine(v.P(), target_v.P(), cYellow, normal_width);
+// 		}
+// 
+// 	}
 }
 
 

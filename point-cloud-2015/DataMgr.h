@@ -37,6 +37,9 @@ public:
 	bool isSamplesEmpty();
 	bool isOriginalEmpty();
   bool isSkeletonEmpty();
+	bool isDualSamplesEmpty();
+	bool isSkeletalPointsEmpty();
+
 
 	CMesh* getCurrentSamples();
   CMesh* getCurrentDualSamples();

@@ -712,14 +712,24 @@ void WlopParaDlg::copySamplesToDualSamples()
 	CMesh* samples = area->dataMgr.getCurrentSamples();
 	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
 
-	dual_samples->vert.resize(samples->vert.size());
+	if (!dual_samples)
+	{
+		dual_samples = new CMesh;
+	}
+
+	CVertex v;
+	dual_samples->vert.assign(samples->vert.size(), v);
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		samples->vert[i].is_dual_sample = false;
 		samples->vert[i].is_fixed_sample = false;
 
-		samples->vert[i].m_index = i;
-		dual_samples->vert[i] = samples->vert[i];
+// 		CVertex temp_v = samples->vert[i];
+// 		dual_samples->vert[i] = temp_v;
+ 		dual_samples->vert[i].P() = samples->vert[i].P();
+ 		dual_samples->vert[i].N() = samples->vert[i].N();
+		dual_samples->vert[i].m_index = i;
+
 		dual_samples->vert[i].is_dual_sample = true;
 	}
 	dual_samples->vn = dual_samples->vert.size();
@@ -735,7 +745,10 @@ void WlopParaDlg::copyDualSamplesToSkel()
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		dual_samples->vert[i].m_index = i;
-		skel_points->vert[i] = dual_samples->vert[i];
+		skel_points->vert[i].P() = dual_samples->vert[i].P();
+		skel_points->vert[i].N() = dual_samples->vert[i].N();
+		dual_samples->vert[i].m_index = i;
+
 		skel_points->vert[i].is_dual_sample = false;
 		skel_points->vert[i].is_skel_point = true;
 	}
@@ -746,20 +759,20 @@ void WlopParaDlg::copyDualSamplesToSkel()
 void WlopParaDlg::applyDualConnection()
 {
 	copySamplesToDualSamples();
-	copyDualSamplesToSkel();
+	//copyDualSamplesToSkel();
 
-	CMesh* samples = area->dataMgr.getCurrentSamples();
-	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		CVertex& dual_v = dual_samples->vert[i];
-		//v.eigen_confidence = 0.0;
-		//dual_v.eigen_confidence = 0.0;
-		//v.skel_radius = 0.0;
-		//dual_v.skel_radius = 0.0;
-	}
+// 	CMesh* samples = area->dataMgr.getCurrentSamples();
+// 	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		//v.eigen_confidence = 0.0;
+// 		//dual_v.eigen_confidence = 0.0;
+// 		//v.skel_radius = 0.0;
+// 		//dual_v.skel_radius = 0.0;
+// 	}
 
 	return;
 }
@@ -1263,6 +1276,7 @@ void WlopParaDlg::applyMoveSkel()
 
 void WlopParaDlg::applyTangentialMotion()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Tangential Motion", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Tangential Motion", BoolValue(false));
@@ -1270,6 +1284,7 @@ void WlopParaDlg::applyTangentialMotion()
 
 void WlopParaDlg::applyDLengthAdjustment()
 {
+	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(false));

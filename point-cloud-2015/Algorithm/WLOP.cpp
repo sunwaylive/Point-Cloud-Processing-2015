@@ -856,11 +856,19 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 	double iradius16 = -para->getDouble("H Gaussian Para")/radius2;
   bool use_tangent = para->getBool("Use Tangent Vector");
 	bool run_skel_wlop = para->getBool("Run Skel WLOP");
+	bool run_tangential_movement = para->getBool("Run Tangential Motion");
+
 
 	if (use_ellipsoid_repulsion && (run_skel_wlop || para->getBool("Run Move Sample")))
 	{
 		repulsion_power = para->getDouble("Big Repulsion Power");
 	}
+
+	if (run_tangential_movement)
+	{
+		repulsion_power = para->getDouble("Big Repulsion Power");
+	}
+
 
 	if (para->getBool("Run Skel WLOP"))
 	{
@@ -903,7 +911,7 @@ void WLOP::computeRepulsionTerm(CMesh* samples)
 			Point3f diff = v.P() - t.P();
 
 			//Point3f diff2 = v.P() - t.P();;
-      if (use_tangent)
+      if (use_tangent || run_tangential_movement)
       {
         diff = GlobalFun::getTangentVector(diff, v.N());
       }
@@ -3066,8 +3074,8 @@ void WLOP::runMoveSample()
 {
 	if (true)
 	{
-		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+// 		GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+// 		GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
 		initVertexes(true);
 
@@ -4251,6 +4259,11 @@ void WLOP::computeInitialNeighborSize()
 
 void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 {
+	if (!dual_samples || dual_samples->vert.empty())
+	{
+		return;
+	}
+
 	bool use_progressive_search = para->getBool("Use Progressive Search Index");
 	double search_dual_index_para = para->getDouble("Search Dual Index Para");
 
@@ -4341,6 +4354,33 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 void WLOP::runTangentialMotion()
 {
 
+	//return;
+// 	initVertexes(true);
+// 
+// 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+// 	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
+// 
+// 	Timer time;
+// 	time.start("Compute Repulsion Term");
+// 	computeRepulsionTerm(samples);
+// 	time.end();
+
+	double mu = 0.4 * 1.0;
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+		CVertex dual_v = dual_samples->vert[i];
+
+		Point3f diff = v.P() - dual_v.P();
+
+		double proj_dist = diff * dual_v.N();
+		v.P() = dual_v.P() + dual_v.N() * proj_dist;
+
+// 		if (repulsion_weight_sum[i] > 1e-10)
+// 		{
+// 			v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+// 		}
+	}
 }
 
 void WLOP::runDlengthAdjustment()
