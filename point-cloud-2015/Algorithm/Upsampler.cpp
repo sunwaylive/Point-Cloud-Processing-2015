@@ -1063,16 +1063,43 @@ void Upsampler::optimizeProjection()
 	double radius = para->getDouble("CGrid Radius");
 	CGrid mesh_grid;
 	CGrid original_grid;
-	mesh_grid.init(samples->vert, samples->bbox, radius);
+	//mesh_grid.init(samples->vert, samples->bbox, radius);
+
+	double radius2 = radius * radius;
+	double iradius16 = -4 / radius2;
 
 	/* updateNormal Before projection */
-	mesh_grid.iterate(self_optimize_normals, other_optimize_normals);
+	//mesh_grid.iterate(self_optimize_normals, other_optimize_normals);
 	//mesh_grid.iterate(self_optimize_upsamples_global, other_optimize_upsamples_global);
+
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+
+	for (int i = 0; i < samples->vert.size(); i++)
+	{
+		CVertex& v = samples->vert[i];
+
+		for (int j = 0; j < v.neighbors.size(); j++)
+		{
+			CVertex& t = samples->vert[v.neighbors[j]];
+
+			Point3f diff = v.P() - t.P();  // 
+			double dist2 = diff.SquaredNorm();
+
+			Point3f vm(v.N());
+			Point3f tm(t.N());
+
+				double theta_1 = exp(dist2 * iradius16);
+				double psi = exp(-pow(1 - vm*tm, 2) / pow(max(1e-18, 1 - cos(sigma / 180.0*3.1415926)), 2));
+
+				double weight = theta_1 * psi;
+				updateVT_proj_normal(v, t, weight, radius / 2.);
+		}
+	}
 
 	for (int i = 0; i < samples->vn; i++)
 	{
 		CVertex& v = samples->vert[i];
-		if (proj_weight[i] > 0)
+		if (proj_weight[i] > 0 && !v.neighbors.empty())
 		{
 			v.N() = sum_N[i] / proj_weight[i];
 			v.N().Normalize();
@@ -1189,6 +1216,7 @@ void Upsampler::self_optimize_normals(CGrid::iterator start, CGrid::iterator end
 		}
 	}
 }
+
 void Upsampler::other_optimize_normals(CGrid::iterator starta, CGrid::iterator enda, 
 	CGrid::iterator startb, CGrid::iterator endb, double radius)
 {

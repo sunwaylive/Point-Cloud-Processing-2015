@@ -4353,19 +4353,19 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 
 void WLOP::runTangentialMotion()
 {
+	initVertexes(true);
 
-	//return;
-// 	initVertexes(true);
-// 
-// 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
-// 	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
-// 
-// 	Timer time;
-// 	time.start("Compute Repulsion Term");
-// 	computeRepulsionTerm(samples);
-// 	time.end();
+	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
+	GlobalFun::computeEigenWithTheta(samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
 
-	double mu = 0.4 * 1.0;
+	Timer time;
+	time.start("Compute Repulsion Term");
+	computeRepulsionTerm(samples);
+	time.end();
+
+	//double mu = 0.4 * 1.0;
+	double mu = para->getDouble("Repulsion Mu");
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
@@ -4376,10 +4376,14 @@ void WLOP::runTangentialMotion()
 		double proj_dist = diff * dual_v.N();
 		v.P() = dual_v.P() + dual_v.N() * proj_dist;
 
-// 		if (repulsion_weight_sum[i] > 1e-10)
-// 		{
-// 			v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
-// 		}
+ 		if (repulsion_weight_sum[i] > 1e-10)
+ 		{
+ 			v.P() += repulsion[i] * (mu / repulsion_weight_sum[i]);
+ 		}
+
+ 		diff = v.P() - dual_v.P();
+ 		v.N() = ((diff.Normalize() + v.N()) / 2.0).Normalize();
+		v.recompute_m_render();
 	}
 }
 
