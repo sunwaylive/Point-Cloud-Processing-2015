@@ -26,6 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::initWidgets()
 {
+
 	ui.actionShow_Samples->setChecked(global_paraMgr.glarea.getBool("Show Samples"));
 	ui.actionShow_Original->setChecked(global_paraMgr.glarea.getBool("Show Original"));
 	ui.actionShow_Normals->setChecked(global_paraMgr.glarea.getBool("Show Normal"));
@@ -74,6 +75,11 @@ void MainWindow::initWidgets()
 void MainWindow::initConnect()
 {
 	if (!connect(area,SIGNAL(needUpdateStatus()),this,SLOT(updateStatusBar())))
+	{
+		cout << "can not connect signal" << endl;
+	}
+
+	if (!connect(area, SIGNAL(needUpdateStatus()), this, SLOT(initWidgets())))
 	{
 		cout << "can not connect signal" << endl;
 	}

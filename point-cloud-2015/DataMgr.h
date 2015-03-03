@@ -33,6 +33,7 @@ public:
 	void savePly(QString fileName, CMesh& mesh);
 	void loadImage(QString fileName);
   void loadXYZN(QString fileName);
+  void loadOFF(QString fileName);
 
 	bool isSamplesEmpty();
 	bool isOriginalEmpty();

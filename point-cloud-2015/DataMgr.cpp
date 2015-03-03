@@ -171,10 +171,114 @@ void DataMgr::loadXYZN(QString fileName)
   samples.vn = samples.vert.size();
 
   infile.close();
+}
 
+void DataMgr::loadOFF(QString fileName)
+{
+  clearCMesh(original);
+  ifstream infile;
+  infile.open(fileName.toStdString().c_str());
 
+  std::string tem_str;
+  int tem_int;
+
+  infile >> tem_str;
+  int points_num, faces_num;
+  infile >> points_num >> faces_num;
+  infile >> tem_int;
+
+  cout << "off points number: " << points_num << endl;
+  for (int i = 0; i < points_num; i++)
+  {
+    CVertex v;
+    float temp = 0.;
+    for (int j = 0; j < 3; j++)
+    {
+      infile >> temp;
+      v.P()[j] = temp;
+    }
+
+    v.m_index = i;
+
+    original.vert.push_back(v);
+    original.bbox.Add(v.P());
+  }
+
+  original.vn = original.vert.size();
+
+  set<int> valid_id;
+  vector< vector<Point3f>> valid_nomals;
+  vector<Point3f> temp_nomals;
+  valid_nomals.assign(original.vert.size(), temp_nomals);
+
+  for (int i = 0; i < faces_num; i++)
+  {
+    int temp = 0.;
+    vector<Point3f> three_points;
+    vector<int> three_indexes;
+    for (int j = 0; j < 3; j++)
+    {
+      infile >> temp;
+      valid_id.insert(temp);
+
+      three_points.push_back(samples.vert[temp].P());
+      three_indexes.push_back(temp);
+    }
+
+    Point3f normal = (three_points[0] - three_points[1]).Normalize() ^ (three_points[1] - three_points[2]).Normalize();
+
+    for (int j = 0; j < 3; j++)
+    {
+      int index = three_indexes[j];
+      valid_nomals[index].push_back(normal.Normalize());
+    }
+  }
+
+  int id = 0;
+  set<int>::iterator iter;
+  vector<CVertex> valid_samples;
+  for (iter = valid_id.begin(); iter != valid_id.end(); ++iter)
+  {
+    int index = *iter;
+    CVertex v = samples.vert[index];
+    v.m_index = id++;
+
+    vector<Point3f> normals = valid_nomals[index];
+
+    if (normals.empty())
+    {
+      cout << "wrong file" << endl;
+      system("Pause");
+    }
+
+    Point3f avg_normal = Point3f(0, 0, 0);
+    for (int j = 0; j < normals.size(); j++)
+    {
+      avg_normal += normals[j];
+    }
+    avg_normal = (avg_normal / normals.size()).Normalize();
+    v.N() = avg_normal;
+    v.recompute_m_render();
+    v.bIsOriginal = true;
+    valid_samples.push_back(v);
+  }
+
+  original.vert.clear();
+  original.bbox.SetNull();
+  for (int i = 0; i < valid_samples.size(); i++)
+  {
+    valid_samples[i].bIsOriginal = true;
+    original.vert.push_back(valid_samples[i]);
+    original.bbox.Add(valid_samples[i]);
+  }
+  original.vn = original.vert.size();
+
+  infile.close();
 
 }
+
+
+
 
 void DataMgr::loadImage(QString fileName)
 {
@@ -1545,6 +1649,7 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 	clearCMesh(samples);
 	clearCMesh(original);
   clearCMesh(dual_samples);
+	clearCMesh(skel_points);
 
 	skeleton.clear();
 

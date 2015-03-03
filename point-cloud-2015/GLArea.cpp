@@ -660,6 +660,9 @@ void GLArea::openByDrop(QString fileName)
 		{
 			dataMgr.loadPlyToSample(fileName);
 		}
+		global_paraMgr.glarea.setValue("Show Samples Dot", BoolValue(true));
+		global_paraMgr.glarea.setValue("Show Samples Circle", BoolValue(false));
+
 	}
 	if(fileName.endsWith("View"))
 	{
@@ -697,6 +700,10 @@ void GLArea::openByDrop(QString fileName)
   if(fileName.endsWith("xyz"))
   {
     dataMgr.loadXYZN(fileName);
+  }
+  if (fileName.endsWith("off"))
+  {
+    dataMgr.loadOFF(fileName);
   }
 
 	show_something = true;
