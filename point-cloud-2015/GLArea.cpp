@@ -646,9 +646,17 @@ void GLArea::runPointCloudAlgorithm(PointCloudAlgorithm& algorithm)
 
 void GLArea::openByDrop(QString fileName)
 {
+  if (fileName.endsWith("plyx"))
+  {
+    dataMgr.tryFixPly(fileName);
+  }
 	if(fileName.endsWith("ply"))
 	{
-		if (fileName.contains("original"))
+    if (para->getBool("Fix ply mode"))
+    {
+      dataMgr.tryFixPly(fileName);
+    }
+		else if (fileName.contains("original"))
 		{
 			dataMgr.loadPlyToOriginal(fileName);
 		}
@@ -2283,14 +2291,28 @@ void GLArea::removePickPoint()
 			CVertex v = samples->vert[pickList[i]]; 
 			int idx = v.m_index;
 			samples->vert.erase(samples->vert.begin() + idx);
+
+      if (pickList[i] < 0 || pickList[i] >= dual_samples->vert.size())
+        continue;
+
 			dual_samples->vert.erase(dual_samples->vert.begin() + idx);
 		}
 	}
 	else
 	{		
+
+    if (samples->vert.size() != dual_samples->vert.size())
+    {
+      cout << "copy dual first" << endl;
+      return;
+    }
+
 		for (int i = 0; i < pickList.size(); i += step_size)
 		{
 			samples->vert[pickList[i]].is_skel_ignore = true;
+
+      if (pickList[i] < 0 || pickList[i] >= dual_samples->vert.size())
+        continue;
       dual_samples->vert[pickList[i]].is_skel_ignore = true;
 
 		}

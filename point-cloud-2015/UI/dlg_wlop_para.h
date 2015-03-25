@@ -106,6 +106,7 @@ class WlopParaDlg : public QFrame
 		void applySkelConnection();
 
 		void applyMatLOP();
+    void apply4PCS();
 
 		void applyRunEstimateAverageDistThreshold();
 

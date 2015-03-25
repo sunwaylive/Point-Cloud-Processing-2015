@@ -5,10 +5,25 @@
 #include <iostream>
 
 #include "Algorithm/pointcloud_normal.h"
-#include "eigenlib/Eigen/Eigen"
+//#include "eigenlib/Eigen/Eigen"
+
+
+
+#include "Algorithm/4PCS/4pcs.h"
+#include "Algorithm/4PCS/io/io.h"
+#include "Eigen/Dense"
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/eigen.hpp>
+#include <fstream>
+#include <string>
+
+#define sqr(x) ((x) * (x))
+
 
 using namespace std;
 using namespace vcg;
+using namespace Eigen;
+using namespace match_4pcs;
 
 class WLOP : public PointCloudAlgorithm
 {
@@ -94,6 +109,8 @@ private:
 
 	void runTangentialMotion();
 	void runDlengthAdjustment();
+
+  void run4PCS();
 
 private:
 	RichParameterSet* para;

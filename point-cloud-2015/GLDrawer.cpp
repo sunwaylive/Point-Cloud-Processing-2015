@@ -203,8 +203,8 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 	if (v.is_boundary && bUseSegmentaionColor)
 	{
-		//return cBlue;
-		return cOrange;
+		return cBlue;
+		//return cOrange;
 	}
 
 // 	if (v.is_boundary && bUseConfidenceColor)
@@ -225,7 +225,8 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 	if (showRadius && v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
  	{
- 		return cOrange;
+    return cBlue;
+ 		//return cOrange;
  	}
 
 	if (v.is_dual_sample /*|| v.is_fixed_sample*/)

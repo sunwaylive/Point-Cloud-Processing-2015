@@ -42,6 +42,12 @@
     <Filter Include="Helper">
       <UniqueIdentifier>{128b2bb9-8bf6-4cbd-a676-a16ecfc4a8e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Algorithm\4PCS">
+      <UniqueIdentifier>{7a4f35cd-a88c-40e4-89ed-3645688a769f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Algorithm\4PCS\io">
+      <UniqueIdentifier>{842027ce-42f3-44e1-bb2a-4439c746e0c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="point-cloud-2015.rc" />
@@ -175,6 +181,15 @@
     <ClInclude Include="nanoflann.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm\4PCS\io\io.h">
+      <Filter>Algorithm\4PCS\io</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm\4PCS\io\io_ply.h">
+      <Filter>Algorithm\4PCS\io</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm\4PCS\4pcs.h">
+      <Filter>Algorithm\4PCS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm\NormalSmoother.cpp">
@@ -302,6 +317,12 @@
     </ClCompile>
     <ClCompile Include="coordinateframe.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\4PCS\io\io.cpp">
+      <Filter>Algorithm\4PCS\io</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm\4PCS\4pcs.cpp">
+      <Filter>Algorithm\4PCS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

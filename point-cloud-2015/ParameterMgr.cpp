@@ -94,7 +94,6 @@ void ParameterMgr::initGlareaParameter()
   glarea.addParam(new RichBool("Pick Dual Point", false) );
 	glarea.addParam(new RichBool("Show Skeltal Points", true));
 
-
 	glarea.addParam(new RichBool("Show Original", false) );
 	glarea.addParam(new RichBool("Show Original Quad", false) );
 	glarea.addParam(new RichBool("Show Original Dot", true) );
@@ -105,12 +104,9 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Show Target Samples", true));
 	glarea.addParam(new RichBool("Show Target Dual Samples", true));
 	glarea.addParam(new RichBool("Show Correspondences", false));
-
 	glarea.addParam(new RichBool("Show Eigen Directions", false));
 
-
 	glarea.addParam(new RichBool("Show Bounding Box", false));
-
 	glarea.addParam(new RichBool("Show Skeleton", false));
 
 	glarea.addParam(new RichBool("Show Radius", true));
@@ -148,14 +144,13 @@ void ParameterMgr::initGlareaParameter()
 
 	glarea.addParam(new RichBool("Need Snap Files", false));
 
+  glarea.addParam(new RichBool("Fix ply mode", false));
 
 
 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
 
 	glarea.addParam(new RichDouble("Show Confidence Percentage", 0.8));
-
-
 }
 
 
@@ -264,6 +259,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Self PCA", false));
 	wLop.addParam(new RichBool("Run Self Projection", false));
 
+  wLop.addParam(new RichBool("Run 4PCS", false));
 
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));

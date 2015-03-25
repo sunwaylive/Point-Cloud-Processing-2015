@@ -35,6 +35,8 @@ public:
   void loadXYZN(QString fileName);
   void loadOFF(QString fileName);
 
+  void tryFixPly(QString fileName);
+
 	bool isSamplesEmpty();
 	bool isOriginalEmpty();
   bool isSkeletonEmpty();

@@ -134,6 +134,8 @@ void WlopParaDlg::initConnects()
 	connect(ui->Only_Do_Avergage, SIGNAL(clicked(bool)), this, SLOT(use_Only_Do_Avergage(bool)));
 	connect(ui->Use_Confidence_To_Merge, SIGNAL(clicked(bool)), this, SLOT(use_Use_Confidence_To_Merge(bool)));
 
+  connect(ui->run_4PCS, SIGNAL(valueChanged(double)), this, SLOT(apply4PCS(double)));
+
   if(!connect(ui->Use_Elliptical_Original_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useEllipticalOriginalNeighbor(bool))))
   {
     cerr << "cannot connect WlopParaDlg::getDoubleValues(double)." << endl;
@@ -240,6 +242,8 @@ void WlopParaDlg::initConnects()
 	
 	connect(ui->tangential_motion, SIGNAL(clicked()), this, SLOT(applyTangentialMotion()));
 	connect(ui->dlength_adjustment, SIGNAL(clicked()), this, SLOT(applyDLengthAdjustment()));
+
+  connect(ui->run_4PCS, SIGNAL(clicked()), this, SLOT(apply4PCS()));
 
 }
 
@@ -860,6 +864,14 @@ void WlopParaDlg::applySkelConnection()
 
 	 CMesh* samples = area->dataMgr.getCurrentSamples();
  }
+
+ void WlopParaDlg::apply4PCS()
+ {
+   m_paras->wLop.setValue("Run 4PCS", BoolValue(true));
+   area->runWlop();
+   m_paras->wLop.setValue("Run 4PCS", BoolValue(false));
+ }
+
 
 void WlopParaDlg::applyAnisotropicLop()
 {

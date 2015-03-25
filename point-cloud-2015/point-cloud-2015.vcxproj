@@ -65,16 +65,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;D:\IncludeLib\libboost_1_53_0-64;$(LibraryPath)</LibraryPath>
+    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;IncludeLib\eigen;IncludeLib\opencv2\include\opencv;IncludeLib\opencv2\include\opencv2;IncludeLib\opencv2\include;IncludeLib\trimesh\include;$(IncludePath)</IncludePath>
+    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;D:\IncludeLib\libboost_1_53_0-64;IncludeLib\opencv2\lib;IncludeLib\opencv2\staticlib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;IncludeLib\trimesh\include;$(IncludePath)</IncludePath>
-    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;$(LibraryPath);C:\Program Files\TBB\lib\intel64\vc10;D:\boost_1_53_0\lib64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSdkDir)lib\x64;IncludeLib\trimesh\lib</LibraryPath>
+    <IncludePath>IncludeLib\vcglib;IncludeLib\glut64\include;IncludeLib\ann_1.1.2\include;IncludeLib\trimesh\include;IncludeLib\opencv2\include;IncludeLib\opencv2\include\opencv2;IncludeLib\opencv2\include\opencv;IncludeLib\eigen;IncludeLib\chealpix\include;$(IncludePath)</IncludePath>
+    <LibraryPath>IncludeLib\glut64\lib;IncludeLib\ann_1.1.2\MS_Win64\bin;$(LibraryPath);C:\Program Files\TBB\lib\intel64\vc10;D:\boost_1_53_0\lib64;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSdkDir)lib\x64;IncludeLib\trimesh\lib;IncludeLib\opencv2\lib;IncludeLib\opencv2\staticlib</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,7 +107,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;ANN.lib;glut64.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;ANN.lib;glut64.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;opencv_core2411d.lib;opencv_highgui2411d.lib;opencv_ml2411d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,7 +139,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>E:\Point-Cloud-Processing-2015\point-cloud-2015\IncludeLib\glut64\bin;E:\Point-Cloud-Processing-2015\point-cloud-2015\IncludeLib\glut64\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;ANN.lib;glut64.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;ANN.lib;glut64.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;opencv_core2411.lib;opencv_highgui2411.lib;opencv_ml2411.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkStatus>true</LinkStatus>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
@@ -168,6 +168,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithm\4PCS\4pcs.h" />
+    <ClInclude Include="Algorithm\4PCS\io\io.h" />
+    <ClInclude Include="Algorithm\4PCS\io\io_ply.h" />
     <ClInclude Include="Algorithm\anistropicPCA_Normal.h" />
     <ClInclude Include="Algorithm\NormalSmoother.h" />
     <ClInclude Include="Algorithm\normal_extrapolation.h" />
@@ -423,6 +426,8 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Algorithm\4PCS\4pcs.cpp" />
+    <ClCompile Include="Algorithm\4PCS\io\io.cpp" />
     <ClCompile Include="Algorithm\NormalSmoother.cpp" />
     <ClCompile Include="Algorithm\Skeleton.cpp" />
     <ClCompile Include="Algorithm\Skeletonization.cpp" />

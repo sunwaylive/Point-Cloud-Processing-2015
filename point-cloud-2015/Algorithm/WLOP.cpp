@@ -445,6 +445,13 @@ void WLOP::run()
 		return;
 	}
 
+  if (para->getBool("Run 4PCS"))
+  {
+    run4PCS();
+    return;
+  }
+
+
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
 	{ 
@@ -4389,5 +4396,114 @@ void WLOP::runTangentialMotion()
 
 void WLOP::runDlengthAdjustment()
 {
+
+}
+
+void WLOP::run4PCS()
+{
+  cout << "run4PCS" << endl;
+
+  vector<Point3D> set1, set2;
+  Match4PCSOptions options;
+
+  vector<cv::Point2f> tex_coords1, tex_coords2;
+  vector<cv::Point3f> normals1, normals2;
+  vector<tripple> tris1, tris2;
+  vector<std::string> mtls1, mtls2;
+
+  IOManager iomananger;
+
+  // First input.
+  //std::string input1 = "input0.obj";
+  std::string input1 = "box1.obj";
+
+  // Second input.
+  //std::string input2 = "input1.obj";
+  std::string input2 = "box2.obj";
+
+  // Read the inputs.
+  if (!iomananger.ReadObject(input1.c_str(), set1, tex_coords1, normals1, tris1,
+    mtls1)) {
+    perror("Can't read input set1");
+    exit(-1);
+  }
+
+  if (!iomananger.ReadObject(input2.c_str(), set2, tex_coords2, normals2, tris2,
+    mtls2)) {
+    perror("Can't read input set2");
+    exit(-1);
+  }
+
+
+
+  // Output. The transformed second input.
+  std::string output = "output.obj";
+
+  // Delta (see the paper).
+  double delta = 5.0;
+
+  // Estimated overlap (see the paper).
+  double overlap = 0.2;
+
+  // Threshold of the computed overlap for termination. 1.0 means don't terminate
+  // before the end.
+  double thr = 1.0;
+
+  // Maximum norm of RGB values between corresponded points. 1e9 means don't use.
+  double max_color = 150;
+
+  // Number of sampled points in both files. The 4PCS allows a very aggressive
+  // sampling.
+  int n_points = 200;
+
+  // Maximum angle (degrees) between corresponded normals.
+  double norm_diff = 90.0;
+
+  // Maximum allowed computation time.
+  int max_time_seconds = 10;
+
+  bool use_super4pcs = false;
+
+  // Set parameters.
+  cv::Mat mat = cv::Mat::eye(4, 4, CV_64F);
+  options.overlap_estimation = overlap;
+  options.sample_size = n_points;
+  options.max_normal_difference = norm_diff;
+  options.max_color_distance = max_color;
+  options.max_time_seconds = max_time_seconds;
+  options.delta = delta;
+
+  // Match and return the score (estimated overlap or the LCP).  
+  float score = 0;
+
+  if (use_super4pcs){
+//     MatchSuper4PCS matcher(options);
+//     cout << "Use Super4PCS" << endl;
+//     score = matcher.ComputeTransformation(set1, &set2, &mat);
+  }
+  else{
+    Match4PCS matcher(options);
+    cout << "Use old 4PCS" << endl;
+    score = matcher.ComputeTransformation(set1, &set2, &mat);
+  }
+  cout << "Score: " << score << endl;
+  cerr << score << endl;
+
+  printf(
+    "\n\n%25.3f %25.3f %25.3f %25.3f\n%25.3f %25.3f %25.3f %25.3f\n%25.3f "
+    "%25.3f %25.3f %25.3f\n%25.3f %25.3f %25.3f %25.3f\n\n",
+    mat.at<double>(0, 0), mat.at<double>(0, 1), mat.at<double>(0, 2),
+    mat.at<double>(0, 3), mat.at<double>(1, 0), mat.at<double>(1, 1),
+    mat.at<double>(1, 2), mat.at<double>(1, 3), mat.at<double>(2, 0),
+    mat.at<double>(2, 1), mat.at<double>(2, 2), mat.at<double>(2, 3),
+    mat.at<double>(3, 0), mat.at<double>(3, 1), mat.at<double>(3, 2),
+    mat.at<double>(3, 3));
+
+  iomananger.WriteObject((char *)output.c_str(),
+    set2,
+    tex_coords2,
+    normals2,
+    tris2,
+    mtls2);
 
 }

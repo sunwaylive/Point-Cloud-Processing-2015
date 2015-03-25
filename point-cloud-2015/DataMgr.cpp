@@ -173,6 +173,84 @@ void DataMgr::loadXYZN(QString fileName)
   infile.close();
 }
 
+
+void DataMgr::tryFixPly(QString fileName)
+{
+  clearCMesh(samples);
+  ifstream infile;
+  infile.open(fileName.toStdString().c_str());
+
+  std::string str;
+  int num;
+  while (true)
+  {
+    infile >> str;
+    if (str == std::string("vertex"))
+    {
+      infile >> num;
+    }
+    if (str == std::string("end_header"))
+    {
+      break;
+    }
+  }
+
+  int i = 0;
+  double x_value = 1.0;
+  Point3f zero_pt(0., 0., 0.);
+  for (; i < num; i++)
+  {
+    CVertex v;
+    double temp = 0.;
+    for (int j = 0; j < 3; j++)
+    {
+      infile >> temp;
+      v.P()[j] = temp;
+
+      if (j < 1)
+      {
+        x_value = temp;
+      }
+    }
+
+
+    for (int j=0; j < 3; j++) {
+      infile >> temp;
+      v.N()[j] = temp;
+    }
+
+   for (int j = 0; j < 4; j++) {
+   	infile >> temp;
+   	//infile >> v.C()[j];
+   }
+
+    v.m_index = i;
+
+    if (x_value > 1e100
+       ||  x_value < -1e100
+       || (x_value > 0 && x_value < 1e-100)
+       || (x_value < 0 && x_value > -1e-100)
+       || GlobalFun::computeEulerDistSquare(v.P(), zero_pt) < 1e-100 
+       )
+    {
+      continue;
+    }
+
+    samples.vert.push_back(v);
+    samples.bbox.Add(v.P());
+
+    if (infile.eof())
+    {
+      break;
+    }
+  }
+
+
+  samples.vn = samples.vert.size();
+
+  infile.close();
+}
+
 void DataMgr::loadOFF(QString fileName)
 {
   clearCMesh(original);
