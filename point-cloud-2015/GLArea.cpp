@@ -2208,33 +2208,33 @@ void GLArea::keyReleaseEvent ( QKeyEvent * e )
 
 void GLArea::reorientPick()
 {
+   CMesh* samples = dataMgr.getCurrentSamples();
+ 
+   for (int i = 0; i < pickList.size(); i++)
+   {
+     samples->vert[pickList[i]].N() *= -1;
+   }
+
+// 	if (global_paraMgr.wLop.getBool("Use Kite Points"))
+// 	{
+// 		CMesh* samples = dataMgr.getCurrentSamples();
+// 
+// 		for (int i = 0; i < pickList.size(); i++)
+// 		{
+// 			samples->vert[pickList[i]].is_boundary = true;
+// 		}
+// 
+// 		return;
+// 	}
+// 
+// 
 //   CMesh* samples = dataMgr.getCurrentSamples();
 // 
 //   for (int i = 0; i < pickList.size(); i++)
 //   {
-//     samples->vert[pickList[i]].N() *= -1;
+//     samples->vert[pickList[i]].is_fixed_sample = true;
+// 		samples->vert[pickList[i]].is_skel_branch = true;
 //   }
-
-	if (global_paraMgr.wLop.getBool("Use Kite Points"))
-	{
-		CMesh* samples = dataMgr.getCurrentSamples();
-
-		for (int i = 0; i < pickList.size(); i++)
-		{
-			samples->vert[pickList[i]].is_boundary = true;
-		}
-
-		return;
-	}
-
-
-  CMesh* samples = dataMgr.getCurrentSamples();
-
-  for (int i = 0; i < pickList.size(); i++)
-  {
-    samples->vert[pickList[i]].is_fixed_sample = true;
-		samples->vert[pickList[i]].is_skel_branch = true;
-  }
 }
 
 void GLArea::cleanPick()
@@ -2266,6 +2266,7 @@ void GLArea::removePickPoint()
 {
 	CMesh* samples = dataMgr.getCurrentSamples();
   CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+  CMesh* skel_points = dataMgr.getCurrentSkelPoints();
 	bool use_random_erase = para->getBool("Random Erase");
 
 	CMesh::VertexIterator vi;
@@ -2296,6 +2297,7 @@ void GLArea::removePickPoint()
         continue;
 
 			dual_samples->vert.erase(dual_samples->vert.begin() + idx);
+      skel_points->vert.erase(skel_points->vert.begin() + idx);
 		}
 	}
 	else
@@ -2314,42 +2316,56 @@ void GLArea::removePickPoint()
       if (pickList[i] < 0 || pickList[i] >= dual_samples->vert.size())
         continue;
       dual_samples->vert[pickList[i]].is_skel_ignore = true;
-
+      skel_points->vert[pickList[i]].is_skel_ignore = true;
 		}
 
 		vector<CVertex> save_sample_vert;
 		vector<CVertex> save_dual_sample_vert;
+    vector<CVertex> save_skel_points_vert;
+
 
 		for (int i = 0; i < samples->vert.size(); i++)
 		{
 			CVertex& v = samples->vert[i];
 			CVertex& dual_v = dual_samples->vert[i];
+      CVertex& skel_p = skel_points->vert[i];
 
 			if (!v.is_skel_ignore)
 			{
 				save_sample_vert.push_back(v);
 				save_dual_sample_vert.push_back(dual_v);
+        save_skel_points_vert.push_back(skel_p);
 			}
 		}
 
 		samples->vert.clear();
 		dual_samples->vert.clear();
+    skel_points->vert.clear();
 
 		for (int i = 0; i < save_sample_vert.size(); i++)
 		{
 			samples->vert.push_back(save_sample_vert[i]);
 			dual_samples->vert.push_back(save_dual_sample_vert[i]);
+      skel_points->vert.push_back(save_skel_points_vert[i]);
 		}
+
+
+
 	}
+
+  cout << "erase stage1 finished" << endl;
 
 	samples->vn = samples->vert.size();
 	dual_samples->vn = dual_samples->vert.size();
+  skel_points->vn = skel_points->vert.size();
 
 	j = 0;
 	for(vi = samples->vert.begin(); vi != samples->vert.end(); ++vi, ++j)
 	{
 		vi->m_index = j;
+    vi->dual_index = j;
 		dual_samples->vert[j].m_index = j;
+    skel_points->vert[j].m_index = j;
 	}
 
 	cleanPickPoints();

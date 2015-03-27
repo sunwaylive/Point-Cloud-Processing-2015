@@ -734,6 +734,9 @@ void WlopParaDlg::copySamplesToDualSamples()
  		dual_samples->vert[i].N() = samples->vert[i].N();
 		dual_samples->vert[i].m_index = i;
 
+    samples->vert[i].dual_index = i;
+    dual_samples->vert[i].dual_index = i;
+
 		dual_samples->vert[i].is_dual_sample = true;
 	}
 	dual_samples->vn = dual_samples->vert.size();

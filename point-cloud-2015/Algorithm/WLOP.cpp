@@ -1859,8 +1859,6 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						v.is_skel_virtual = true; // gray
 
 					}
-
-
 					else if (dist < radius_threshold)
 					{
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
@@ -3572,6 +3570,7 @@ void WLOP::runMoveBackward()
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
+    CVertex& v = samples->vert[i];
 
 		if (dual_v.is_fixed_sample || dual_v.neighbors.empty())
 		{
@@ -3588,12 +3587,21 @@ void WLOP::runMoveBackward()
 		bool keep_going = true;
 		for (int j = 0; j < dual_v.neighbors.size(); j++)
 		{
-			CVertex& t = dual_samples->vert[dual_v.neighbors[j]];
+			CVertex& dual_t = dual_samples->vert[dual_v.neighbors[j]];
+      CVertex& t = samples->vert[dual_t.dual_index];
 
-			double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), t.N());
+      double dist_v_t = GlobalFun::computeEulerDist(v.P(), t.P());
+      if (dist_v_t < stop_neighbor_size * 2.0)
+      {
+        cout << "no local static can stop" << endl;
+        continue;
+      }
 
-			if (angle > stop_angle_threshold || dual_v.N() * t.N() < 0)
+      double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), dual_t.N());
+
+			if (angle > stop_angle_threshold /*|| dual_v.N() * t.N() < 0*/)
 			{
+        cout << "angel: " << angle << endl;
 				keep_going = false;
 				break;
 			}
