@@ -169,8 +169,6 @@ void ParameterMgr::initDrawerParameter()
 	drawer.addParam(new RichBool("Show Segmentation Color", false));
 
 	drawer.addParam(new RichBool("Show Feature Color", true));
-
-
   drawer.addParam(new RichBool("Draw Picked Point Neighbor", false));
 
 

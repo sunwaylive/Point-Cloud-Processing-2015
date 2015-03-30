@@ -68,6 +68,10 @@ private:
 	RichParameterSet* para;
 	CMesh* samples;
 
+  CMesh* dual_samples;
+  CMesh* skel_points;
+
+
 	double radius;
 	double old_radius;
 	double sigma;
@@ -100,5 +104,7 @@ private:
 	static vector<Point3f> sum_N;
 	static vector<Point3f> sum_Gw;
 	static vector<Point3f> sum_Gf;
+
+  bool also_insert_dual_points;
 
 };

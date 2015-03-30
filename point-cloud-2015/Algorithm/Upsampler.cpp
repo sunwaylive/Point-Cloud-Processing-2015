@@ -14,6 +14,7 @@ Upsampler::Upsampler(RichParameterSet* _para)
 	samples = NULL;
 	para = _para;
 	b_first = true;
+  also_insert_dual_points = false;
 
 	sigma = 25.0;
 	old_radius = 0.0;
@@ -31,6 +32,8 @@ void Upsampler::setInput(DataMgr* pData)
 		input(pData->getCurrentSamples());
     //input(pData->getCurrentDualSamples());
 
+    dual_samples = pData->getCurrentDualSamples();
+    skel_points = pData->getCurrentSkelPoints();
 	}
 	else
 	{
@@ -41,6 +44,16 @@ void Upsampler::setInput(DataMgr* pData)
 
 void Upsampler::run()
 {
+  if (global_paraMgr.glarea.getBool("Show Skeltal Points"))
+  {
+    also_insert_dual_points = true;
+  }
+  else
+  {
+    also_insert_dual_points = false;
+  }
+
+
 	if(samples == NULL )
 	{
 		cout << "ERROR: Upsampler::run() mesh == NULL || original == NULL";
@@ -78,6 +91,13 @@ void Upsampler::run()
     return;
   }
 
+
+  if (also_insert_dual_points)
+  {
+    assert(samples->vert.size() == dual_samples->vert.size());
+    assert(skel_points->vert.size() == dual_samples->vert.size());
+  }
+
   if (para->getBool("Use Constant Threshold"))
   {
     radius = para->getDouble("CGrid Radius");
@@ -91,8 +111,6 @@ void Upsampler::run()
     runConstantUpsampling();
     return;
   }
-
-
 
 	doUpsampling();	
 }
@@ -656,6 +674,8 @@ void Upsampler::insertPointsByThreshold()
 
   int max_add_number = para->getInt("Number of Add Point");
 
+
+
   while(1)
   {
     abandonCounter = 0;
@@ -715,6 +735,44 @@ void Upsampler::insertPointsByThreshold()
       CVertex newv;
       newv.P() = (v.P() + t.P()) / 2.0;  // mass center
       newv.m_index = samples->vert.size();
+      newv.dual_index = newv.m_index;
+
+
+      if (also_insert_dual_points)
+      {
+        CVertex& dual_v = dual_samples->vert[v.m_index];
+        CVertex& dual_t = dual_samples->vert[t.m_index];
+
+        CVertex new_dual_v;
+        new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
+        new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
+
+        new_dual_v.m_index = dual_samples->vert.size();
+        new_dual_v.dual_index = new_dual_v.m_index;
+        new_dual_v.is_dual_sample = true;
+
+        // add new point
+        dual_samples->vert.push_back(new_dual_v);
+
+
+
+
+        CVertex& skel_v = skel_points->vert[v.m_index];
+        CVertex& skel_t = skel_points->vert[t.m_index];
+        
+        CVertex new_skel_v;
+        new_skel_v.P() = (skel_v.P() + skel_t.P()) / 2.0;  // mass center
+        new_skel_v.N() = (skel_v.N() + skel_t.N()) / 2.0;  // mass center
+        
+        new_skel_v.m_index = skel_points->vert.size();
+        new_skel_v.dual_index = new_skel_v.m_index;
+        new_skel_v.is_skel_point = true;
+
+        // add new point
+        skel_points->vert.push_back(new_skel_v);
+      }
+
+
 
       // add new point
       samples->vert.push_back(newv);
@@ -755,9 +813,14 @@ void Upsampler::insertPointsByThreshold()
       cout << "add point: " << samples->vert.size() - oldSize << endl;
       oldSize = samples->vert.size();
       cout << "abandent : " << abandonCounter << endl << endl; 
+      cout << "dual sample number: " << dual_samples->vert.size() << endl;
+
     }
 
   }
+
+  cout << endl  << "dual sample number: " << dual_samples->vert.size() << 
+       "skel number" << skel_points->vert.size() << endl;
 
   samples->vn = samples->vert.size();
 
@@ -769,6 +832,7 @@ void Upsampler::insertPointsByThreshold()
   cout << "getPredictThreshold" << getPredictThreshold() << endl;
 
   computeEigenVerctorForRendering();
+
 }
 
 
