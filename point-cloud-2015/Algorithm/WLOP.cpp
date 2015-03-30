@@ -774,16 +774,13 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 				average[i] += t.P() * w;
 // 			}
 // 			else
-			if (use_tangent /*&& !use_confidence*/)
-			{
-// 				if (i < 2)
-// 				{
-// 					cout << "use_tangent use_tangent use_tangent" << endl;
-// 				}
-				Point3f proj_point = v.P() + v.N() * proj_dist;
-				average[i] += proj_point * w;
-			}
-			else 
+
+// 			if (use_tangent /*&& !use_confidence*/)
+// 			{
+// 				Point3f proj_point = v.P() + v.N() * proj_dist;
+// 				average[i] += proj_point * w;
+// 			}
+// 			else 
 			{
 				average[i] += t.P() * w;
 			}
@@ -3588,12 +3585,12 @@ void WLOP::runMoveBackward()
 		for (int j = 0; j < dual_v.neighbors.size(); j++)
 		{
 			CVertex& dual_t = dual_samples->vert[dual_v.neighbors[j]];
-      CVertex& t = samples->vert[dual_t.dual_index];
+      CVertex& t = samples->vert[dual_v.neighbors[j]];
 
       double dist_v_t = GlobalFun::computeEulerDist(v.P(), t.P());
       if (dist_v_t < stop_neighbor_size * 2.0)
       {
-        cout << "no local static can stop" << endl;
+        //cout << "no local static can stop" << endl;
         continue;
       }
 
