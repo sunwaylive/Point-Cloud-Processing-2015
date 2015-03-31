@@ -775,7 +775,7 @@ void DataMgr::subSamples()
 void DataMgr::savePly(QString fileName, CMesh& mesh)
 {
 	int mask= tri::io::Mask::IOM_VERTCOORD + tri::io::Mask::IOM_VERTNORMAL ;
-	mask += tri::io::Mask::IOM_VERTCOLOR;
+	//mask += tri::io::Mask::IOM_VERTCOLOR;
 	mask += tri::io::Mask::IOM_BITPOLYGONAL;
 
 	if (fileName.endsWith("ply"))
