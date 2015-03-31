@@ -356,7 +356,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.55));
 	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
 	//
-	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));
+	wLop.addParam(new RichDouble("Protect Small Tubular Para", 0.5));
 	wLop.addParam(new RichDouble("Protect High Confidence Para", 0.90));
 
 	wLop.addParam(new RichDouble("Data Outweigh Similarity Para", 1.0));

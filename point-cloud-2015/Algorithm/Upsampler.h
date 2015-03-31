@@ -55,8 +55,6 @@ private:
 
   void pointsExtrapoaltion();
   void projectOneCVertex(CVertex& v);
-
-
 	
 protected:
 	Upsampler(void);

@@ -443,7 +443,12 @@ double Upsampler::getPredictThreshold()
   {
     CVertex& v = samples->vert[i];
     int secondVertIndx = -1;
-    sumDist += findMaxMidpoint(v, secondVertIndx);
+    double dist = findMaxMidpoint(v, secondVertIndx);
+    if (dist < 0)
+    {
+      continue;
+    }
+    sumDist += dist;
     testNumber++;
   }
 
@@ -509,6 +514,37 @@ void Upsampler::runConstantUpsampling()
       CVertex newv;
       newv.P() = (v.P() + t.P()) / 2.0;  // mass center
       newv.m_index = samples->vert.size();
+
+      if (also_insert_dual_points)
+      {
+        CVertex& dual_v = dual_samples->vert[v.m_index];
+        CVertex& dual_t = dual_samples->vert[t.m_index];
+
+        CVertex new_dual_v;
+        new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
+        new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
+
+        new_dual_v.m_index = dual_samples->vert.size();
+        new_dual_v.dual_index = new_dual_v.m_index;
+        new_dual_v.is_dual_sample = true;
+
+        // add new point
+        dual_samples->vert.push_back(new_dual_v);
+
+        CVertex& skel_v = skel_points->vert[v.m_index];
+        CVertex& skel_t = skel_points->vert[t.m_index];
+
+        CVertex new_skel_v;
+        new_skel_v.P() = (skel_v.P() + skel_t.P()) / 2.0;  // mass center
+        new_skel_v.N() = (skel_v.N() + skel_t.N()) / 2.0;  // mass center
+
+        new_skel_v.m_index = skel_points->vert.size();
+        new_skel_v.dual_index = new_skel_v.m_index;
+        new_skel_v.is_skel_point = true;
+
+        // add new point
+        skel_points->vert.push_back(new_skel_v);
+      }
 
       // add new point
       samples->vert.push_back(newv);
@@ -1163,7 +1199,11 @@ void Upsampler::optimizeProjection()
 	for (int i = 0; i < samples->vn; i++)
 	{
 		CVertex& v = samples->vert[i];
-		if (proj_weight[i] > 0 && !v.neighbors.empty())
+    if (v.neighbors.empty())
+    {
+      continue;
+    }
+		if (proj_weight[i] > 1e-20 && !v.neighbors.empty())
 		{
 			v.N() = sum_N[i] / proj_weight[i];
 			v.N().Normalize();

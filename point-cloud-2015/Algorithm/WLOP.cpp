@@ -432,11 +432,11 @@ void WLOP::run()
 		return;
 	}
 
-	if (para->getBool("Run DLength Adjustment"))
-	{
-		runDlengthAdjustment();
-		return;
-	}
+// 	if (para->getBool("Run DLength Adjustment"))
+// 	{
+// 		runDlengthAdjustment();
+// 		return;
+// 	}
 
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
@@ -624,6 +624,8 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 		use_elliptical_neighbor = use_nearest_neighbor = use_tangent = L2 = use_confidence = need_normal_weight = false;
 	}
 
+  bool only_adjust_dlength = para->getBool("Run DLength Adjustment");
+
 	cout << "dual" << endl;
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -775,7 +777,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			}
 // 			else
 
-			if (use_tangent /*&& !use_confidence*/)
+      if (use_tangent && !only_adjust_dlength /*&& !use_confidence*/)
 			{
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
@@ -1609,22 +1611,22 @@ double WLOP::iterate()
 		time.end();
 	}
 
-  time.start("Compute Average Term");
-	computeAverageTerm(samples, original);
-	time.end();
+   time.start("Compute Average Term");
+ 	computeAverageTerm(samples, original);
+ 	time.end();
 
 
-	time.start("Compute Repulsion Term");
-	computeRepulsionTerm(samples);
-	time.end();
+ 	time.start("Compute Repulsion Term");
+ 	computeRepulsionTerm(samples);
+ 	time.end();
 
 
-	if (para->getBool("Need Similarity"))
-	{
-		time.start("Compute Similarity Term");
-		computeSampleSimilarityTerm(samples);
-		time.end();
-	}
+  if (para->getBool("Need Similarity"))
+  {
+    time.start("Compute Similarity Term");
+    computeSampleSimilarityTerm(samples);
+    time.end();
+ 	}
 
 	
   vector<Point3f> new_sample_positions;
@@ -1748,6 +1750,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 	double protect_high_confidence_para = para->getDouble("Protect High Confidence Para");
 	double data_outweigh_simimlarity_para = para->getDouble("Data Outweigh Similarity Para");
 
+  bool only_adjust_dlength = para->getBool("Run DLength Adjustment");
+
 	Point3f c;
 
 	vector<Point3f> new_pos(samples->vert.size());
@@ -1800,7 +1804,11 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
         if (use_confidence /*&& v.eigen_confidence < 0.85*/)
 				{
 					//using this
-					Point3f avg_point = average[i] / average_weight_sum[i];
+          Point3f avg_point = v.P();
+          if (average_weight_sum[i] > 1e-20)
+          {
+            avg_point = average[i] / average_weight_sum[i];
+          }
 					Point3f sim_point = samples_similarity[i];
 
 					double dist_avg = GlobalFun::computeEulerDist(v.P(), avg_point);
@@ -1939,23 +1947,26 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 				new_pos[i] = average[i] / average_weight_sum[i];
 			}
 
+      if (!only_adjust_dlength)
+      {
+        if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
+        {
+          new_pos[i] += repulsion[i] * (mu / repulsion_weight_sum[i]);
+        }
+        else
+        {
+          cout << "maybe no neighbor for repulsion" << endl;
+          v.is_skel_virtual = true;
+        }
 
-			if (repulsion_weight_sum[i] > 1e-20 && mu > 0)
-			{
-				new_pos[i] += repulsion[i] * (mu / repulsion_weight_sum[i]);
-			}
-			else
-			{
-				cout << "maybe no neighbor for repulsion" << endl;
-				v.is_skel_virtual = true;
-			}
+        if (repulsion_weight_sum[i] > 1e-20)
+        {
+          Point3f diff = v.P() - c;
+          double move_error = sqrt(diff.SquaredNorm());
+          error_x += move_error;
+        }
+      }
 
-			if (repulsion_weight_sum[i] > 1e-20)
-			{
-				Point3f diff = v.P() - c;
-				double move_error = sqrt(diff.SquaredNorm());
-				error_x += move_error;
-			}
 			//}
 		}
 		else
@@ -3421,6 +3432,11 @@ void WLOP::runMoveBackward()
 	Timer time;
 
 	initVertexes(true);
+
+  time.start("Sample@@@@dual_samples neighbor");
+  GlobalFun::computeBallNeighbors(dual_samples, samples,
+    stop_neighbor_size, box);
+  time.end();
 
 
 	time.start("Sample0000dual_samples neighbor");

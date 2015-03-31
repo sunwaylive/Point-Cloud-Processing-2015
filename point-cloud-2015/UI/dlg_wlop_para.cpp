@@ -1301,7 +1301,90 @@ void WlopParaDlg::applyDLengthAdjustment()
 {
 	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(true));
-	area->runWlop();
+	/*area->runWlop();*/
+
+
+
+
+
+
+  double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");
+  m_paras->wLop.setValue("Num Of Iterate Time", DoubleValue(1));
+
+  m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+
+  for (int i = 0; i < iter_time; i++)
+  {
+    m_paras->wLop.setValue("Use Tangent Vector", BoolValue(true));
+    m_paras->wLop.setValue("Need Similarity", BoolValue(true));
+    m_paras->wLop.setValue("Use Confidence", BoolValue(true));
+    m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
+    m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
+    //applyComputeConfidence();
+
+    int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+    CMesh* samples;
+    samples = area->dataMgr.getCurrentSamples();
+    vector<Point3f> remember_normal(samples->vert.size());
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      remember_normal[i] = samples->vert[i].N();
+    }
+    vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+    pca_para.fittingAdjNum = knn;
+    vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      if (v.N() * remember_normal[i] < 0)
+      {
+        v.N() *= -1;
+      }
+    }
+
+    m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+    applyComputeConfidence();
+
+    m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+    applyRegularizeNormals();
+
+    m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+    applyWlop();
+
+
+    //// 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+    //// 		CMesh* samples;
+    //		samples = area->dataMgr.getCurrentSamples();
+    //		//vector<Point3f> remember_normal(samples->vert.size());
+    //		for (int i = 0; i < samples->vert.size(); i++)
+    //		{
+    //			remember_normal[i] = samples->vert[i].N();
+    //		}
+    //// 		vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+    //// 		pca_para.fittingAdjNum = knn;
+    //		vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+    //		for (int i = 0; i < samples->vert.size(); i++)
+    //		{
+    //			CVertex& v = samples->vert[i];
+    //			if (v.N() * remember_normal[i] < 0)
+    //			{
+    //				v.N() *= -1;
+    //			}
+    //		}
+
+    cout << "finish one key" << endl;
+
+
+  }
+
+
+  m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+
+
+
+
+
+
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(false));
 }
 
