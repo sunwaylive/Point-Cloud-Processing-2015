@@ -2097,8 +2097,6 @@ vcg::Trackball::Button QT2VCG(Qt::MouseButton qtbt,  Qt::KeyboardModifiers modif
 
 void GLArea::mousePressEvent(QMouseEvent *e)
 {
-
-
 	if ((e->modifiers() & Qt::ShiftModifier) && (e->modifiers() & Qt::ControlModifier) &&
 		(e->button()==Qt::LeftButton) )
 		activeDefaultTrackball=false;

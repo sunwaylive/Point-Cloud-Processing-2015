@@ -353,7 +353,7 @@ void ParameterMgr::initWLopParameter()
 
 
 	//vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
-	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.35));
+	wLop.addParam(new RichDouble("Save Move Dist Along Normal Para", 0.55));
 	wLop.addParam(new RichDouble("Big Repulsion Power", 5.0));
 	//
 	wLop.addParam(new RichDouble("Protect Small Tubular Para", 1.8));

@@ -775,12 +775,12 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			}
 // 			else
 
-// 			if (use_tangent /*&& !use_confidence*/)
-// 			{
-// 				Point3f proj_point = v.P() + v.N() * proj_dist;
-// 				average[i] += proj_point * w;
-// 			}
-// 			else 
+			if (use_tangent /*&& !use_confidence*/)
+			{
+				Point3f proj_point = v.P() + v.N() * proj_dist;
+				average[i] += proj_point * w;
+			}
+			else 
 			{
 				average[i] += t.P() * w;
 			}
@@ -1767,11 +1767,11 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 
 		//save_move_threshold_along_normal = dlink_length * para->getDouble("Save Move Dist Along Normal Para");
 
-		if (v.is_fixed_sample)
-		{
-			new_pos[i] = v.P();
-			continue;
-		}
+// 		if (v.is_fixed_sample)
+// 		{
+// 			new_pos[i] = v.P();
+// 			continue;
+// 		}
 
 		if (use_tangent)
 		{
@@ -1816,7 +1816,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					}
 
 					double dist_sim = GlobalFun::computeEulerDist(v.P(), sim_point);
-					if (dist_sim > save_move_threshold_along_normal && (sim_point - v.P())*v.N() > 0)
+					if (dist_sim > save_move_threshold_along_normal /*&& (sim_point - v.P())*v.N() > 0*/)
 					{
 						sim_point = v.P();
 						//v.is_skel_branch = true;
@@ -1840,10 +1840,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					v.is_skel_branch = false;
 					v.is_fixed_original = false;
 
-					if (0)
-					{
-					}
-					else if (v.eigen_confidence > protect_high_confidence_para)
+					if (v.eigen_confidence > protect_high_confidence_para)
 					{
 						new_pos[i] = avg_point;
 						v.is_skel_branch = true; // blue
@@ -1858,8 +1855,11 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 					}
 					else if (dist < radius_threshold)
 					{
+            
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
 						{
+              cout << "rare points" << endl;
+
 							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
 							if (v.eigen_confidence > 0.99)
 							{
@@ -1946,7 +1946,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 			}
 			else
 			{
-				//cout << "maybe no neighbor for repulsion" << endl;
+				cout << "maybe no neighbor for repulsion" << endl;
 				v.is_skel_virtual = true;
 			}
 
