@@ -1380,10 +1380,10 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		CVertex& dual_v = dual_samples->vert[v.dual_index];
 		Point3f v_outward_direction = v.N();
 
-		if (use_kite_points && !v.is_boundary)
-		{
-			continue;
-		}
+// 		if (use_kite_points && !v.is_boundary)
+// 		{
+// 			continue;
+// 		}
 
 		double sum_radius = 0;
 		double sum_weight = 0;
@@ -1402,10 +1402,12 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 			Point3f t_outward_direction = t.N();
 
-			double dist2 = (v.P() - t.P()).SquaredNorm();
+			//double dist2 = (v.P() - t.P()).SquaredNorm();
+      double dist2 = (dual_v.P() - dual_t.P()).SquaredNorm();
+
 			double dist_diff = exp(dist2 * iradius16);
 
-			double sign_dist = t.skel_radius - v.skel_radius;
+			//double sign_dist = t.skel_radius - v.skel_radius;
 			//double length_dist = abs(sign_dist);
 //  			if (sign_dist > length_threshold_dist)
 //  			{
