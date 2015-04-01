@@ -44,15 +44,8 @@ void Upsampler::setInput(DataMgr* pData)
 
 void Upsampler::run()
 {
-  if (global_paraMgr.glarea.getBool("Show Skeltal Points"))
-  {
-    also_insert_dual_points = true;
-  }
-  else
-  {
-    also_insert_dual_points = false;
-  }
-
+  also_insert_dual_points = global_paraMgr.glarea.getBool("Show Skeltal Points");
+  use_adaptive_upsampling = global_paraMgr.upsampling.getBool("Use Adaptive Upsampling");
 
 	if(samples == NULL )
 	{
@@ -300,6 +293,12 @@ double Upsampler::findMaxMidpoint(CVertex & v, int & neighbor_index)
 	for (int i = 0; i < nb_size; ++i)
 	{
 		CVertex & t = samples->vert[v.neighbors[i]];
+
+    if (use_adaptive_upsampling && !t.is_fixed_sample)
+    {
+      continue;
+    }
+
 		midPoint = (v.P() + t.P()) / 2.0;
 
 		if (trick_for_closeby_surface)
@@ -710,8 +709,6 @@ void Upsampler::insertPointsByThreshold()
 
   int max_add_number = para->getInt("Number of Add Point");
 
-
-
   while(1)
   {
     abandonCounter = 0;
@@ -728,6 +725,11 @@ void Upsampler::insertPointsByThreshold()
     for(int i = 0; i < samples->vert.size(); i++)
     {
       CVertex& v = samples->vert[i];
+
+      if (use_adaptive_upsampling && !v.is_fixed_sample)
+      {
+        continue;
+      }
 
       if (v.neighbors.empty())
       {
@@ -772,6 +774,11 @@ void Upsampler::insertPointsByThreshold()
       newv.P() = (v.P() + t.P()) / 2.0;  // mass center
       newv.m_index = samples->vert.size();
       newv.dual_index = newv.m_index;
+
+      if (use_adaptive_upsampling)
+      {
+        newv.is_fixed_sample = true;
+      }
 
 
       if (also_insert_dual_points)

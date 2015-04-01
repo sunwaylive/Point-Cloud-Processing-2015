@@ -40,6 +40,7 @@ class UpsamplingParaDlg : public QFrame
     void setUseConstantThreshold(bool _val);
 
 		void needSnapFiles(bool _val);
+    void useAdaptiveUpsampling(bool _val);
 
 
 		void getSnapShotResolution(double _val);
@@ -62,6 +63,9 @@ class UpsamplingParaDlg : public QFrame
 		void getRotateNormalZ(double _val);
 		void getRotateStep(double _val);
 		void getRotateAngle(double _val);
+
+    void getDensityThreshold(double _val);
+
 
 		void rotateStep();
 		void rotateAnimation();

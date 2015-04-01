@@ -1143,6 +1143,27 @@ vector<double> GlobalFun::computeBilateralConfidence(CMesh *mesh, double radius,
 	return confidences;
 }
 
+void GlobalFun::computeAverageDistToInput(CMesh *mesh, CMesh *input, int k)
+{
+  computeAnnNeigbhors(input->vert, mesh->vert, k, false, "computeAverageDistToInput");
+
+
+  for (int i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    vector<int>* neighbors = &v.neighbors;
+    v.nearest_neighbor_dist = 0.0;
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = input->vert[(*neighbors)[j]];
+      double dist = computeEulerDist(v.P(), t.P());
+      v.nearest_neighbor_dist += dist;
+    }
+
+    v.nearest_neighbor_dist /= v.neighbors.size();
+  }
+}
 
 //  void
 //  GlobalFun::computeICP(CMesh *dst, CMesh *src)

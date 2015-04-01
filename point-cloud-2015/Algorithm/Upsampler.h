@@ -104,5 +104,5 @@ private:
 	static vector<Point3f> sum_Gf;
 
   bool also_insert_dual_points;
-
+  bool use_adaptive_upsampling;
 };

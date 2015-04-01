@@ -263,6 +263,54 @@
       <string>Extrapolation</string>
      </property>
     </widget>
+    <widget class="QCheckBox" name="use_adaptive_upsampling">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>380</y>
+       <width>161</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use Adaptive upsampling</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="density_threshold">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>400</y>
+       <width>113</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="decimals">
+      <number>10</number>
+     </property>
+     <property name="minimum">
+      <double>-0.999999000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.001000000000000</double>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>400</y>
+       <width>91</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Density Threshold:</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">

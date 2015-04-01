@@ -103,6 +103,8 @@ namespace GlobalFun
 	vector<double> computeNormalDifference(CMesh *mesh, double radius, double sigma);
 	vector<double> computeBilateralConfidence(CMesh *mesh, double radius, double sigma);
 
+  void computeAverageDistToInput(CMesh *mesh, CMesh *input, int k);
+
 	vector<double> smoothConfidences(CMesh *mesh, double radius);
 }
 

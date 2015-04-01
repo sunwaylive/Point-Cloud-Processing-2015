@@ -518,6 +518,9 @@ void ParameterMgr::initUpsamplingParameter()
 
   upsampling.addParam(new RichBool("Run Points Extrapolation", false));
 
+  upsampling.addParam(new RichBool("Use Adaptive Upsampling", false));
+  upsampling.addParam(new RichDouble("Density Threshold Dist", 0.05));
+
 
 }
 

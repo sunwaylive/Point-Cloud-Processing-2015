@@ -34,6 +34,7 @@ void UpsamplingParaDlg::initConnects()
   connect(ui->use_constant_threshold,SIGNAL(clicked(bool)),this,SLOT(setUseConstantThreshold(bool)));
 
 	connect(ui->need_snap_files, SIGNAL(clicked(bool)), this, SLOT(needSnapFiles(bool)));
+  connect(ui->use_adaptive_upsampling, SIGNAL(clicked(bool)), this, SLOT(useAdaptiveUpsampling(bool)));
 
 
   connect(ui->threshold,SIGNAL(valueChanged(double)),this,SLOT(setThreshold(double)));
@@ -49,6 +50,7 @@ void UpsamplingParaDlg::initConnects()
 	connect(ui->pushButton_play_video,SIGNAL(clicked()),this,SLOT(applyPlayVideo()));
 	connect(ui->wlop_snapshot_resolution,SIGNAL(valueChanged(double)),this,SLOT(getSnapShotResolution(double)));
 	connect(ui->wlop_snapshot_index,SIGNAL(valueChanged(double)),this,SLOT(getSnapShotIndex(double)));
+  connect(ui->density_threshold, SIGNAL(valueChanged(double)), this, SLOT(getDensityThreshold(double)));
 
 	connect(ui->pushButton_load_video_files, SIGNAL(clicked()), this, SLOT(loadVideoFiles()));
 
@@ -86,11 +88,17 @@ bool UpsamplingParaDlg::initWidgets()
 	state = m_paras->glarea.getBool("Need Snap Files") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->need_snap_files->setCheckState(state);
 
+  state = m_paras->upsampling.getBool("Use Adaptive Upsampling") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+  ui->use_adaptive_upsampling->setCheckState(state);
+
 	ui->threshold->setValue(m_paras->upsampling.getDouble("Dist Threshold"));
 	ui->edge_paramete->setValue(m_paras->upsampling.getDouble("Edge Parameter"));
 
 	ui->wlop_snapshot_resolution->setValue(m_paras->glarea.getDouble("Snapshot Resolution"));
 	ui->wlop_snapshot_index->setValue(m_paras->glarea.getDouble("Snapshot Index"));
+
+  ui->density_threshold->setValue(m_paras->upsampling.getDouble("Density Threshold Dist"));
+
 
 
 	ui->rotate_center_X->setValue(area->rotate_pos.X());
@@ -170,8 +178,36 @@ void UpsamplingParaDlg::setUsingThresholdProcess(bool _val)
 void UpsamplingParaDlg::needSnapFiles(bool _val)
 {
 	m_paras->glarea.setValue("Need Snap Files", BoolValue(_val));
-
 }
+
+void UpsamplingParaDlg::useAdaptiveUpsampling(bool _val)
+{
+  m_paras->upsampling.setValue("Use Adaptive Upsampling", BoolValue(_val));
+
+  if (_val)
+  {
+    CMesh* samples = area->dataMgr.getCurrentSamples();
+    CMesh* original = area->dataMgr.getCurrentOriginal();
+
+    GlobalFun::computeAverageDistToInput(samples, original, 50);
+
+    double threshold = m_paras->upsampling.getDouble("Density Threshold Dist");
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      if (v.nearest_neighbor_dist < threshold)
+      {
+        v.is_fixed_sample = true;
+      }
+      else
+      {
+        v.is_fixed_sample = false;
+      }
+    }
+  }
+}
+
 
 void UpsamplingParaDlg::setUseConstantThreshold(bool _val)
 {
@@ -502,6 +538,14 @@ void UpsamplingParaDlg::getRotateAngle(double _val)
 {
 	area->rotate_angle = _val;
 	update(); area->update(); //area->updateGL();
+}
+
+void UpsamplingParaDlg::getDensityThreshold(double _val)
+{
+  m_paras->upsampling.setValue("Density Threshold Dist", DoubleValue(_val));
+  update(); area->update(); //area->updateGL();
+  area->updateUI();
+  area->needUpdateStatus();
 }
 
 

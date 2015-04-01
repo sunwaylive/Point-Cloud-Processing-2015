@@ -718,6 +718,7 @@ void GLArea::openByDrop(QString fileName)
 	cout << "finish open " << endl; 
 	initAfterOpenFile();
 	updateGL();
+  updateUI();
 	emit needUpdateStatus();
 }
 
@@ -2206,12 +2207,12 @@ void GLArea::keyReleaseEvent ( QKeyEvent * e )
 
 void GLArea::reorientPick()
 {
-   CMesh* samples = dataMgr.getCurrentSamples();
- 
-   for (int i = 0; i < pickList.size(); i++)
-   {
-     samples->vert[pickList[i]].N() *= -1;
-   }
+//    CMesh* samples = dataMgr.getCurrentSamples();
+//  
+//    for (int i = 0; i < pickList.size(); i++)
+//    {
+//      samples->vert[pickList[i]].N() *= -1;
+//    }
 
 // 	if (global_paraMgr.wLop.getBool("Use Kite Points"))
 // 	{
@@ -2226,13 +2227,13 @@ void GLArea::reorientPick()
 // 	}
 // 
 // 
-//   CMesh* samples = dataMgr.getCurrentSamples();
-// 
-//   for (int i = 0; i < pickList.size(); i++)
-//   {
-//     samples->vert[pickList[i]].is_fixed_sample = true;
-// 		samples->vert[pickList[i]].is_skel_branch = true;
-//   }
+   CMesh* samples = dataMgr.getCurrentSamples();
+ 
+   for (int i = 0; i < pickList.size(); i++)
+   {
+     samples->vert[pickList[i]].is_fixed_sample = true;
+ 		samples->vert[pickList[i]].is_skel_branch = true;
+   }
 }
 
 void GLArea::cleanPick()
