@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -382,6 +382,19 @@
      </property>
      <property name="text">
       <string>DLength Adjustment</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_Elliptical_Original_Neighbor">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>750</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Elliptical_Original_Neighbor （need normal weight）</string>
      </property>
     </widget>
    </widget>
@@ -1828,19 +1841,6 @@
      </property>
      <property name="text">
       <string>Use_original_averaging KNN</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="Use_Elliptical_Original_Neighbor">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>384</y>
-       <width>311</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Use_Elliptical_Original_Neighbor</string>
      </property>
     </widget>
    </widget>

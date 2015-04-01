@@ -432,11 +432,11 @@ void WLOP::run()
 		return;
 	}
 
-// 	if (para->getBool("Run DLength Adjustment"))
-// 	{
-// 		runDlengthAdjustment();
-// 		return;
-// 	}
+ 	if (para->getBool("Run DLength Adjustment"))
+ 	{
+ 		runDlengthAdjustment();
+ 		return;
+ 	}
 
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
@@ -595,9 +595,9 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 	//bool use_fixed_original = para->getBool("Run Skel WLOP");
 
 	//bool need_normal_weight = para->getBool("Need Compute Density");
-	//bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
-	bool need_normal_weight = false;
-	bool need_anti_normal = para->getBool("Use Elliptical Original Neighbor");
+	bool need_normal_weight = para->getBool("Use Elliptical Original Neighbor");
+	//bool need_normal_weight = false;
+//	bool need_anti_normal = para->getBool("Use Elliptical Original Neighbor");
 	bool use_ellipsoid_weight = para->getBool("Use Ellipsoid Weight");
 
 
@@ -628,6 +628,13 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 	cout << "dual" << endl;
 	cout << "Original Size:" << samples->vert[0].original_neighbors.size() << endl;
+  if (need_normal_weight)
+  {
+    cout << "using normal weight!!!!!!!";
+  }
+  //need_normal_weight = true;
+
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 
@@ -651,12 +658,12 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			double w = 1;
 
-			if (use_nearest_neighbor)
-			{
-				float new_radius = radius + v.nearest_neighbor_dist;
-				float new_radius2 = new_radius * new_radius;
-				iradius16 = -4 / radius2;
-			}
+// 			if (use_nearest_neighbor)
+// 			{
+// 				float new_radius = radius + v.nearest_neighbor_dist;
+// 				float new_radius2 = new_radius * new_radius;
+// 				iradius16 = -4 / radius2;
+// 			}
 
 			if (run_anisotropic_lop)
 			{
@@ -710,16 +717,18 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 				w = exp(proj_dist2 * iradius16_proj);
 // 			}
 
-// 			if (need_normal_weight)
-// 			{
-// 				if (i < 5)
-// 				{
-// 					cout << "need_normal_weight" << endl;
-// 				}
-// 
-// 				double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
-// 				w *= normal_diff;
-// 			}
+ 			if (need_normal_weight)
+ 			{
+
+ 
+ 				double normal_diff = exp(-pow(1 - v.N() * t.N(), 2) / sigma_threshold);
+ 				w *= normal_diff;
+
+        if (i < 15)
+        {
+          cout << "need_normal_weight " << normal_diff << endl;
+        }
+ 			}
 
 			if (need_density && !original_density.empty())
 			{
@@ -777,7 +786,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 // 			}
 // 			else
 
-      if (use_tangent && !only_adjust_dlength /*&& !use_confidence*/)
+      if (use_tangent /*&& !only_adjust_dlength*/ /*&& !use_confidence*/)
 			{
 				Point3f proj_point = v.P() + v.N() * proj_dist;
 				average[i] += proj_point * w;
@@ -1538,6 +1547,76 @@ void WLOP::computeDensity(bool isOriginal, double radius, CMesh* samples, CMesh*
 }
 
 
+void WLOP::runDlengthAdjustment()
+{
+  use_adaptive_mu = para->getBool("Use Adaptive Mu");
+  is_sample_close_to_original.assign(samples->vert.size(), false);
+  bool use_tangent = para->getBool("Use Tangent Vector");
+
+  Timer time;
+
+  initVertexes(true);
+
+// 
+//   time.start("Sample Sample Neighbor Tree");
+//   GlobalFun::computeBallNeighbors(samples, NULL,
+//     para->getDouble("CGrid Radius"), samples->bbox);
+//   time.end();
+
+
+//   if (nTimeIterated == 0)
+//   {
+//     if (para->getBool("Need Compute Density"))
+//     {
+//       double local_density_para = 1.0;
+//       time.start("Original Original Neighbor Tree");
+//       GlobalFun::computeBallNeighbors(original, NULL,
+//         para->getDouble("CGrid Radius") * local_density_para, original->bbox);
+//       time.end();
+// 
+//       time.start("Compute Original Density");
+//       original_density.assign(original->vn, 0);
+// 
+//       computeDensity(true, para->getDouble("CGrid Radius") * local_density_para, samples, original);
+//       time.end();
+//     }
+//   }
+
+//   if (para->getBool("Need Compute Density"))
+//   {
+//     time.start("Compute Density For Sample");
+//     computeDensity(false, para->getDouble("CGrid Radius"), samples, original);
+//     time.end();
+//   }
+
+
+  time.start("Sample Original Neighbor Tree!!!");
+  GlobalFun::computeBallNeighbors(samples, original,
+    para->getDouble("CGrid Radius"), box);
+  time.end();
+  
+  time.start("Compute Average Term");
+  computeAverageTerm(samples, original);
+  time.end();
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    if (global_paraMgr.upsampling.getBool("Use Adaptive Upsampling") && !v.is_fixed_sample)
+    {
+      continue;
+    }
+
+    Point3f avg_point = v.P();
+    if (average_weight_sum[i] > 1e-20)
+    {
+      avg_point = average[i] / average_weight_sum[i];
+    }
+
+    v.P() = avg_point;
+  }
+}
 
 double WLOP::iterate()
 {
@@ -4415,10 +4494,7 @@ void WLOP::runTangentialMotion()
 	}
 }
 
-void WLOP::runDlengthAdjustment()
-{
 
-}
 
 void WLOP::run4PCS()
 {
