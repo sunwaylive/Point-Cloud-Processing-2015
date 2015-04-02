@@ -218,7 +218,7 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return original_color;
 	}
 
-	if (!v.is_dual_sample && v.is_fixed_sample)
+  if (!v.is_dual_sample && v.is_fixed_sample && bUseConfidenceColor)
 	{
 		return cBlue;
 	}

@@ -4402,11 +4402,14 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
-		CVertex& dual_v = dual_samples->vert[i];
+		//CVertex& dual_v = dual_samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
 
 		double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
-		int dual_idx = i;
-		int current_idx = i;
+// 		int dual_idx = i;
+// 		int current_idx = i;
+    int dual_idx = v.dual_index;
+    int current_idx = v.dual_index;
 
 		if (use_cloest)
 		{
@@ -4426,7 +4429,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 
 
 		int max_iterate = 0;
-		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 5 )
+		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15 )
 		{
 			current_idx = dual_idx;
 

@@ -1329,10 +1329,10 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   strStream << endl;
 
   strStream << "dual_corresponding_index " << samples.vert.size() << endl;
-  for(int i = 0; i < dual_samples.vert.size(); i++)
+  for (int i = 0; i < samples.vert.size(); i++)
   {
-    CVertex& v = dual_samples.vert[i];
-    strStream << dual_samples.vert[i].dual_index << endl;
+    CVertex& v = samples.vert[i];
+    strStream << samples.vert[i].dual_index << endl;
   }
   strStream << endl;
 
@@ -2059,7 +2059,7 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 			{
 				int index;
 				sem >> index;
-				dual_samples.vert[i].dual_index = index;
+				samples.vert[i].dual_index = index;
 			}
 		}
 	}
