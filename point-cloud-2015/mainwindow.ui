@@ -229,6 +229,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNormalize"/>
    <addaction name="actionImport_Ply"/>
    <addaction name="actionSave_Ply"/>
    <addaction name="actionSave_Skel"/>

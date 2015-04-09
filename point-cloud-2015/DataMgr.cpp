@@ -811,11 +811,6 @@ void DataMgr::savePly(QString fileName, CMesh& mesh)
 //}
 
 
-void DataMgr::normalizeROSA_MeshForDual(CMesh& mesh, Point3f box)
-{
-
-
-}
 
 void DataMgr::normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f mid_point)
 {
@@ -856,6 +851,60 @@ void DataMgr::normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f mid_point)
 }
 
 
+void DataMgr::normalizeROSA_UsingKnownCondition(CMesh& mesh, Point3f center, double length)
+{
+  mesh.bbox.SetNull();
+  for (int i = 0; i < mesh.vert.size(); i++)
+  {
+    Point3f& p = mesh.vert[i].P();
+
+    p /= length;
+    p -= center;
+    p *= 2.0;
+
+    mesh.vert[i].N().Normalize();
+    mesh.bbox.Add(p);
+  }
+
+
+}
+
+
+void DataMgr::saveNomalization(QString fileName)
+{
+  ofstream outfile;
+  outfile.open(fileName.toStdString().c_str());
+
+  Point3f center_point = global_paraMgr.data.getPoint3f("Normalization Center Point");
+  double length = global_paraMgr.data.getDouble("Normalization Length");
+
+  outfile << length << "  " << center_point.X() << "  " << center_point.Y() << "  " << center_point.Z() << endl;
+  outfile.close();
+}
+
+
+
+void DataMgr::loadNomalization(QString fileName)
+{
+  ifstream infile;
+  infile.open(fileName.toStdString().c_str());
+
+  Point3f center_point;
+  double length;
+
+  infile >> length;
+  infile >> center_point.X() >> center_point.Y() >> center_point.Z();
+
+  normalizeROSA_UsingKnownCondition(original, center_point, length);
+  normalizeROSA_UsingKnownCondition(samples, center_point, length);
+  normalizeROSA_UsingKnownCondition(dual_samples, center_point, length);
+  normalizeROSA_UsingKnownCondition(skel_points, center_point, length);
+
+  getInitRadiuse();
+}
+
+
+
 Point3f DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 {
 	Box3f box = mesh.bbox;
@@ -879,7 +928,9 @@ Point3f DataMgr::normalizeROSA_Mesh(CMesh& mesh)
 	}
 
 	Point3f mid_point = (box_temp.min + box_temp.max) / 2.0;
-	//mid_point = (box.min + box.max) / 2.0;
+
+  para->setValue("Normalization Center Point", Point3fValue(mid_point));
+  para->setValue("Normalization Length", DoubleValue(max_length));
 
 
 	mesh.bbox.SetNull();
@@ -949,12 +1000,12 @@ Box3f DataMgr::normalizeAllMesh()
 		{
 			box.Add(original.vert[i].P());
 		}
-		//original.bbox =box;
 	}
 
 	samples.bbox = box;
 	dual_samples.bbox = box;
 	original.bbox = box;
+  skel_points.bbox = box;
 
 	Point3f mid = normalizeROSA_Mesh(samples);
   //normalizeROSA_Mesh(dual_samples);
@@ -1182,6 +1233,9 @@ void DataMgr::saveTargetSkeletonAsSkel(QString fileName)
 	outfile.close();
 
 }
+
+
+
 
 void DataMgr::saveSkeletonAsSkel(QString fileName)
 {

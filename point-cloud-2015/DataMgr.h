@@ -62,7 +62,8 @@ public:
 	Point3f normalizeROSA_Mesh(CMesh& mesh);
 
 	void normalizeROSA_MeshForOriginal(CMesh& mesh, Point3f box);
-	void normalizeROSA_MeshForDual(CMesh& mesh, Point3f box);
+  void normalizeROSA_UsingKnownCondition(CMesh& mesh, Point3f center, double length);
+
 
 	Box3f normalizeAllMesh();
 
@@ -83,6 +84,9 @@ public:
 	void switchSampleOriginal();
 
 	void loadDefaultSphere();
+
+  void saveNomalization(QString fileName);
+  void loadNomalization(QString fileName);
 
 private:
 	void clearCMesh(CMesh& mesh);

@@ -1165,12 +1165,22 @@ void WlopParaDlg::applySmoothNeighborhood()
 
 void WlopParaDlg::applyMoveBackward()
 {
-	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
-	area->runWlop();
-	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
-	
-	copyDualSamplesToSkel();
+// 	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(true));
+// 	area->runWlop();
+// 	m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
+// 	
+// 	copyDualSamplesToSkel();
+
+  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+  double step_size = m_paras->wLop.getDouble("Increasing Step Size");
+
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    CVertex& v = dual_samples->vert[i];
+    v.P() -= v.N() * step_size;
+  }
+
 }
 
 void WlopParaDlg::applySelfWLOP()
@@ -1420,8 +1430,11 @@ void WlopParaDlg::oneKEY()
 		m_paras->wLop.setValue("Need Similarity", BoolValue(true));
 		m_paras->wLop.setValue("Use Confidence", BoolValue(true));
 		m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
-		m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
-		//applyComputeConfidence();
+
+
+		//m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
+		
+    //applyComputeConfidence();
 
 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
 		CMesh* samples;

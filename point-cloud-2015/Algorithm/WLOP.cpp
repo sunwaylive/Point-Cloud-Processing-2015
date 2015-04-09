@@ -2844,6 +2844,8 @@ void WLOP::runRegularizeNormals(CMesh* samples, CMesh* dual_samples)
 
 		Point3f dir = diff;
 
+
+    //这里应该用另外的判断法则：假设骨架的洞都被填上
 		if (use_confidence && v.eigen_confidence > confidence_threshold)
 		{
 			if (dir.Normalize() * v.N() < 0)
@@ -4368,99 +4370,207 @@ void WLOP::computeInitialNeighborSize()
 
 void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
 {
-	if (!dual_samples || dual_samples->vert.empty())
-	{
-		return;
-	}
 
-	bool use_progressive_search = para->getBool("Use Progressive Search Index");
-	double search_dual_index_para = para->getDouble("Search Dual Index Para");
+  if (!dual_samples || dual_samples->vert.empty())
+  {
+    return;
+  }
 
-	if (!global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
-	{
-		cout << "use fixed index" << endl;
+  bool use_progressive_search = para->getBool("Use Progressive Search Index");
+  double search_dual_index_para = para->getDouble("Search Dual Index Para");
 
-		for (int i = 0; i < samples->vert.size(); i++)
-		{
-			CVertex& v = samples->vert[i];
-			CVertex& dual_v = dual_samples->vert[i];
+  if (!global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+  {
+    cout << "use fixed index" << endl;
 
-			v.dual_index = i;
-		}
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      CVertex& dual_v = dual_samples->vert[i];
 
-		return;
-	}
+      v.dual_index = i;
+    }
+
+    return;
+  }
 
 
-	cout << "computeDualIndex" << endl;
-	Timer timer;
-	timer.start("computeDualIndex");
+  cout << "computeDualIndex" << endl;
+  Timer timer;
+  timer.start("computeDualIndex");
 
-	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
-	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+  GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
+  bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
 
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
-		//CVertex& dual_v = dual_samples->vert[i];
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    //CVertex& dual_v = dual_samples->vert[i];
     CVertex& dual_v = dual_samples->vert[v.dual_index];
 
-		double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
-// 		int dual_idx = i;
-// 		int current_idx = i;
+    double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+    //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+
+
+
+    // 		int dual_idx = i;
+    // 		int current_idx = i;
     int dual_idx = v.dual_index;
     int current_idx = v.dual_index;
 
-		if (use_cloest)
-		{
-			for (int j = 0; j < dual_v.neighbors.size(); j++)
-			{
-				int index = dual_v.neighbors[j];
-				CVertex& dual_t = dual_samples->vert[index];
 
-				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
-				if (dist2 < min_dist2)
-				{
-					min_dist2 = dist2;
-					dual_idx = index;
-				}
-			}
-		}
+    for (int j = 0; j < dual_v.neighbors.size(); j++)
+    {
+      int index = dual_v.neighbors[j];
+      CVertex& dual_t = dual_samples->vert[index];
+
+      double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+      //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+      if (dist2 < min_dist2)
+      {
+        min_dist2 = dist2;
+        dual_idx = index;
+      }
+    }
+    
 
 
-		int max_iterate = 0;
-		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15 )
-		{
-			current_idx = dual_idx;
+    int max_iterate = 0;
+    while ((use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15)
+    {
+      current_idx = dual_idx;
 
-			CVertex dual_v2 = dual_samples->vert[current_idx];
+      CVertex dual_v2 = dual_samples->vert[current_idx];
 
-			if (dual_v2.neighbors.empty())
-			{
-				break;
-			}
+      if (dual_v2.neighbors.empty())
+      {
+        break;
+      }
 
-			double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
-			for (int j = 0; j < dual_v2.neighbors.size(); j++)
-			{
-				int index = dual_v2.neighbors[j];
-				CVertex& dual_t2 = dual_samples->vert[index];
+      double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
+      //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
 
-				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t2.P());
-				if (dist2 < min_dist2)
-				{
-					min_dist2 = dist2;
-					dual_idx = index;
-				}
-			}
+      for (int j = 0; j < dual_v2.neighbors.size(); j++)
+      {
+        int index = dual_v2.neighbors[j];
+        CVertex& dual_t2 = dual_samples->vert[index];
 
-		}
+        double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t2.P());
+        //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
 
-		v.dual_index = dual_idx;
-	}
+        if (dist2 < min_dist2)
+        {
+          min_dist2 = dist2;
+          dual_idx = index;
+        }
+      }
 
-	timer.end();
+    }
+
+    v.dual_index = dual_idx;
+  }
+
+  timer.end();
+
+  cout << "$$$$$$$$$$$$$  done new index $$$$$$$$$$$" << endl;
+
 }
+
+// void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
+// {
+// 	if (!dual_samples || dual_samples->vert.empty())
+// 	{
+// 		return;
+// 	}
+// 
+// 	bool use_progressive_search = para->getBool("Use Progressive Search Index");
+// 	double search_dual_index_para = para->getDouble("Search Dual Index Para");
+// 
+// 	if (!global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+// 	{
+// 		cout << "use fixed index" << endl;
+// 
+// 		for (int i = 0; i < samples->vert.size(); i++)
+// 		{
+// 			CVertex& v = samples->vert[i];
+// 			CVertex& dual_v = dual_samples->vert[i];
+// 
+// 			v.dual_index = i;
+// 		}
+// 
+// 		return;
+// 	}
+// 
+// 
+// 	cout << "computeDualIndex" << endl;
+// 	Timer timer;
+// 	timer.start("computeDualIndex");
+// 
+// 	GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
+// 	bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 		//CVertex& dual_v = dual_samples->vert[i];
+//     CVertex& dual_v = dual_samples->vert[v.dual_index];
+// 
+// 		double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+// // 		int dual_idx = i;
+// // 		int current_idx = i;
+//     int dual_idx = v.dual_index;
+//     int current_idx = v.dual_index;
+// 
+// 		if (use_cloest)
+// 		{
+// 			for (int j = 0; j < dual_v.neighbors.size(); j++)
+// 			{
+// 				int index = dual_v.neighbors[j];
+// 				CVertex& dual_t = dual_samples->vert[index];
+// 
+// 				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+// 				if (dist2 < min_dist2)
+// 				{
+// 					min_dist2 = dist2;
+// 					dual_idx = index;
+// 				}
+// 			}
+// 		}
+// 
+// 
+// 		int max_iterate = 0;
+// 		while ( (use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15 )
+// 		{
+// 			current_idx = dual_idx;
+// 
+// 			CVertex dual_v2 = dual_samples->vert[current_idx];
+// 
+// 			if (dual_v2.neighbors.empty())
+// 			{
+// 				break;
+// 			}
+// 
+// 			double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
+// 			for (int j = 0; j < dual_v2.neighbors.size(); j++)
+// 			{
+// 				int index = dual_v2.neighbors[j];
+// 				CVertex& dual_t2 = dual_samples->vert[index];
+// 
+// 				double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t2.P());
+// 				if (dist2 < min_dist2)
+// 				{
+// 					min_dist2 = dist2;
+// 					dual_idx = index;
+// 				}
+// 			}
+// 
+// 		}
+// 
+// 		v.dual_index = dual_idx;
+// 	}
+// 
+// 	timer.end();
+// }
 
 
 void WLOP::runTangentialMotion()

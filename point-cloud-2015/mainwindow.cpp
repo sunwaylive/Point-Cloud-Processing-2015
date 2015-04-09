@@ -524,6 +524,18 @@ void MainWindow::subSample()
 void MainWindow::normalizeData()
 {
 	area->dataMgr.normalizeAllMesh();
+
+
+  QString file = QFileDialog::getSaveFileName(this, "Select a ply file", "", "*.normalize");
+  if (!file.size()) return;
+
+  if (!file.endsWith(".normalize"))
+  {
+    file += QString(".normalize");
+  }
+
+  area->dataMgr.saveNomalization(file);
+
 	area->initView();
 	area->updateGL();
 }
@@ -649,6 +661,7 @@ void MainWindow::showTargets(bool _val)
 void MainWindow::showClosestDualConnection(bool _val)
 {
 	global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  global_paraMgr.glarea.setValue("Show Cloest Dual Connection", BoolValue(_val));
 
 	if (_val && !area->dataMgr.isSkeletalPointsEmpty())
 	{

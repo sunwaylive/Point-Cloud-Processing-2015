@@ -713,6 +713,10 @@ void GLArea::openByDrop(QString fileName)
   {
     dataMgr.loadOFF(fileName);
   }
+  if (fileName.endsWith("normalize"))
+  {
+    dataMgr.loadNomalization(fileName);
+  }
 
 	show_something = true;
 	cout << "finish open " << endl; 

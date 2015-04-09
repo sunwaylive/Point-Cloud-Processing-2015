@@ -67,6 +67,11 @@ void ParameterMgr::initDataMgrParameter()
 	data.addParam(new RichDouble("Init Radius Para", 1.0));
 	data.addParam(new RichDouble("Down Sample Num", 1000));
 	data.addParam(new RichDouble("CGrid Radius", grid_r));
+
+
+  data.addParam(new RichPoint3f("Normalization Center Point", vcg::Point3f(0.0, 0.0, 0.0)));
+  data.addParam(new RichDouble("Normalization Length", grid_r));
+
 }
 
 
@@ -325,7 +330,7 @@ void ParameterMgr::initWLopParameter()
 
 	//new parameters:
 	wLop.addParam(new RichDouble("Average Closest Dist", 0.02301));
-	wLop.addParam(new RichDouble("Search Dual Index Para", 2.1));
+	wLop.addParam(new RichDouble("Search Dual Index Para", 3.1));
 	wLop.addParam(new RichBool("Use Progressive Search Index", true));
 
 
@@ -348,7 +353,7 @@ void ParameterMgr::initWLopParameter()
 
 	//void WLOP::runRegularizeNormals()
 	wLop.addParam(new RichDouble("Density Confidence Segment Threshold", 0.8));
-	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.55000));
+	wLop.addParam(new RichDouble("Eigen Directional Threshold", 0.35000));
 	wLop.addParam(new RichBool("Use Confidence To Combine Normal", false));
 
 
