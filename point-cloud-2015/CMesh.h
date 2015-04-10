@@ -75,8 +75,9 @@ public:
   bool is_fixed_original; 
 
   
-  double skel_radius; // remember radius for branches
+  float skel_radius; // remember radius for branches
 	float nearest_neighbor_dist;
+  double temporary_variable;
 
   bool is_dual_sample;
   bool is_boundary;
@@ -120,7 +121,8 @@ public:
 		eigen_value0(0.),
 		eigen_value1(0.),
 		eigen_value2(0.),
-    skel_radius(-1.0)
+    skel_radius(-1.0),
+    temporary_variable(0.0)
 		{
 			N() = Point3f(0,0,0);
 

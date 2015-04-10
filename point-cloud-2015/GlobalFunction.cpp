@@ -242,6 +242,123 @@ void GlobalFun::computeAnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &q
 }
 
 
+void GlobalFun::removeOutliersBaseOnDistance(CMesh *mesh, int KNN, double removel_percentage)
+{
+  if (removel_percentage < 0 || removel_percentage > 0.9999 || KNN < 0 || KNN > mesh->vert.size())
+  {
+    cout << "wrong parameters for removeOutliersBaseOnDistance" << endl;
+    return;
+  }
+  cout << "KNN " << KNN << "percentage: " << removel_percentage << endl;
+
+  Timer timer;
+  timer.start("computeAnnNeigbhors");
+  GlobalFun::computeAnnNeigbhors(mesh->vert, mesh->vert, KNN, false, "removeOutliersBaseOnDistance");
+  timer.end();
+
+  vector<double> dist_values;
+  for (int i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    double sum = 0;
+    
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = mesh->vert[v.neighbors[j]];
+
+      double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+
+      sum += dist2;
+    }
+
+    v.temporary_variable = sum / v.neighbors.size();
+    dist_values.push_back(v.temporary_variable);
+  }
+
+  std::sort(dist_values.begin(), dist_values.end());
+  double dist_threshold = dist_values[int(dist_values.size()*(1-removel_percentage))];
+
+  vector<CVertex> temp_mesh;
+  for (size_t i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    if (v.temporary_variable < dist_threshold)
+    {
+      temp_mesh.push_back(v);
+    }
+  }
+
+
+  mesh->vert.clear();
+  mesh->bbox.SetNull();
+   for (int i = 0; i < temp_mesh.size(); i++)
+   {
+     CVertex& v = temp_mesh[i];
+     mesh->vert.push_back(v);
+     mesh->bbox.Add(v.P());
+   }
+   mesh->vn = mesh->vert.size();
+}
+
+void GlobalFun::removeOutliersBaseOnNormal(CMesh *mesh, int KNN, double removel_percentage)
+{
+  if (removel_percentage < 0 || removel_percentage > 0.9999 || KNN < 0 || KNN > mesh->vert.size())
+  {
+    cout << "wrong parameters for removeOutliersBaseOnDistance" << endl;
+    return;
+  }
+  cout << "KNN " << KNN << "percentage: " << removel_percentage << endl;
+
+  Timer timer;
+  timer.start("computeAnnNeigbhors");
+  GlobalFun::computeAnnNeigbhors(mesh->vert, mesh->vert, KNN, false, "removeOutliersBaseOnDistance");
+  timer.end();
+
+  vector<double> normal_diff_values;
+  for (int i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    double sum = 0;
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = mesh->vert[v.neighbors[j]];
+
+      double normal_diff = pow((1 - v.N()*t.N()), 2.0);
+
+      sum += normal_diff;
+    }
+
+    v.temporary_variable = sum / v.neighbors.size();
+    normal_diff_values.push_back(v.temporary_variable);
+  }
+
+  std::sort(normal_diff_values.begin(), normal_diff_values.end());
+  double dist_threshold = normal_diff_values[int(normal_diff_values.size()*(1 - removel_percentage))];
+
+  vector<CVertex> temp_mesh;
+  for (size_t i = 0; i < mesh->vert.size(); i++)
+  {
+    CVertex& v = mesh->vert[i];
+    if (v.temporary_variable < dist_threshold)
+    {
+      temp_mesh.push_back(v);
+    }
+  }
+
+
+  mesh->vert.clear();
+  mesh->bbox.SetNull();
+  for (int i = 0; i < temp_mesh.size(); i++)
+  {
+    CVertex& v = temp_mesh[i];
+    mesh->vert.push_back(v);
+    mesh->bbox.Add(v.P());
+  }
+  mesh->vn = mesh->vert.size();
+}
+
+
 void GlobalFun::computeKnnNeigbhors(vector<CVertex> &datapts, vector<CVertex> &querypts, int numKnn, bool need_self_included = false, QString purpose = "?_?")
 {
 	if (querypts.size() <= numKnn+1)

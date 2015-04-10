@@ -1419,8 +1419,11 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 // 				double length_diff = exp(length_dist2 * iradius16_length);
 			//double direction_diff = exp(-pow(1 - pow(v_outward_direction * t_outward_direction, 2), 2) / sigma_threshold);
 
-			double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
-			
+			//double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
+      double angle_diff = abs(v_outward_direction * t_outward_direction);
+      double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
+
+
 // 			if (similarity_KNN > 2)
 // 			{
 // 				direction_diff = 1.0;

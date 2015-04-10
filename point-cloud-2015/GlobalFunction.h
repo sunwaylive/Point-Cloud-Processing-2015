@@ -106,6 +106,11 @@ namespace GlobalFun
   void computeAverageDistToInput(CMesh *mesh, CMesh *input, int k);
 
 	vector<double> smoothConfidences(CMesh *mesh, double radius);
+
+
+  void removeOutliersBaseOnDistance(CMesh *mesh, int KNN, double removel_percentage);
+  void removeOutliersBaseOnNormal(CMesh *mesh, int KNN, double removel_percentage);
+
 }
 
 class Timer

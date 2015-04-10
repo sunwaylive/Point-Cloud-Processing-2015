@@ -150,9 +150,9 @@ void DataMgr::loadXYZN(QString fileName)
     }
 
 
-//      for (int j=0; j<3; j++) {
-//        infile >> v.N()[j];
-//      }
+      for (int j=0; j<3; j++) {
+        infile >> v.N()[j];
+      }
 
 // 		for (int j = 0; j < 3; j++) {
 // 			infile >> temp;

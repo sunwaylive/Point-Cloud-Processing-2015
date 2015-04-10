@@ -555,18 +555,25 @@ void MainWindow::saveSnapshot()
 
 void MainWindow::saveView()
 {
-	ofstream outpara("outpara.paras");
-	global_paraMgr.outputAllParameters(outpara);
-	outpara.close();
+  CMesh* samples = area->dataMgr.getCurrentSamples();
+  double percentage = 0.01;
+  //GlobalFun::removeOutliersBaseOnDistance(samples, 50, percentage);
+  GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
 
- 	QString file = QFileDialog::getSaveFileName(this, "Select a ply file", "", "*.VPoint");
- 	if(!file.size()) return;
- 	area->saveView(file);
 
-	file.replace(".VPoint", ".paras");
-	ifstream inpara(file.toStdString().c_str());
-	global_paraMgr.inputAllParameters(inpara);
-	inpara.close();
+
+// 	ofstream outpara("outpara.paras");
+// 	global_paraMgr.outputAllParameters(outpara);
+// 	outpara.close();
+// 
+//  	QString file = QFileDialog::getSaveFileName(this, "Select a ply file", "", "*.VPoint");
+//  	if(!file.size()) return;
+//  	area->saveView(file);
+// 
+// 	file.replace(".VPoint", ".paras");
+// 	ifstream inpara(file.toStdString().c_str());
+// 	global_paraMgr.inputAllParameters(inpara);
+// 	inpara.close();
 }
 
 void MainWindow::saveSkel()
