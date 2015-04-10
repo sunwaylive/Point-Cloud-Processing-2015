@@ -556,9 +556,9 @@ void MainWindow::saveSnapshot()
 void MainWindow::saveView()
 {
   CMesh* samples = area->dataMgr.getCurrentSamples();
-  double percentage = 0.01;
-  //GlobalFun::removeOutliersBaseOnDistance(samples, 50, percentage);
-  GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
+  double percentage = 0.02;
+  GlobalFun::removeOutliersBaseOnDistance(samples, 50, percentage);
+  //GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
 
 
 
