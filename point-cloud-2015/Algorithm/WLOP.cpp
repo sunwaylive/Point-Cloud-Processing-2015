@@ -651,7 +651,7 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 
 			Point3f diff = t.P() - v.P();
 			double proj_dist = diff * v.N();
-			double proj_dist2 = proj_dist * proj_dist;
+			//double proj_dist2 = proj_dist * proj_dist;
 
 			
 			double dist2 = diff.SquaredNorm();
@@ -700,22 +700,6 @@ void WLOP::computeAverageTerm(CMesh* samples, CMesh* original)
 			{
 				w = exp(dist2 * iradius16);
 			}
-
-// 			if (use_elliptical_neighbor)
-// 			{
-// 				if (i < 5)
-// 				{
-// 					cout << "use_elliptical_neighbor" << endl;
-// 				}
-// 				if (use_nearest_neighbor)
-// 				{
-// 					float new_radius = radius + v.nearest_neighbor_dist;
-// 					float new_radius2 = new_radius * new_radius;
-// 					iradius16_proj = -16 / radius2;
-// 				}
-// 
-// 				w = exp(proj_dist2 * iradius16_proj);
-// 			}
 
  			if (need_normal_weight)
  			{
@@ -3547,20 +3531,17 @@ void WLOP::runMoveBackward()
 
 			double angle = GlobalFun::computeRealAngleOfTwoVertor(dual_v.N(), t.N());
 
-			if (angle > stop_angle_threshold || dual_v.N() * t.N() < 0)
+			if (angle > stop_angle_threshold )
 			{
 				keep_going = false;
 				break;
 			}
 		}
 
-		if (keep_going)
-		{
-			dual_v.is_fixed_sample = false;
-		}
-		else
+		if (!keep_going)
 		{
 			dual_v.is_fixed_sample = true;
+      dual_v.moving_speed = 0.0;
 
 			if (dual_v.skel_radius < 1e-15)
 			{
@@ -3569,10 +3550,6 @@ void WLOP::runMoveBackward()
 		}
 	}
 
-	//return;
-
-	vector<Point3f> remember_position(dual_samples->vert.size());
-	vector<Point3f> remember_normal(dual_samples->vert.size());
 
 	// compute move step
 	//int knn = para->getDouble("Sefl KNN");
@@ -3580,8 +3557,12 @@ void WLOP::runMoveBackward()
 	//cout << "end knn" << endl;
 	double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
 	computeConstNeighborhoodUsingRadius(local_radius);
+  double radius2 = local_radius * local_radius;
+  double iradius16 = -4 / radius2;
 
 	vector<double> real_step_size(samples->vert.size(), 0.0);
+  vector<double> new_speed(samples->vert.size(), 0.0);
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
@@ -3591,59 +3572,67 @@ void WLOP::runMoveBackward()
 		{
 			continue;
 		}
-		for (int j = 0; j < v.neighbors.size(); j++)
-		{
-			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
-
-			if (dual_t.is_fixed_sample)
-			{
-				real_step_size[i] += 0.0;
-			}
-			else
-			{
-				real_step_size[i] += 1.0;
-			}
-		}
-
-		real_step_size[i] /= v.neighbors.size();
-	}
-
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		real_step_size[i] *= step_size;
-	}
-
-	// bi-laplician begin
-	vector<double> real_step_size2(samples->vert.size(), 0.0);
-
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-		CVertex& v = samples->vert[i];
-
-		v.m_index = i;
-		dual_v.m_index = i;
+    
+    double sum_weight = 0.;
+    double sum_speed = 0.;
+    double weight = 0;
 
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
 			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+      CVertex& t = samples->vert[v.neighbors[j]];
 
-			real_step_size2[i] += real_step_size[i];
+      Point3f diff = t.P() - v.P();
+      double dist2 = diff.SquaredNorm();
+      weight = exp(dist2 * iradius16);
+
+      sum_speed += dual_t.moving_speed * weight;
+      sum_weight += weight;
 		}
 
-		real_step_size2[i] /= v.neighbors.size();
+    if (weight > 0)
+    {
+      new_speed[i] = sum_speed / sum_weight;
+    }
 	}
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
-		real_step_size[i] = real_step_size2[i];
+    CVertex& dual_v = dual_samples->vert[i];
+    dual_v.moving_speed = new_speed[i];
+
+		real_step_size[i] = step_size * dual_v.moving_speed;
 	}
-	// bi-laplician end
+
+// 	// bi-laplician begin
+// 	vector<double> real_step_size2(samples->vert.size(), 0.0);
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		CVertex& v = samples->vert[i];
+// 
+// 		v.m_index = i;
+// 		dual_v.m_index = i;
+// 
+// 		for (int j = 0; j < v.neighbors.size(); j++)
+// 		{
+// 			CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+// 
+// 			real_step_size2[i] += real_step_size[i];
+// 		}
+// 
+// 		real_step_size2[i] /= v.neighbors.size();
+// 	}
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		real_step_size[i] = real_step_size2[i];
+// 	}
+// 	// bi-laplician end
 
 	for (int i = 0; i < dual_samples->vert.size(); i++)
 	{
 		CVertex& dual_v = dual_samples->vert[i];
-		// 		remember_position[i] = dual_v.P();
-		// 		remember_normal[i] = dual_v.N();
 
 		if (dual_v.is_fixed_sample)
 		{
@@ -3653,7 +3642,7 @@ void WLOP::runMoveBackward()
 		dual_v.P() -= dual_v.N() * real_step_size[i];
 	}
 
-	//return;
+	return;
 
 
  	time.start("Sample0000dual_samples neighbor");
@@ -3714,8 +3703,6 @@ void WLOP::runMoveBackward()
 		{
 			dual_v.is_fixed_sample = true;
 
-			// 			dual_v.P() = remember_position[i];
-			// 			dual_v.N() = remember_normal[i];
 
 			if (dual_v.skel_radius < 1e-15)
 			{

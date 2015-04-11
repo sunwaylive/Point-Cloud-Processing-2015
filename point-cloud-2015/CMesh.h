@@ -79,6 +79,8 @@ public:
 	float nearest_neighbor_dist;
   double temporary_variable;
 
+  float moving_speed;
+
   bool is_dual_sample;
   bool is_boundary;
 	
@@ -122,7 +124,8 @@ public:
 		eigen_value1(0.),
 		eigen_value2(0.),
     skel_radius(-1.0),
-    temporary_variable(0.0)
+    temporary_variable(0.0),
+    moving_speed(1.0)
 		{
 			N() = Point3f(0,0,0);
 

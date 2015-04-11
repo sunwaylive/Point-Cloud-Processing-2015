@@ -584,6 +584,8 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
     CVertex &v = samples->vert[i];
     Point3f &p = v.P();  
 
+    cout << v.neighbors.size();
+
 		if (v.neighbors.empty())
 		{
 			continue;
@@ -593,6 +595,9 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
     vector<int>::iterator vi = v.neighbors.begin();
     int nsize = 6;
     int j = 0;
+
+   
+
     for(; vi != v.neighbors.end()/* && j < nsize*/; ++vi, ++j)
     {
       if( (*vi) > samples->vert.size() || (*vi) < 0)

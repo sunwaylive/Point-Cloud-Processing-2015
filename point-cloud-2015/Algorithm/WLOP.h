@@ -93,6 +93,10 @@ private:
 	void runSmoothNeighborhood();
 
 	void runMoveBackward();
+
+  //void runMoveBackwardUntilAllPointsStop();
+
+
 	void runSelfWLOP();
 	void runNormalSmoothing();
 	void runSelfPCA();
