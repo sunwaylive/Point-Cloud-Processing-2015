@@ -854,9 +854,13 @@ void WlopParaDlg::applySkelConnection()
 
  void WlopParaDlg::applyRunEstimateAverageDistThreshold()
  {
+   m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	 m_paras->wLop.setValue("Run Estimate Average Dist Threshold", BoolValue(true));
 	 area->runWlop();
 	 m_paras->wLop.setValue("Run Estimate Average Dist Threshold", BoolValue(false));
+   m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));
+
+   area->updateUI();
  }
 
 

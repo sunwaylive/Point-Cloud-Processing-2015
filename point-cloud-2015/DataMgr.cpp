@@ -1408,6 +1408,15 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
 	}
 	strStream << endl;
 
+
+   strStream << "DS_onedge " << samples.vert.size() << endl;
+   for (int i = 0; i < samples.vert.size(); i++)
+   {
+     CVertex& dual_v = dual_samples.vert[i];
+     strStream << dual_v.is_fixed_sample << "	";
+   }
+   strStream << endl;
+
 	outfile.write( strStream.str().c_str(), strStream.str().size() ); 
 	outfile.close();
 }
@@ -2170,6 +2179,22 @@ void DataMgr::loadSkeletonFromSkel(QString fileName)
 		}
 		skel_points.vn = skel_points.vert.size();
 	}
+
+  if (!sem.eof())
+  {
+    sem >> str;
+    if (str == "DS_onedge")
+    {
+      sem >> num;
+      for (int i = 0; i < num; i++)
+      {
+        bool b;
+        sem >> b;
+        dual_samples.vert[i].is_fixed_sample = b;
+      }
+    }
+  }
+
 
  	clearCMesh(target_dual_samples);
  	clearCMesh(target_samples);
