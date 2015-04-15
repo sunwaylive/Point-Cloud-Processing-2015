@@ -70,6 +70,9 @@ void MainWindow::initWidgets()
 	ui.actionRandom_Erase->setChecked(paras->glarea.getBool("Random Erase"));
 	ui.actionShow_Segment_Color->setChecked(paras->drawer.getBool("Show Segmentation Color"));
 
+  update();
+  repaint();
+
 }
 
 void MainWindow::initConnect()
@@ -268,6 +271,8 @@ void MainWindow::updateStatusBar()
 	
 	QString strError = "Movement: " + QString::number(error);
 	error_label->setText(strError);
+
+  initWidgets();
 
 	update();
 	repaint();

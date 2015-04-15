@@ -3986,10 +3986,10 @@ void WLOP::runSelfProjection()
 {
   cout << "sefl projection freeze" << endl;
 
-  double static_radius = para->getDouble("Local Neighbor Size For Surface Points");
+  double static_radius = para->getDouble("Local Neighbor Size For Surface Points") * 0.5;
   GlobalFun::computeBallNeighbors(samples, NULL, static_radius, samples->bbox);
 
-  for (int k = 0; k < 5; k++)
+  for (int k = 0; k < 1; k++)
   {
     int unsettle_number = 0;
 
@@ -4023,8 +4023,8 @@ void WLOP::runSelfProjection()
         continue;
       }
 
-      int fixed_neighbor_number = 0;
-      double sum_length = 0;
+      double min_length = -1;
+      double min_dist = 1000000;
 
       for (int j = 0; j < v.neighbors.size(); j++)
       {
@@ -4035,16 +4035,20 @@ void WLOP::runSelfProjection()
           continue;
         }
 
-        sum_length += t.skel_radius;
-        fixed_neighbor_number++;
+        double dist = GlobalFun::computeEulerDist(v.P(), t.P());
+        if (dist < min_dist)
+        {
+          min_dist = dist;
+          min_length = t.skel_radius;
+        }
       }
 
-      if (fixed_neighbor_number < 1)
+      if (min_length < 0)
       {
         continue;
       }
 
-      double length = sum_length / fixed_neighbor_number;
+      double length = min_length;
 
       dual_v.P() = v.P() - v.N() * length;
       dual_v.is_fixed_sample = true;

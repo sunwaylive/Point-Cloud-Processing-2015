@@ -686,6 +686,8 @@ void GLArea::openByDrop(QString fileName)
 		ifstream inpara(fileName.toStdString().c_str());
 		global_paraMgr.inputAllParameters(inpara);
 		inpara.close();
+
+    updateUI();
 	}
 	if (fileName.endsWith("skel"))
 	{
