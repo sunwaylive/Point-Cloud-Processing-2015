@@ -56,6 +56,7 @@ private:
   void pointsExtrapoaltion();
   void projectOneCVertex(CVertex& v);
 	
+ 
 protected:
 	Upsampler(void);
 
@@ -105,4 +106,5 @@ private:
 
   bool also_insert_dual_points;
   bool use_adaptive_upsampling;
+  bool do_upsample_on_skeltal_points;
 };

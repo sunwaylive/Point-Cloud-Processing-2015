@@ -32,6 +32,7 @@ void UpsamplingParaDlg::initConnects()
 	connect(ui->add_num,SIGNAL(valueChanged(int)),this,SLOT(setNum(int)));
 	connect(ui->using_threshol_process,SIGNAL(clicked(bool)),this,SLOT(setUsingThresholdProcess(bool)));
   connect(ui->use_constant_threshold,SIGNAL(clicked(bool)),this,SLOT(setUseConstantThreshold(bool)));
+  connect(ui->use_upsample_skeletal_points, SIGNAL(clicked(bool)), this, SLOT(useUpsampleSkeletalPoints(bool)));
 
 	connect(ui->need_snap_files, SIGNAL(clicked(bool)), this, SLOT(needSnapFiles(bool)));
   connect(ui->use_adaptive_upsampling, SIGNAL(clicked(bool)), this, SLOT(useAdaptiveUpsampling(bool)));
@@ -90,6 +91,9 @@ bool UpsamplingParaDlg::initWidgets()
 
   state = m_paras->upsampling.getBool("Use Adaptive Upsampling") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
   ui->use_adaptive_upsampling->setCheckState(state);
+
+  state = m_paras->upsampling.getBool("Use Upsample On Skeletal Points") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+  ui->use_upsample_skeletal_points->setCheckState(state);
 
 	ui->threshold->setValue(m_paras->upsampling.getDouble("Dist Threshold"));
 	ui->edge_paramete->setValue(m_paras->upsampling.getDouble("Edge Parameter"));
@@ -179,6 +183,12 @@ void UpsamplingParaDlg::needSnapFiles(bool _val)
 {
 	m_paras->glarea.setValue("Need Snap Files", BoolValue(_val));
 }
+
+void UpsamplingParaDlg::useUpsampleSkeletalPoints(bool _val)
+{
+  m_paras->upsampling.setValue("Use Upsample On Skeletal Points", BoolValue(_val));
+}
+
 
 void UpsamplingParaDlg::useAdaptiveUpsampling(bool _val)
 {

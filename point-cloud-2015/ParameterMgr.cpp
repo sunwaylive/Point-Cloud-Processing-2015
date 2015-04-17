@@ -527,6 +527,8 @@ void ParameterMgr::initUpsamplingParameter()
   upsampling.addParam(new RichDouble("Density Threshold Dist", 0.05));
 
 
+  upsampling.addParam(new RichBool("Use Upsample On Skeletal Points", false));
+
 }
 
 

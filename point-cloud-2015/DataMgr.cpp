@@ -1068,6 +1068,11 @@ void DataMgr::recomputeQuad()
     dual_samples.vert[i].recompute_m_render();
   }
 
+  for (int i = 0; i < dual_samples.vert.size(); i++)
+  {
+    skel_points.vert[i].recompute_m_render();
+  }
+
   for (int i = 0; i < original.vert.size(); i++)
   {
     original.vert[i].recompute_m_render();

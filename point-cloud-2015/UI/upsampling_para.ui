@@ -267,7 +267,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>380</y>
+       <y>400</y>
        <width>161</width>
        <height>16</height>
       </rect>
@@ -280,7 +280,7 @@
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>400</y>
+       <y>420</y>
        <width>113</width>
        <height>20</height>
       </rect>
@@ -302,13 +302,26 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>400</y>
+       <y>420</y>
        <width>91</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>Density Threshold:</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="use_upsample_skeletal_points">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>370</y>
+       <width>161</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Upsample Skeletal Points</string>
      </property>
     </widget>
    </widget>

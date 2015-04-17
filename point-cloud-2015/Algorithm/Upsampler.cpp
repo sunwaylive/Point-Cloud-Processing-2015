@@ -15,6 +15,8 @@ Upsampler::Upsampler(RichParameterSet* _para)
 	para = _para;
 	b_first = true;
   also_insert_dual_points = false;
+  use_adaptive_upsampling = false;
+  do_upsample_on_skeltal_points = false;
 
 	sigma = 25.0;
 	old_radius = 0.0;
@@ -29,7 +31,15 @@ void Upsampler::setInput(DataMgr* pData)
 {
 	if(!pData->isSamplesEmpty())
 	{
+
 		input(pData->getCurrentSamples());
+
+    if (para->getBool("Use Upsample On Skeletal Points"))
+    {
+      input(pData->getCurrentSkelPoints());
+    }
+
+
     //input(pData->getCurrentDualSamples());
 
     dual_samples = pData->getCurrentDualSamples();
@@ -46,6 +56,14 @@ void Upsampler::run()
 {
   also_insert_dual_points = global_paraMgr.glarea.getBool("Show Skeltal Points");
   use_adaptive_upsampling = global_paraMgr.upsampling.getBool("Use Adaptive Upsampling");
+
+  if (para->getBool("Use Upsample On Skeletal Points"))
+  {
+    do_upsample_on_skeltal_points = true;
+    also_insert_dual_points = false;
+    use_adaptive_upsampling = false;
+  }
+
 
 	if(samples == NULL )
 	{
@@ -426,7 +444,12 @@ void Upsampler::runGetConstantPredictThreshold()
   {
     CVertex& v = samples->vert[i];
     int secondVertIndx = -1;
-    sumDist += findMaxMidpoint(v, secondVertIndx);
+    double density = findMaxMidpoint(v, secondVertIndx);
+    if (density < 0)
+    {
+      continue;
+    }
+    sumDist += density;
     testNumber++;
   }
 
@@ -513,6 +536,12 @@ void Upsampler::runConstantUpsampling()
       CVertex newv;
       newv.P() = (v.P() + t.P()) / 2.0;  // mass center
       newv.m_index = samples->vert.size();
+
+      if (do_upsample_on_skeltal_points)
+      {
+        //newv.is_dual_sample = true;
+        newv.is_skel_point = true;
+      }
 
       if (also_insert_dual_points)
       {
@@ -780,6 +809,11 @@ void Upsampler::insertPointsByThreshold()
         newv.is_fixed_sample = true;
       }
 
+      if (do_upsample_on_skeltal_points)
+      {
+        //newv.is_dual_sample = true;
+        newv.is_skel_point = true;
+      }
 
       if (also_insert_dual_points)
       {
