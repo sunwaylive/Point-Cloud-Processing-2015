@@ -93,6 +93,7 @@ private:
 	void runSmoothNeighborhood();
 
 	void runMoveBackward();
+  void stopBreakingDualPoints();
 
   //void runMoveBackwardUntilAllPointsStop();
 

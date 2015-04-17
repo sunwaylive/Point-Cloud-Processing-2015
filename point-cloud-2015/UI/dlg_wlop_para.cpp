@@ -727,6 +727,7 @@ void WlopParaDlg::copySamplesToDualSamples()
 	{
 		samples->vert[i].is_dual_sample = false;
 		samples->vert[i].is_fixed_sample = false;
+    samples->vert[i].is_boundary = false;
 
 // 		CVertex temp_v = samples->vert[i];
 // 		dual_samples->vert[i] = temp_v;
@@ -739,6 +740,9 @@ void WlopParaDlg::copySamplesToDualSamples()
 
 		dual_samples->vert[i].is_dual_sample = true;
     dual_samples->vert[i].moving_speed = 1.0;
+    dual_samples->vert[i].is_fixed_sample = false;
+    dual_samples->vert[i].is_boundary = false;
+
 	}
 	dual_samples->vn = dual_samples->vert.size();
 }

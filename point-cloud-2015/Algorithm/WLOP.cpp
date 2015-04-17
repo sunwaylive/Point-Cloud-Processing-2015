@@ -3583,7 +3583,14 @@ void WLOP::runMoveBackward()
 	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
 	//cout << "end knn" << endl;
 	double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
-	computeConstNeighborhoodUsingRadius(local_radius);
+	
+  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 8, false, "stopBreakingDualPoints");
+  //stopBreakingDualPoints();
+
+
+  computeConstNeighborhoodUsingRadius(local_radius);
+
+
   double radius2 = local_radius * local_radius;
   double iradius16 = -4 / radius2;
 
@@ -3669,7 +3676,7 @@ void WLOP::runMoveBackward()
 		dual_v.P() -= dual_v.N() * real_step_size[i];
 	}
 
-	return;
+	//return;
 
 
  	time.start("Sample0000dual_samples neighbor");
@@ -3739,7 +3746,7 @@ void WLOP::runMoveBackward()
 	}
 
 	//GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, knn, false, "WlopParaDlg::runMoveBackward()");
-	computeConstNeighborhoodUsingRadius(local_radius);
+	//computeConstNeighborhoodUsingRadius(local_radius);
 }
 
 
@@ -3981,15 +3988,89 @@ void WLOP::runSelfPCA()
 
 }
 
+void WLOP::stopBreakingDualPoints()
+{
+  double break_move_threshold = para->getDouble("Local Neighbor Size For Inner Points") * 1.0; //need a new parameter here
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[i];
+
+    v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+  }
+
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[i];
+
+    if (dual_v.is_fixed_sample)
+    {
+      continue;
+    }
+
+    double min_length = -1;
+    int min_index = -1;
+    double min_dist = 1000000;
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+      if (!dual_t.is_fixed_sample)
+      {
+        continue;
+      }
+
+      double angle = GlobalFun::computeRealAngleOfTwoVertor(-v.N(), -t.N());
+      if (angle > 15)
+      {
+        continue;
+      }
+
+      double dist = GlobalFun::computeEulerDist(v.P(), t.P());
+      if (dist < min_dist)
+      {
+        min_dist = dist;
+        min_length = t.skel_radius;
+        min_index = v.neighbors[j];
+      }
+    }
+
+    if (min_length < 0)
+    {
+      continue;
+    }
+
+    CVertex& min_t = samples->vert[min_index];
+    CVertex& min_dual_t = dual_samples->vert[min_index];
+
+    double proj_dist_of_surface_points = abs(GlobalFun::computeProjDist(v.P(), min_t.P(), v.N()));
+    double proj_dist_of_inner_points = abs(GlobalFun::computeProjDist(dual_v.P(), min_dual_t.P(), v.N()));
+    if (abs(proj_dist_of_surface_points - proj_dist_of_inner_points) > break_move_threshold)
+    {
+      double length = min_length;
+
+      dual_v.P() = v.P() - v.N() * length;
+      v.skel_radius = length;
+      dual_v.is_boundary = true;
+      dual_v.is_fixed_sample = true;
+    }
+  }
+}
+
 
 void WLOP::runSelfProjection()
 {
   cout << "sefl projection freeze" << endl;
 
-  double static_radius = para->getDouble("Local Neighbor Size For Surface Points") * 0.5;
-  GlobalFun::computeBallNeighbors(samples, NULL, static_radius, samples->bbox);
+//   double static_radius = para->getDouble("Local Neighbor Size For Surface Points") * 0.5;
+//   GlobalFun::computeBallNeighbors(samples, NULL, static_radius, samples->bbox);
+  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 8, false,"runSelfProjection");
 
-  for (int k = 0; k < 1; k++)
+  for (int k = 0; k < 5; k++)
   {
     int unsettle_number = 0;
 
@@ -4012,6 +4093,9 @@ void WLOP::runSelfProjection()
     }
 
     cout << "unsettle_number: " << unsettle_number << endl;
+
+    vector<int> need_change_index;
+    vector<double> need_change_length;
 
     for (int i = 0; i < samples->vert.size(); i++)
     {
@@ -4051,9 +4135,16 @@ void WLOP::runSelfProjection()
       double length = min_length;
 
       dual_v.P() = v.P() - v.N() * length;
-      dual_v.is_fixed_sample = true;
+      v.skel_radius = length;
+      //dual_v.is_fixed_sample = true;
+      need_change_index.push_back(v.m_index);
     }
 
+    for (int i = 0; i < need_change_index.size(); i++)
+    {
+      CVertex& dual_v = dual_samples->vert[need_change_index[i]];
+      dual_v.is_fixed_sample = true;
+    }
 
   }
 

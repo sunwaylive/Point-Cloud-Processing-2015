@@ -223,11 +223,20 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 		return cBlue;
 	}
 
-	if (showRadius && v.is_dual_sample && (/*v.is_skel_branch ||*/ v.is_fixed_sample) /*&& bUseConfidenceColor*/)
+  if (showRadius && v.is_dual_sample && (v.is_boundary))
+  {
+    return cGray;
+    //return cOrange;
+  }
+
+	if (showRadius && v.is_dual_sample && ( v.is_fixed_sample) /*&& bUseConfidenceColor*/)
  	{
     return cBlue;
  		//return cOrange;
  	}
+
+
+
 
 	if (v.is_dual_sample /*|| v.is_fixed_sample*/)
 	{

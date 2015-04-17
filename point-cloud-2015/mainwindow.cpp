@@ -562,9 +562,8 @@ void MainWindow::saveView()
 {
   CMesh* samples = area->dataMgr.getCurrentSamples();
   double percentage = 0.02;
-  GlobalFun::removeOutliersBaseOnDistance(samples, 50, percentage);
+  GlobalFun::removeOutliersBaseOnDistance(samples, 10, percentage);
   //GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
-
 
 
 // 	ofstream outpara("outpara.paras");
