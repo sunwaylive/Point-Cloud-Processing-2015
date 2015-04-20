@@ -152,8 +152,10 @@ void ParameterMgr::initGlareaParameter()
   glarea.addParam(new RichBool("Fix ply mode", false));
 
 
-	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
-	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
+ 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
+ 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
+  //  glarea.addParam(new RichDouble("Sample Confidence Color Scale", 1.0));
+  //  glarea.addParam(new RichDouble("Point ISO Value Shift", 0.0));
 
 	glarea.addParam(new RichDouble("Show Confidence Percentage", 0.8));
 }
@@ -340,8 +342,8 @@ void ParameterMgr::initWLopParameter()
 
 
 	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.11889));
-	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.50000));
-	wLop.addParam(new RichDouble("Original Confidence KNN", 155));
+	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.9));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 75));
 
 	wLop.addParam(new RichDouble("Confidence Power", 3.0));
 

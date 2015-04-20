@@ -440,10 +440,12 @@ void WLOP::run()
 
 	if (para->getBool("Run Estimate Average Dist Threshold"))
 	{
-		//runComputeAverageDistThreshold();
-		//runComputeConfidence();
-    runEstimateParameters();
-		return;
+		runComputeAverageDistThreshold();
+		runComputeConfidence();
+    
+    //runEstimateParameters();
+		
+    return;
 	}
 
   if (para->getBool("Run 4PCS"))
@@ -2198,8 +2200,11 @@ void WLOP::runEstimateParameters()
 
 void WLOP::runComputeAverageDistThreshold()
 {
-	double original_knn = para->getDouble("Original Averaging KNN");
-	GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, original_knn, false, "WlopParaDlg::runRegularizeNormals()");
+	//double original_knn = para->getDouble("Original Averaging KNN");
+  int knn = para->getDouble("Original Confidence KNN");
+  GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, knn, false, "WlopParaDlg::runRegularizeNormals()");
+
+  ofstream outfile("avg_dist.txt");
 
 	vector<double> avg_dists(samples->vert.size());
 	for (int i = 0; i < samples->vert.size(); i++)
@@ -2218,7 +2223,10 @@ void WLOP::runComputeAverageDistThreshold()
 		//v.eigen_confidence = sum_dist / sum_weight;
 		v.nearest_neighbor_dist = sum_dist / sum_weight;
 		avg_dists[i] = v.nearest_neighbor_dist;
+
+    outfile << v.nearest_neighbor_dist << endl;;
 	}
+  outfile.close();
 
 	std::sort(avg_dists.begin(), avg_dists.end());
 	double percentage = para->getDouble("Choose ADT Threshold Percentage");
@@ -2239,6 +2247,7 @@ void WLOP::runComputeConfidence()
  	}
 // 	return;
 	cout << "comput confidence" << endl;
+  //system("Pause");
 
 	double original_knn = para->getDouble("Original Confidence KNN");
 
@@ -2319,8 +2328,8 @@ void WLOP::runComputeConfidence()
 
 		if (use_dist_threshold)
 		{
-			v.eigen_confidence = 1 - v.eigen_confidence;
-			//v.eigen_confidence = pow(1 - v.eigen_confidence, 2);
+			//v.eigen_confidence = 1 - v.eigen_confidence;
+      v.eigen_confidence = pow(1 - v.eigen_confidence, confidenc_power);
 		}
 		else
 		{
@@ -2333,18 +2342,19 @@ void WLOP::runComputeConfidence()
  	if (use_dist_threshold)
  	{
  		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 2.0, samples->bbox);
- 		GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius"));
+    GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius") * 2.0);
  		GlobalFun::normalizeConfidence(samples->vert, 0);
  	}
 
-	//ofstream outfile2("average_neighbor_dist2.txt");
-// 	for (int i = 0; i < samples->vert.size(); i++)
-// 	{
-// 		CVertex& v = samples->vert[i];
-// 		//outfile2 << v.eigen_confidence << endl;
-// 	}
 
+  ofstream outfile("confident.txt");
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    outfile << v.eigen_confidence << endl;
 
+  }
+  outfile.close();
 	cout << "finshed compute confidence#######" << endl;
 
 }

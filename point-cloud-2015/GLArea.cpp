@@ -597,6 +597,16 @@ void GLArea::initAfterOpenFile()
 	//emit needUpdateStatus();
 }
 
+void GLArea::initSettingSaveMode()
+{
+  //dataMgr.recomputeQuad();
+  initView();
+  wlop.setFirstIterate();
+  skeletonization.setFirstIterate();
+  emit needUpdateStatus();
+}
+
+
 void GLArea::initSetting()
 {
   dataMgr.recomputeQuad();

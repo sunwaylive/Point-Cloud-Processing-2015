@@ -57,6 +57,8 @@ public:
 	void initAfterOpenFile();
 	void initView();
 	void initSetting();
+  void initSettingSaveMode();
+
 
 	void runWlop();
 	void runNormalSmoothing();

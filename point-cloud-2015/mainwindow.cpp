@@ -492,8 +492,11 @@ void MainWindow::downSample()
 
   
 	area->dataMgr.downSamplesByNum();
+
+  cout << "down sampled" << endl;
+
   area->dataMgr.skeleton.clear();
-	area->initSetting();
+	area->initSettingSaveMode();
 	area->updateGL();
 }
 

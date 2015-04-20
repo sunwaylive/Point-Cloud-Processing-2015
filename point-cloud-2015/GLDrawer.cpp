@@ -1087,40 +1087,40 @@ GLColor GLDrawer::isoValue2color(double iso_value,
 	}
 	Point3f mixed_color;
 
-//  	if (is_inside && need_negative)
-//  	{
-//  		base_colors[4] = Point3f(0.0, 0.0, 1.0);
-//  		base_colors[3] = Point3f(0.0, 0.7, 1.0);
-//  		base_colors[2] = Point3f(0.0, 1.0, 1.0);
-//  		base_colors[1] = Point3f(0.0, 1.0, 0.7);
-//  		base_colors[0] = Point3f(0.0, 1.0, 0.0);
-//  	}
-//  	else
-//  	{
-//  		base_colors[4] = Point3f(1.0, 0.0, 0.0);
-//  		base_colors[3] = Point3f(1.0, 0.7, 0.0);
-//  		base_colors[2] = Point3f(1.0, 1.0, 0.0);
-//  		base_colors[1] = Point3f(0.7, 1.0, 0.0);
-//  		base_colors[0] = Point3f(0.0, 1.0, 0.0);
-//  	}
-
-
   	if (is_inside && need_negative)
   	{
   		base_colors[4] = Point3f(0.0, 0.0, 1.0);
-  		base_colors[3] = Point3f(0.75, 0.0, 1.0);
-  		base_colors[2] = Point3f(0.5, 0.0, 1.0);
-  		base_colors[1] = Point3f(0.25, 0.0, 1.0);
-  		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+  		base_colors[3] = Point3f(0.0, 0.7, 1.0);
+  		base_colors[2] = Point3f(0.0, 1.0, 1.0);
+  		base_colors[1] = Point3f(0.0, 1.0, 0.7);
+  		base_colors[0] = Point3f(0.0, 1.0, 0.0);
   	}
   	else
   	{
   		base_colors[4] = Point3f(1.0, 0.0, 0.0);
-  		base_colors[3] = Point3f(1.0, 0.0, 0.75);
-  		base_colors[2] = Point3f(1.0, 0.0, 0.5);
-  		base_colors[1] = Point3f(1.0, 0.0, 0.25);
-  		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+  		base_colors[3] = Point3f(1.0, 0.7, 0.0);
+  		base_colors[2] = Point3f(1.0, 1.0, 0.0);
+  		base_colors[1] = Point3f(0.7, 1.0, 0.0);
+  		base_colors[0] = Point3f(0.0, 1.0, 0.0);
   	}
+
+
+//   	if (is_inside && need_negative)
+//   	{
+//   		base_colors[4] = Point3f(0.0, 0.0, 1.0);
+//   		base_colors[3] = Point3f(0.75, 0.0, 1.0);
+//   		base_colors[2] = Point3f(0.5, 0.0, 1.0);
+//   		base_colors[1] = Point3f(0.25, 0.0, 1.0);
+//   		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+//   	}
+//   	else
+//   	{
+//   		base_colors[4] = Point3f(1.0, 0.0, 0.0);
+//   		base_colors[3] = Point3f(1.0, 0.0, 0.75);
+//   		base_colors[2] = Point3f(1.0, 0.0, 0.5);
+//   		base_colors[1] = Point3f(1.0, 0.0, 0.25);
+//   		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+//   	}
 
 	mixed_color = base_colors[base_id] * (base_id * step_size + step_size - iso_value)
 		+ base_colors[base_id + 1] * (iso_value - base_id * step_size);
