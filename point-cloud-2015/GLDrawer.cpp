@@ -1011,7 +1011,7 @@ void GLDrawer::drawDualSampleRelations(CMesh* samples, CMesh* dual_samples)
 		}
 
 		int index = i;
- 		if (global_paraMgr.glarea.getBool("Show Cloest Dual Connection"))
+ 		if (1/*global_paraMgr.glarea.getBool("Show Cloest Dual Connection")*/)
  		{
  			if (v.dual_index >= 0 && v.dual_index < dual_samples->vert.size())
  			{

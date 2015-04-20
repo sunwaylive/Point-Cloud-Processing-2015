@@ -557,23 +557,23 @@ void MainWindow::clearData()
 
 void MainWindow::saveSnapshot()
 {
-  Timer timer;
-  timer.start("walk");
-  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 350, false, "test random walk");
-  timer.end();
-  return;
+//   Timer timer;
+//   timer.start("walk");
+//   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+//   GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 350, false, "test random walk");
+//   timer.end();
+//   return;
 
 	area->saveSnapshot();
 }
 
 void MainWindow::saveView()
 {
-  Timer timer;
-  timer.start("walk");
-  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 350);
-  timer.end();
+   Timer timer;
+   timer.start("walk");
+   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+   GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 250);
+   timer.end();
 
   return;
 

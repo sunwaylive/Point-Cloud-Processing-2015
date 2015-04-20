@@ -1394,6 +1394,13 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
+      if (v.neighbors[j] < 0 || v.neighbors[j] > samples->vert.size())
+      {
+        system("Pause");
+        cout << "wrong v.neighbors[j] index: " << v.neighbors[j] << endl;
+        continue;
+      }
+
 			CVertex& t = samples->vert[v.neighbors[j]];
 
       if (t.dual_index < 0 || t.dual_index > dual_samples->vert.size())
@@ -4687,7 +4694,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 350);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 250);
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
