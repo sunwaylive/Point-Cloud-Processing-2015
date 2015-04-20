@@ -175,6 +175,10 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
 // 	}
 
+  if (v.is_skel_point && v.is_skel_virtual)
+  {
+    return cYellow;
+  }
 
 
 	if (v.is_boundary && v.is_fixed_original && bUseSegmentaionColor)
@@ -577,7 +581,7 @@ void GLDrawer::drawPickedPointOriginalNeighbor(CMesh* samples, CMesh* original, 
 
 void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
 {
-  double width = para->getDouble("Sample Draw Width") * 2.6;
+  double width = para->getDouble("Sample Draw Width") * 1.6;
   //GLColor dnn_color = para->getColor("Pick Point DNN Color");
 	GLColor dnn_color = cBlack;
 
@@ -593,13 +597,13 @@ void GLDrawer::drawPickedPointNeighbor(CMesh* samples, vector<int>& pickList)
     CVertex &v = samples->vert[i];
     Point3f &p = v.P();  
 
-    cout << v.neighbors.size();
+    //cout << "Neighbor number: " << v.neighbors.size() << endl;
 
 		if (v.neighbors.empty())
 		{
 			continue;
 		}
-    //cout << "Neighbor number: " << v.neighbors.size() << endl;
+    
 
     vector<int>::iterator vi = v.neighbors.begin();
     int nsize = 6;

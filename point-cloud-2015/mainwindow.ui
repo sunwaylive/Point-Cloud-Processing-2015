@@ -208,6 +208,7 @@
     <addaction name="actionShow_Target"/>
     <addaction name="actionShow_Eigens"/>
     <addaction name="actionShow_Skeletal_Points"/>
+    <addaction name="actionShow_Neighbor"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAlgorithom"/>
@@ -312,6 +313,7 @@
    <addaction name="actionSave_View"/>
    <addaction name="actionAdd_Samples_To_Original"/>
    <addaction name="actionSwitch_Sample_Original"/>
+   <addaction name="actionShow_Neighbor"/>
   </widget>
   <action name="actionImport_Ply">
    <property name="icon">
@@ -919,6 +921,14 @@
    </property>
    <property name="text">
     <string>Show Skel Points</string>
+   </property>
+  </action>
+  <action name="actionShow_Neighbor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Neighbor</string>
    </property>
   </action>
  </widget>

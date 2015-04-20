@@ -483,11 +483,11 @@ void GLArea::paintGL()
     //glDrawer.drawPickPoint(dataMgr.getCurrentDualSamples(), pickList, false);
 
 
-		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") && para->getBool("Show Radius"))
+		if (global_paraMgr.drawer.getBool("Draw Picked Point Neighbor") /*&& para->getBool("Show Radius")*/)
      {
-      //cout << "Draw Picked Point Neighbor";
+      //cout << "Draw Picked Point Neighbor" << endl;
       //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentSamples(), pickList);
-      //glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
+      glDrawer.drawPickedPointNeighbor(dataMgr.getCurrentDualSamples(), pickList);
        
 			//glDrawer.drawPickedPointOriginalNeighbor(dataMgr.getCurrentDualSamples(), dataMgr.getCurrentOriginal(), pickList);
 			

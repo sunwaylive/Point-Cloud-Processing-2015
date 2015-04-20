@@ -111,6 +111,7 @@ namespace GlobalFun
   void removeOutliersBaseOnDistance(CMesh *mesh, int KNN, double removel_percentage);
   void removeOutliersBaseOnNormal(CMesh *mesh, int KNN, double removel_percentage);
 
+  void computeRandomwalkNeighborhood(CMesh *mesh, int one_ring_knn, int max_knn);
 }
 
 class Timer

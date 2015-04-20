@@ -66,6 +66,7 @@ void MainWindow::initWidgets()
 	ui.actionShow_Eigens->setChecked(paras->glarea.getBool("Show Eigen Directions"));
 	ui.actionMultiple_Pick->setChecked(paras->glarea.getBool("Multiply Pick Point"));
 	ui.actionShow_Skeletal_Points->setChecked(paras->glarea.getBool("Show Skeltal Points"));
+  ui.actionShow_Neighbor->setChecked(paras->drawer.getBool("Draw Picked Point Neighbor"));
 
 	ui.actionRandom_Erase->setChecked(paras->glarea.getBool("Random Erase"));
 	ui.actionShow_Segment_Color->setChecked(paras->drawer.getBool("Show Segmentation Color"));
@@ -139,6 +140,7 @@ void MainWindow::initConnect()
 	connect(ui.actionRandom_Erase, SIGNAL(toggled(bool)), this, SLOT(randomErasePick(bool)));
 	connect(ui.actionShow_Segment_Color, SIGNAL(toggled(bool)), this, SLOT(ShowSegmentColor(bool)));
 	connect(ui.actionShow_Skeletal_Points, SIGNAL(toggled(bool)), this, SLOT(showSkeletalPoints(bool)));
+  connect(ui.actionShow_Neighbor, SIGNAL(toggled(bool)), this, SLOT(showPickedNeighbors(bool)));
 
 	connect(sample_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setSmapleType(QAction *)));
 	connect(original_draw_type,SIGNAL(triggered(QAction *)),this,SLOT(setOriginalType(QAction *)));
@@ -555,11 +557,26 @@ void MainWindow::clearData()
 
 void MainWindow::saveSnapshot()
 {
+  Timer timer;
+  timer.start("walk");
+  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 350, false, "test random walk");
+  timer.end();
+  return;
+
 	area->saveSnapshot();
 }
 
 void MainWindow::saveView()
 {
+  Timer timer;
+  timer.start("walk");
+  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 350);
+  timer.end();
+
+  return;
+
   CMesh* samples = area->dataMgr.getCurrentSamples();
   double percentage = 0.02;
   GlobalFun::removeOutliersBaseOnDistance(samples, 10, percentage);
@@ -640,6 +657,10 @@ void MainWindow::showSkeletalPoints(bool _val)
 	paras->glarea.setValue("Show Skeltal Points", BoolValue(_val));
 }
 
+void MainWindow::showPickedNeighbors(bool _val)
+{
+  paras->drawer.setValue("Draw Picked Point Neighbor", BoolValue(_val));
+}
 
 
 void MainWindow::showColorfulBranches(bool _val)

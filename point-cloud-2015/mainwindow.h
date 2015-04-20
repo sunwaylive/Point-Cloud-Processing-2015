@@ -94,6 +94,8 @@ private slots:
   void showColorfulBranches(bool _val);
 	void showEigenDirections(bool _val);
 	void showSkeletalPoints(bool _val);
+  void showPickedNeighbors(bool _val);
+
 
 	void showTargets(bool _val);
 

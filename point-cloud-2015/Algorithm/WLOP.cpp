@@ -1308,9 +1308,8 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		Point3f diff = v.P() - dual_v.P();
 		//double proj_dist = abs(diff * v.N());
-		double proj_dist = sqrt(diff.SquaredNorm());
 
-		v.skel_radius = proj_dist;
+    v.skel_radius = sqrt(diff.SquaredNorm());
 		samples->bbox.Add(v.P());
 	}
 
@@ -1352,16 +1351,29 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		//samples->vert[i].neighbors = dual_samples->vert[i].neighbors;
 	}
 
+  
+
 	vector<double> new_radiuses;
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		new_radiuses.push_back(samples->vert[i].skel_radius);
 	}
 
+  cout << "Updated neighbors" << endl;
+
+
 	// compute averaging lengthes
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
+
+    if (v.dual_index < 0 || v.dual_index > dual_samples->vert.size())
+    {
+      system("Pause");
+      cout << "wrong dual index: " << v.dual_index << endl;
+      continue;
+    }
+
 		CVertex& dual_v = dual_samples->vert[v.dual_index];
 		Point3f v_outward_direction = v.N();
 
@@ -1383,13 +1395,19 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		for (int j = 0; j < v.neighbors.size(); j++)
 		{
 			CVertex& t = samples->vert[v.neighbors[j]];
+
+      if (t.dual_index < 0 || t.dual_index > dual_samples->vert.size())
+      {
+        system("Pause");
+        cout << "wrong dual index: " << t.dual_index << endl;
+        continue;
+      }
 			CVertex& dual_t = dual_samples->vert[t.dual_index];
 
 			Point3f t_outward_direction = t.N();
 
 			//double dist2 = (v.P() - t.P()).SquaredNorm();
       double dist2 = (dual_v.P() - dual_t.P()).SquaredNorm();
-
 			double dist_diff = exp(dist2 * iradius16);
 
 			//double sign_dist = t.skel_radius - v.skel_radius;
@@ -1406,13 +1424,9 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 			//double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
       double angle_diff = abs(v_outward_direction * t_outward_direction);
-      double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
+      //double direction_diff = exp(-pow(1 - v_outward_direction * t_outward_direction, 2) / sigma_threshold);
+      double direction_diff = exp(-pow(1 - angle_diff, 2) / sigma_threshold); //important and not sure
 
-
-// 			if (similarity_KNN > 2)
-// 			{
-// 				direction_diff = 1.0;
-// 			}
 			
 			weight = direction_diff * dist_diff /** length_diff*/;
 
@@ -1432,7 +1446,12 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 		}
 	}
 
+  cout << "computed new d-length" << endl;
+
 	computeDualIndex(samples, dual_samples);
+  cout << "updated dual index" << endl;
+
+
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		CVertex& v = samples->vert[i];
@@ -1461,6 +1480,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
 		//sample
 	}
+  cout << "finished similarity term" << endl;
 }
 
 
@@ -4653,30 +4673,30 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
     return;
   }
 
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    samples->vert[i].m_index = i;
+  }
+  for (int i = 0; i < dual_samples->vert.size(); i++)
+  {
+    dual_samples->vert[i].m_index = i;
+  }
 
   cout << "computeDualIndex" << endl;
   Timer timer;
   timer.start("computeDualIndex");
 
-  GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
-  bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+  // random walk
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 350);
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
-    //CVertex& dual_v = dual_samples->vert[i];
     CVertex& dual_v = dual_samples->vert[v.dual_index];
 
     double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
-    //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
 
-
-
-    // 		int dual_idx = i;
-    // 		int current_idx = i;
     int dual_idx = v.dual_index;
-    int current_idx = v.dual_index;
-
 
     for (int j = 0; j < dual_v.neighbors.size(); j++)
     {
@@ -4684,50 +4704,91 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
       CVertex& dual_t = dual_samples->vert[index];
 
       double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
-      //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
       if (dist2 < min_dist2)
       {
         min_dist2 = dist2;
         dual_idx = index;
       }
     }
-    
-
-
-    int max_iterate = 0;
-    while ((use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15)
-    {
-      current_idx = dual_idx;
-
-      CVertex dual_v2 = dual_samples->vert[current_idx];
-
-      if (dual_v2.neighbors.empty())
-      {
-        break;
-      }
-
-      double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
-      //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
-
-      for (int j = 0; j < dual_v2.neighbors.size(); j++)
-      {
-        int index = dual_v2.neighbors[j];
-        CVertex& dual_t2 = dual_samples->vert[index];
-
-        double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t2.P());
-        //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
-
-        if (dist2 < min_dist2)
-        {
-          min_dist2 = dist2;
-          dual_idx = index;
-        }
-      }
-
-    }
 
     v.dual_index = dual_idx;
+
+    if (i < 5)
+    {
+      cout << "dual neighbor size" << dual_v.neighbors.size() << endl;
+    }
   }
+
+//   GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
+//   bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");
+// 
+//   for (int i = 0; i < samples->vert.size(); i++)
+//   {
+//     CVertex& v = samples->vert[i];
+//     //CVertex& dual_v = dual_samples->vert[i];
+//     CVertex& dual_v = dual_samples->vert[v.dual_index];
+// 
+//     double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+//     //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+// 
+// 
+// 
+//     // 		int dual_idx = i;
+//     // 		int current_idx = i;
+//     int dual_idx = v.dual_index;
+//     int current_idx = v.dual_index;
+// 
+// 
+//     for (int j = 0; j < dual_v.neighbors.size(); j++)
+//     {
+//       int index = dual_v.neighbors[j];
+//       CVertex& dual_t = dual_samples->vert[index];
+// 
+//       double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+//       //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+//       if (dist2 < min_dist2)
+//       {
+//         min_dist2 = dist2;
+//         dual_idx = index;
+//       }
+//     }
+//     
+// 
+// 
+//     int max_iterate = 0;
+//     while ((use_progressive_search && dual_idx != current_idx) || max_iterate++ < 15)
+//     {
+//       current_idx = dual_idx;
+// 
+//       CVertex dual_v2 = dual_samples->vert[current_idx];
+// 
+//       if (dual_v2.neighbors.empty())
+//       {
+//         break;
+//       }
+// 
+//       double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v2.P());
+//       //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+// 
+//       for (int j = 0; j < dual_v2.neighbors.size(); j++)
+//       {
+//         int index = dual_v2.neighbors[j];
+//         CVertex& dual_t2 = dual_samples->vert[index];
+// 
+//         double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t2.P());
+//         //double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P(), v.N());
+// 
+//         if (dist2 < min_dist2)
+//         {
+//           min_dist2 = dist2;
+//           dual_idx = index;
+//         }
+//       }
+// 
+//     }
+// 
+//     v.dual_index = dual_idx;
+//   }
 
   timer.end();
 
