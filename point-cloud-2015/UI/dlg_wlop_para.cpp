@@ -1310,6 +1310,20 @@ void WlopParaDlg::applyMoveSkel()
 
 void WlopParaDlg::applyTangentialMotion()
 {
+  CMesh* samples = area->dataMgr.getCurrentSamples();
+  double step_size = m_paras->wLop.getDouble("Increasing Step Size");
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    v.moving_speed = step_size;
+  }
+
+  double local_radius = m_paras->wLop.getDouble("CGrid Radius");
+  GlobalFun::computeBallNeighbors(samples, NULL, local_radius, samples->bbox);
+
+  return;
+
 	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Tangential Motion", BoolValue(true));
 	area->runWlop();

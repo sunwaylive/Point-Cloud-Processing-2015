@@ -2193,6 +2193,18 @@ void GLArea::mouseReleaseEvent(QMouseEvent *e)
         para->setValue("Picked Index", DoubleValue(pickList[0]));
       }
 
+      //print out picked
+      if (!pickList.empty() && !dataMgr.isSamplesEmpty())
+      {
+        CMesh* samples = dataMgr.getCurrentSamples();
+        int id = pickList[0];
+        if (id > 0 && id < samples->vert.size())
+        {
+          CVertex& v = samples->vert[id];
+          cout << "picked confidence: " << v.eigen_confidence << endl;
+
+        }
+      }
 
       //if (!pickList.empty())
       //{

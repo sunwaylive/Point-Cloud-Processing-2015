@@ -434,7 +434,9 @@ void WLOP::run()
 
  	if (para->getBool("Run DLength Adjustment"))
  	{
- 		runDlengthAdjustment();
+ 		//runDlengthAdjustment();
+
+    runPostprocessingDlength();
  		return;
  	}
 
@@ -1275,6 +1277,162 @@ void WLOP::computeSampleAverageTerm(CMesh* samples)
 //}
 
 
+void WLOP::runPostprocessingDlength()
+{
+  //runComputeConfidence();
+
+  double confidence_threshold = para->getDouble("Protect High Confidence Para");
+  double step_size = para->getDouble("Increasing Step Size");
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    v.moving_speed = step_size /** (1-v.eigen_confidence)*/;
+  }
+
+
+  double local_radius = para->getDouble("CGrid Radius");
+  //computeConstNeighborhoodUsingRadius(local_radius);
+
+  double radius2 = local_radius * local_radius;
+  double iradius16 = -4 / radius2;
+
+  vector<double> real_steps(samples->vert.size(), step_size);
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+
+    v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+
+    if (v.eigen_confidence > confidence_threshold)
+    {
+      //real_steps[i] = 0;
+      v.moving_speed = 0;
+      continue;
+    }
+
+    if ((v.skel_radius - step_size) == 0)
+    {
+      //real_steps[i] = 0;
+      v.moving_speed = 0;
+      continue;
+    }
+  }
+
+
+  vector<double> real_step2(samples->vert.size(), 0.0);
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    if (v.moving_speed < 1e-5)
+    {
+      continue;
+    }
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      //real_step2[i] += real_steps[v.neighbors[j]];
+      real_step2[i] += t.moving_speed;
+    }
+
+    real_step2[i] /= v.neighbors.size();
+  }
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    real_steps[i] = real_step2[i];
+  }
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    v.moving_speed = real_steps[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+    Point3f direction = (dual_v.P() - v.P()).Normalize();
+    v.P() += direction * real_steps[i];
+  }
+
+
+
+  // compute current lengthes
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+
+    Point3f diff = v.P() - dual_v.P();
+    //double proj_dist = abs(diff * v.N());
+
+    v.skel_radius = sqrt(diff.SquaredNorm());
+    samples->bbox.Add(v.P());
+  }
+
+  vector<double> new_radiuses;
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    new_radiuses.push_back(samples->vert[i].skel_radius);
+  }
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    if (v.moving_speed < 1e-5)
+    {
+      continue;
+    }
+
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+
+    double sum_radius = 0;
+    double sum_weight = 0;
+    double weight = 1;
+
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      CVertex& dual_t = dual_samples->vert[t.dual_index];
+
+      weight = 1.;
+
+      sum_radius += t.skel_radius * weight;
+      sum_weight += weight;
+    }
+
+    if (!v.neighbors.empty() && sum_weight > 1e-5)
+    {
+      new_radiuses[i] = sum_radius / sum_weight;
+    }
+  }
+
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    if (v.moving_speed < 1e-5)
+    {
+      continue;
+    }
+
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
+    Point3f direction = (v.P() - dual_v.P()).Normalize();
+
+    v.P() = dual_v.P() + direction * new_radiuses[i];
+    v.skel_radius = new_radiuses[i];
+  }
+
+   Timer time;
+   time.start("Recompute PCA");
+   recomputePCA_Normal();
+   time.end();
+}
+
+
 void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 {
 	double simi_neighbor_radius_para = para->getDouble("Similarity Term Neighbor Para");
@@ -1564,6 +1722,7 @@ void WLOP::computeDensity(bool isOriginal, double radius, CMesh* samples, CMesh*
 	}
 
 }
+
 
 
 void WLOP::runDlengthAdjustment()
@@ -1902,35 +2061,41 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
         if (use_confidence /*&& v.eigen_confidence < 0.85*/)
 				{
 					//using this
+          bool avg_point_is_dangerous = false;
+          bool sim_point_is_dangerous = false;
+
           Point3f avg_point = v.P();
           if (average_weight_sum[i] > 1e-20)
           {
             avg_point = average[i] / average_weight_sum[i];
           }
+          else
+          {
+            avg_point_is_dangerous = true;
+          }
+
 					Point3f sim_point = samples_similarity[i];
 
+
+
+
 					double dist_avg = GlobalFun::computeEulerDist(v.P(), avg_point);
+          if (avg_point_is_dangerous)
+          {
+            dist_avg = 10000;
+          }
 					if (dist_avg > save_move_threshold_along_normal)
 					{
 						avg_point = v.P();
-						//v.is_skel_virtual = true;
-						//continue;
+            avg_point_is_dangerous = true;
 					}
-					else
-					{
-						//v.is_skel_virtual = false;
-					}
+
 
 					double dist_sim = GlobalFun::computeEulerDist(v.P(), sim_point);
 					if (dist_sim > save_move_threshold_along_normal /*&& (sim_point - v.P())*v.N() > 0*/)
 					{
 						sim_point = v.P();
-						//v.is_skel_branch = true;
-						//continue;
-					}
-					else
-					{
-						//v.is_skel_branch = false;
+            sim_point_is_dangerous = true;
 					}
 
 
@@ -1964,23 +2129,23 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
             
 						if (use_confidence_to_combine && v.eigen_confidence > 0)
 						{
-              cout << "rare points" << endl;
-
-							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
-							if (v.eigen_confidence > 0.99)
-							{
-								new_pos[i] = avg_point;
-							}
-							else if (v.eigen_confidence < 0.1)
-							{
-								new_pos[i] = sim_point;
-							}
-							else
-							{
-								new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1 - v.eigen_confidence);
-
-								v.is_boundary = true; //orange
-							}
+//               cout << "rare points" << endl;
+// 
+// 							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
+// 							if (v.eigen_confidence > 0.99)
+// 							{
+// 								new_pos[i] = avg_point;
+// 							}
+// 							else if (v.eigen_confidence < 0.1)
+// 							{
+// 								new_pos[i] = sim_point;
+// 							}
+// 							else
+// 							{
+// 								new_pos[i] = avg_point * v.eigen_confidence + sim_point * (1 - v.eigen_confidence);
+// 
+// 								v.is_boundary = true; //orange
+// 							}
 						}
 						else
 						{
@@ -1995,6 +2160,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 							else
 							{
 								new_pos[i] = sim_point;
+                v.is_boundary = false;
 								v.is_fixed_original = true; // green
 							}
 							//new_pos[i] = avg_point * 0.5 + sim_point * 0.5;
@@ -2014,8 +2180,8 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
 						{
 							new_pos[i] = sim_point;
 
+              v.is_boundary = false;
 							v.is_fixed_original = true; // green 
-
 						}
 					}
 				}
@@ -2134,14 +2300,16 @@ void WLOP::recomputePCA_Normal()
   }
   else
   {
-		
+    mesh_temp.resize(samples->vn);
     for(int i = 0; i < samples->vn; i++)
     {
       mesh_temp[i].P() = samples->vert[i].P();
     }
 
+    cout << "Pca" << endl;
     int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
     vcg::NormalExtrapolation<vector<CVertex> >::ExtrapolateNormals(mesh_temp.begin(), mesh_temp.end(), knn, -1);
+    cout << "Pca end" << endl;
 
     for(int i = 0; i < samples->vn; i++)
     {
@@ -2224,7 +2392,7 @@ void WLOP::runComputeAverageDistThreshold()
 		v.nearest_neighbor_dist = sum_dist / sum_weight;
 		avg_dists[i] = v.nearest_neighbor_dist;
 
-    outfile << v.nearest_neighbor_dist << endl;;
+    //outfile << v.nearest_neighbor_dist << endl;;
 	}
   outfile.close();
 
@@ -2255,7 +2423,7 @@ void WLOP::runComputeConfidence()
 	
 	bool use_dist_threshold = para->getBool("Use Average Dist Threshold");
 	//bool use_dist_threshold = use_ellipsoid_weight;
-	double theshold = para->getDouble("Average Dist To Input Threshold");
+	double dist_theshold = para->getDouble("Average Dist To Input Threshold");
 	double sigma = 45;
 	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
@@ -2296,7 +2464,6 @@ void WLOP::runComputeConfidence()
 		v.nearest_neighbor_dist = v.eigen_confidence;
 		//outfile << v.nearest_neighbor_dist << endl;
 	}
-	cout << "how many hole points in compute confidence?: " << cnt_hole << endl;
 
 
 
@@ -2306,7 +2473,7 @@ void WLOP::runComputeConfidence()
 		{
 			CVertex& v = samples->vert[i];
 
-			if (v.eigen_confidence < theshold)
+      if (v.eigen_confidence < dist_theshold)
 			{
 				v.eigen_confidence = min_dist;
 			}
@@ -2316,6 +2483,7 @@ void WLOP::runComputeConfidence()
 			}
 		}
 	}
+  cout << "how many hole points in compute confidence?: " << cnt_hole << endl;
 
 	GlobalFun::normalizeConfidence(samples->vert, 0);
 	double confidenc_power = para->getDouble("Confidence Power");
@@ -3554,6 +3722,11 @@ void WLOP::computeConstNeighborhoodUsingRadius(double radius)
 {
 	GlobalFun::computeBallNeighbors(samples, NULL, radius, box);
 }
+
+
+
+
+
 
 void WLOP::runMoveBackward()
 {
