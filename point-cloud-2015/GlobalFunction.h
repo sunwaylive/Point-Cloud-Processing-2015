@@ -5,7 +5,6 @@
 // #include "TriMesh_algo.h"
 // #include "ICP.h"
 
-
 #include <vector>
 #include "CMesh.h"
 #include "grid.h"
@@ -112,6 +111,9 @@ namespace GlobalFun
   void removeOutliersBaseOnNormal(CMesh *mesh, int KNN, double removel_percentage);
 
   void computeRandomwalkNeighborhood(CMesh *mesh, int one_ring_knn, int max_knn);
+
+
+  Point3f scale2color(double value, double scale_threshold, double shift, bool need_negative);
 }
 
 class Timer
@@ -464,6 +466,11 @@ public:
   vector<Point3f> projected_points;
   int slot_num;
 };
+
+
+
+
+
 
 
 /* Useful code template

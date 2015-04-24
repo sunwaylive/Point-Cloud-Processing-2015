@@ -63,6 +63,10 @@ void Upsampler::run()
     also_insert_dual_points = false;
     use_adaptive_upsampling = false;
   }
+  else
+  {
+    do_upsample_on_skeltal_points = false;
+  }
 
 
 	if(samples == NULL )

@@ -206,7 +206,8 @@ void WLOP::run()
 
   if (para->getBool("Run Projection"))
   {
-    runProjection();
+    //runProjection();
+    runEvaluation();
     return;
   }
 
@@ -1426,10 +1427,10 @@ void WLOP::runPostprocessingDlength()
     v.skel_radius = new_radiuses[i];
   }
 
-   Timer time;
-   time.start("Recompute PCA");
-   recomputePCA_Normal();
-   time.end();
+//    Timer time;
+//    time.start("Recompute PCA");
+//    recomputePCA_Normal();
+//    time.end();
 }
 
 
@@ -2411,6 +2412,10 @@ void WLOP::runComputeConfidence()
  	for (int i = 0; i < samples->vert.size(); i++)
  	{
  		CVertex& v = samples->vert[i];
+    if (v.neighbors.empty())
+    {
+      return;
+    }
  		v.eigen_confidence = 0.0;
  	}
 // 	return;
@@ -2509,8 +2514,8 @@ void WLOP::runComputeConfidence()
 
  	if (use_dist_threshold)
  	{
- 		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 2.0, samples->bbox);
-    GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius") * 2.0);
+ 		GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius") * 1.5, samples->bbox);
+    GlobalFun::smoothConfidences(samples, para->getDouble("CGrid Radius") * 1.5);
  		GlobalFun::normalizeConfidence(samples->vert, 0);
  	}
 
@@ -4837,13 +4842,14 @@ void WLOP::computeInitialNeighborSize()
 }
 
 
-void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
+void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_dist)
 {
 
   if (!dual_samples || dual_samples->vert.empty())
   {
     return;
   }
+
 
   bool use_progressive_search = para->getBool("Use Progressive Search Index");
   double search_dual_index_para = para->getDouble("Search Dual Index Para");
@@ -4877,14 +4883,22 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 250);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 450);
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
     CVertex& dual_v = dual_samples->vert[v.dual_index];
 
-    double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+    double min_dist2;
+    if (use_proj_dist)
+    {
+      min_dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_v.P(), v.N());
+    }
+    else
+    {
+      min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
+    }
 
     int dual_idx = v.dual_index;
 
@@ -4894,6 +4908,17 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples)
       CVertex& dual_t = dual_samples->vert[index];
 
       double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+
+      if (use_proj_dist)
+      {
+        dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_t.P(), v.N());
+
+      }
+      else
+      {
+        dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+      }
+
       if (dist2 < min_dist2)
       {
         min_dist2 = dist2;
@@ -5228,4 +5253,55 @@ void WLOP::run4PCS()
     tris2,
     mtls2);
 
+}
+
+
+void WLOP::runEvaluation()
+{
+  GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, 1, false, "runEvaluation");
+
+  double sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
+  double iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
+
+//   for (int i = 0; i < samples->vert.size(); i++)
+//   {
+//     CVertex& v = samples->vert[i];
+//     CVertex& nearest = original->vert[v.neighbors[0]];
+//     double dist = GlobalFun::computeEulerDist(v.P(), nearest.P());
+// 
+//     v.eigen_confidence = dist;
+// 
+//     Point3f c = GlobalFun::scale2color(dist, sample_cofidence_color_scale, iso_value_shift, true);
+//     v.C().SetRGB(255. * c[0], 255. * c[1], 255. * c[2]);
+// 
+// //     if (i < 20)
+// //     {
+// //       cout << c[0] << ", " << c[1] << ", " << c[2] << ", " << endl;
+// //     }
+//     //GLColor tem_c = 
+//   }
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& nearest = original->vert[v.neighbors[0]];
+    double dist = GlobalFun::computeEulerDist(v.P(), nearest.P());
+
+    v.eigen_confidence = dist;
+    //     if (i < 20)
+    //     {
+    //       cout << c[0] << ", " << c[1] << ", " << c[2] << ", " << endl;
+    //     }
+    //GLColor tem_c = 
+  }
+
+  GlobalFun::normalizeConfidence(samples->vert, 0.);
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    Point3f c = GlobalFun::scale2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+    v.C().SetRGB(255. * c[0], 255. * c[1], 255. * c[2]);
+  }
 }

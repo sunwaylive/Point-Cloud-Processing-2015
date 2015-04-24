@@ -965,9 +965,10 @@ void WlopParaDlg::applyDetectKitePoints()
 
 void WlopParaDlg::applyProjection()
 {
-//   m_paras->wLop.setValue("Run Projection", BoolValue(true));
-//   area->runWlop();
-//   m_paras->wLop.setValue("Run Projection", BoolValue(false));
+   m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+   m_paras->wLop.setValue("Run Projection", BoolValue(true));
+   area->runWlop();
+   m_paras->wLop.setValue("Run Projection", BoolValue(false));
 }
 
 WlopParaDlg::~WlopParaDlg()

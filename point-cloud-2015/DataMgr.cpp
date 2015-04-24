@@ -775,7 +775,7 @@ void DataMgr::subSamples()
 void DataMgr::savePly(QString fileName, CMesh& mesh)
 {
 	int mask= tri::io::Mask::IOM_VERTCOORD + tri::io::Mask::IOM_VERTNORMAL ;
-	//mask += tri::io::Mask::IOM_VERTCOLOR;
+	mask += tri::io::Mask::IOM_VERTCOLOR;
 	mask += tri::io::Mask::IOM_BITPOLYGONAL;
 
 	if (fileName.endsWith("ply"))
@@ -1267,6 +1267,9 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
 	}
 	strStream << endl;
 
+
+  cout << "saved samples original" << endl;
+
 	strStream << "CN " << skeleton.branches.size() << endl;
 	for (int i = 0; i < skeleton.branches.size(); i++)
 	{
@@ -1317,6 +1320,9 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   }
   strStream << endl;
 
+  cout << "saved skeleton" << endl;
+
+
 	strStream << "Confidence_Sigma	" << samples.vert.size() << endl;
 	for(int i = 0; i < samples.vert.size(); i++)
 	{
@@ -1355,6 +1361,8 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   }
   strStream << endl;
 
+  cout << "saved label" << endl;
+
 	strStream << "Skel_isVirtual " << skeleton.size << endl;
 	for (int i = 0; i < skeleton.branches.size(); i++)
 	{
@@ -1378,6 +1386,8 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
   }
   strStream << endl;
 
+
+
   strStream << "DSN " << dual_samples.vert.size() << endl;
   for(int i = 0; i < dual_samples.vert.size(); i++)
   {
@@ -1386,6 +1396,9 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
     strStream << v.N()[0] << "	" << v.N()[1] << "	" << v.N()[2] << "	" << endl;
   }
   strStream << endl;
+
+  cout << "saved dual samples" << endl;
+
 
   strStream << "dual_corresponding_index " << samples.vert.size() << endl;
   for (int i = 0; i < samples.vert.size(); i++)
@@ -1413,9 +1426,11 @@ void DataMgr::saveSkeletonAsSkel(QString fileName)
 	}
 	strStream << endl;
 
+  cout << "saved skeletal points" << endl;
 
-   strStream << "DS_onedge " << samples.vert.size() << endl;
-   for (int i = 0; i < samples.vert.size(); i++)
+
+  strStream << "DS_onedge " << dual_samples.vert.size() << endl;
+   for (int i = 0; i < dual_samples.vert.size(); i++)
    {
      CVertex& dual_v = dual_samples.vert[i];
      strStream << dual_v.is_fixed_sample << "	";

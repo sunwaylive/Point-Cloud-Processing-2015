@@ -1354,6 +1354,95 @@ void GlobalFun::computeRandomwalkNeighborhood(CMesh *mesh, int one_ring_knn, int
 }
 
 
+Point3f GlobalFun::scale2color(double iso_value,
+  double scale_threshold,
+  double shift,
+  bool need_negative)
+{
+  iso_value += shift;
+
+  if (scale_threshold <= 0)
+  {
+    scale_threshold = 1;
+  }
+
+  iso_value = (std::min)((std::max)(iso_value, -scale_threshold), scale_threshold);
+
+  bool is_inside = true;
+  if (iso_value < 0)
+  {
+    if (!need_negative)
+    {
+      iso_value = 0;
+    }
+    else
+    {
+      iso_value /= -(scale_threshold + 1e-10);
+    }
+  }
+  else
+  {
+    iso_value /= scale_threshold;
+    is_inside = false;
+  }
+
+  vector<Point3f> base_colors(5);
+  double step_size = 1.0 / (base_colors.size() - 1);
+  int base_id = iso_value / (step_size + 1e-10);
+  if (base_id == base_colors.size() - 1)
+  {
+    base_id = base_colors.size() - 2;
+  }
+  Point3f mixed_color;
+
+  if (is_inside && need_negative)
+  {
+    base_colors[4] = Point3f(0.0, 0.0, 1.0);
+    base_colors[3] = Point3f(0.0, 0.7, 1.0);
+    base_colors[2] = Point3f(0.0, 1.0, 1.0);
+    base_colors[1] = Point3f(0.0, 1.0, 0.7);
+    base_colors[0] = Point3f(0.0, 1.0, 0.0);
+  }
+  else
+  {
+    base_colors[4] = Point3f(1.0, 0.0, 0.0);
+    base_colors[3] = Point3f(1.0, 0.7, 0.0);
+    base_colors[2] = Point3f(1.0, 1.0, 0.0);
+    base_colors[1] = Point3f(0.7, 1.0, 0.0);
+    base_colors[0] = Point3f(0.0, 1.0, 0.0);
+  }
+
+
+  //   	if (is_inside && need_negative)
+  //   	{
+  //   		base_colors[4] = Point3f(0.0, 0.0, 1.0);
+  //   		base_colors[3] = Point3f(0.75, 0.0, 1.0);
+  //   		base_colors[2] = Point3f(0.5, 0.0, 1.0);
+  //   		base_colors[1] = Point3f(0.25, 0.0, 1.0);
+  //   		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+  //   	}
+  //   	else
+  //   	{
+  //   		base_colors[4] = Point3f(1.0, 0.0, 0.0);
+  //   		base_colors[3] = Point3f(1.0, 0.0, 0.75);
+  //   		base_colors[2] = Point3f(1.0, 0.0, 0.5);
+  //   		base_colors[1] = Point3f(1.0, 0.0, 0.25);
+  //   		base_colors[0] = Point3f(1.0, 0.0, 1.0);
+  //   	}
+
+  mixed_color = base_colors[base_id] * (base_id * step_size + step_size - iso_value)
+    + base_colors[base_id + 1] * (iso_value - base_id * step_size);
+
+  return Point3f(mixed_color.X() / float(step_size),
+    mixed_color.Y() / float(step_size),
+    mixed_color.Z() / float(step_size));
+}
+
+
+
+
+
+
 //  void
 //  GlobalFun::computeICP(CMesh *dst, CMesh *src)
 //  {

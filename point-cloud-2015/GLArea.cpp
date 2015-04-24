@@ -2378,8 +2378,6 @@ void GLArea::removePickPoint()
       skel_points->vert.push_back(save_skel_points_vert[i]);
 		}
 
-
-
 	}
 
   cout << "erase stage1 finished" << endl;

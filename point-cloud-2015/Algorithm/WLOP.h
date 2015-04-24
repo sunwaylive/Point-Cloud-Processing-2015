@@ -109,7 +109,7 @@ private:
 	void runComputeEigenDirections(CMesh* dual_samples, CMesh* samples);
 	void runComputeEigenNeighborhood(CMesh* dual_samples, CMesh* samples);
 
-	void computeDualIndex(CMesh* samples, CMesh* dual_samples);
+	void computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_dist = false);
 	void runComputeAverageDistThreshold();
 
   void runEstimateParameters();
@@ -121,6 +121,8 @@ private:
   void runPostprocessingDlength();
 
   void run4PCS();
+
+  void runEvaluation();
 
 private:
 	RichParameterSet* para;

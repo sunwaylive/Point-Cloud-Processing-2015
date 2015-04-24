@@ -13,21 +13,21 @@ using namespace vcg;
 class GLColor
 {
 public:
-	GLColor(const float& _r = 0, const float& _g = 0, const float& _b = 0, const float& _a = 1.0):r(_r),g(_g),b(_b),a(_a){}
-	GLColor(const QColor & qcolor)
-	{
-		int _r;
-		int _g;
-		int _b;
-		qcolor.getRgb(&_r, &_g, &_b);
-		r = _r / 255.0;
-		g = _g / 255.0;
-		b = _b / 255.0;
-	}
-	float r;
-	float g;
-	float b;
-	float a;
+  GLColor(const float& _r = 0, const float& _g = 0, const float& _b = 0, const float& _a = 1.0) :r(_r), g(_g), b(_b), a(_a){}
+  GLColor(const QColor & qcolor)
+  {
+    int _r;
+    int _g;
+    int _b;
+    qcolor.getRgb(&_r, &_g, &_b);
+    r = _r / 255.0;
+    g = _g / 255.0;
+    b = _b / 255.0;
+  }
+  float r;
+  float g;
+  float b;
+  float a;
 };
 
 static GLColor cBrown(0.7, 0, 0);

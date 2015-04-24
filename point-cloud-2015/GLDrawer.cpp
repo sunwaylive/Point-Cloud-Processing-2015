@@ -175,6 +175,15 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 // 		return isoValue2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
 // 	}
 
+  if (bUseSegmentaionColor && bUseConfidenceColor)
+  {
+    //cout << v.cC() << endl;
+    //const CMesh::VertexType::ColorType & c = v.cC();
+    GLColor gc((v.cC()[0] / 255.), v.cC()[1] / 255., v.cC()[2] / 255.);
+    //GLColor gc;
+    return gc;
+  }
+
   if (v.is_skel_point && v.is_skel_virtual)
   {
     return cYellow;

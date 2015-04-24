@@ -828,6 +828,8 @@ void MainWindow::showNormalColor(bool _val)
 	cout << "show normal" << endl;
 	global_paraMgr.drawer.setValue("Use Color From Normal", BoolValue(_val));
 	area->updateGL();
+
+
 }
 
 
