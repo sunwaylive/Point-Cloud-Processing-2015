@@ -1054,6 +1054,12 @@ void WlopParaDlg::applyInnerPointsClassification()
 
 void WlopParaDlg::applyEllipsoidFitting()
 {
+  m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
+
+  return;
 
 	double eigen_value0 = 0.7;
 	double eigen_value1 = 0.2;
@@ -1143,9 +1149,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 
 	area->needUpdateStatus();
 
-// 	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(true));
-// 	area->runWlop();
-// 	m_paras->wLop.setValue("Run Ellipsoid Fitting", BoolValue(false));
+
 }
 
 
@@ -1338,10 +1342,6 @@ void WlopParaDlg::applyDLengthAdjustment()
 	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(true));
 	area->runWlop();
-
-
-
-
 
 
 //   double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");

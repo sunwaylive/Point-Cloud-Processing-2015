@@ -705,7 +705,7 @@ void MainWindow::showClosestDualConnection(bool _val)
 		global_paraMgr.wLop.setValue("Run Compute Dual Index", BoolValue(false));
 
     CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-    GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 410);
+    GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 110);
 // 
 //     for (int i = 0; i < dual_samples->vert.size(); i++)
 //     {

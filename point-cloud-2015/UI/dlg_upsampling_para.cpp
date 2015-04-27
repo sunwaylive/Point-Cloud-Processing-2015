@@ -194,11 +194,12 @@ void UpsamplingParaDlg::useAdaptiveUpsampling(bool _val)
 {
   m_paras->upsampling.setValue("Use Adaptive Upsampling", BoolValue(_val));
 
+  CMesh* samples = area->dataMgr.getCurrentSamples();
+  CMesh* original = area->dataMgr.getCurrentOriginal();
+
+
   if (_val)
   {
-    CMesh* samples = area->dataMgr.getCurrentSamples();
-    CMesh* original = area->dataMgr.getCurrentOriginal();
-
     int knn = global_paraMgr.wLop.getDouble("Original Confidence KNN");
     GlobalFun::computeAverageDistToInput(samples, original, knn);
 
@@ -219,6 +220,16 @@ void UpsamplingParaDlg::useAdaptiveUpsampling(bool _val)
       }
     }
   }
+  else
+  {
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      v.is_fixed_sample = false;
+    }
+  }
+
 }
 
 

@@ -24,6 +24,7 @@ using namespace std;
 using namespace vcg;
 using namespace Eigen;
 using namespace match_4pcs;
+using std::cout;
 
 class WLOP : public PointCloudAlgorithm
 {
