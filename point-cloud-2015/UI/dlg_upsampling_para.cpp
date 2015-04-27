@@ -199,13 +199,16 @@ void UpsamplingParaDlg::useAdaptiveUpsampling(bool _val)
     CMesh* samples = area->dataMgr.getCurrentSamples();
     CMesh* original = area->dataMgr.getCurrentOriginal();
 
-    GlobalFun::computeAverageDistToInput(samples, original, 50);
+    int knn = global_paraMgr.wLop.getDouble("Original Confidence KNN");
+    GlobalFun::computeAverageDistToInput(samples, original, knn);
 
     double threshold = m_paras->upsampling.getDouble("Density Threshold Dist");
 
     for (int i = 0; i < samples->vert.size(); i++)
     {
       CVertex& v = samples->vert[i];
+      v.is_dual_sample = false;
+      v.eigen_confidence = 0.;
       if (v.nearest_neighbor_dist < threshold)
       {
         v.is_fixed_sample = true;

@@ -2420,6 +2420,8 @@ void WLOP::runComputeAverageDistThreshold()
 
 	para->setValue("Average Dist To Input Threshold", DoubleValue(threshold));
 
+  global_paraMgr.upsampling.setValue("Density Threshold Dist", DoubleValue(threshold));
+
 	cout << "dist threshold!  " << para->getDouble("Average Dist To Input Threshold") << endl;
 }
 
