@@ -1100,6 +1100,10 @@ void GlobalFun::normalizeConfidence(vector<CVertex>& vertexes, float delta)
 		}
 	}
 
+  ofstream outfile("current.confidence_range");
+  outfile << min_confidence << endl;
+  outfile << max_confidence << endl;
+  outfile.close(); 
 }
 
 

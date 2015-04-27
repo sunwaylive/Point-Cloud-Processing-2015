@@ -295,7 +295,22 @@ void WLOP::run()
 
 	if (para->getBool("Run Compute Correspondence"))
 	{
-		runComputeCorrespondence();
+    double sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
+    double iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
+
+
+    GlobalFun::normalizeConfidence(samples->vert, 0.);
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      Point3f c = GlobalFun::scale2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
+      v.C().SetRGB(255. * c[0], 255. * c[1], 255. * c[2]);
+    }
+
+
+		//runComputeCorrespondence();
 		return;
 	}
 
@@ -376,6 +391,7 @@ void WLOP::run()
 
 	if (para->getBool("Run Compute Initial Neighborhood"))
 	{
+    runEstimateParameters();
 		computeInitialNeighborSize();
 		return;
 	}
@@ -5288,6 +5304,8 @@ void WLOP::runEvaluation()
     double dist = GlobalFun::computeEulerDist(v.P(), nearest.P());
 
     v.eigen_confidence = dist;
+    v.nearest_neighbor_dist = dist;
+
     //     if (i < 20)
     //     {
     //       cout << c[0] << ", " << c[1] << ", " << c[2] << ", " << endl;
@@ -5295,7 +5313,7 @@ void WLOP::runEvaluation()
     //GLColor tem_c = 
   }
 
-  GlobalFun::normalizeConfidence(samples->vert, 0.);
+  //GlobalFun::normalizeConfidence(samples->vert, 0.);
 
   for (int i = 0; i < samples->vert.size(); i++)
   {

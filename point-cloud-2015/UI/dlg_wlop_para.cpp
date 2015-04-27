@@ -1022,6 +1022,7 @@ void WlopParaDlg::applyComputeInnerClustering()
 
 void WlopParaDlg::applyComputeCorrespondence()
 {
+  m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Compute Correspondence", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Compute Correspondence", BoolValue(false));
