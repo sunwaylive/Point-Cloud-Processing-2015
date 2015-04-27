@@ -3498,132 +3498,182 @@ void WLOP::runEllipsoidFitting()
 }
 
 
-
 void WLOP::runInnerPointsRegularization()
 {
-	cout << "runInnerPointsRegularization" << endl;
+  double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+  computeConstNeighborhoodUsingRadius(local_radius);
 
-	double max_skel_radius = 0.0;
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[i];
 
-	for (int i = 0; i < samples->vert.size(); i++)
-	{
-		CVertex& v = samples->vert[i];
+    v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
+  }
 
-		if (v.skel_radius > max_skel_radius)
-		{
-			max_skel_radius = v.skel_radius;
-		}
-	}
-	cout << "Max skel radius:  " << max_skel_radius << endl;
+  vector<double> new_radius(samples->vert.size());
 
-	Timer time;
-	time.start("Sample Original neighbor");
-	GlobalFun::computeBallNeighbors(dual_samples, samples,
-		                              max_skel_radius * 0.5, box);
-	time.end();
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
 
-	vector<double> farthest_proj_dist(dual_samples->vert.size(), 0.0);
-	vector<Point3f> data_term(dual_samples->vert.size());
-	for (int i = 0; i < dual_samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-		CVertex& v = samples->vert[i]; 
-		double threshold = v.skel_radius * 0.5;
-		double skel_radius2 = threshold * threshold;
+    double sum_radius = 0;
+    double sum_weight = 0;
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      double radius = t.skel_radius;
+      sum_weight += 1.0;
+      sum_radius += radius;
+    }
 
-		for (int j = 0; j < dual_v.original_neighbors.size(); j++)
-		{
-			int idx = dual_v.original_neighbors[j];
-			CVertex& t = samples->vert[idx];
+    if (sum_weight > 0.)
+    {
+      new_radius[i] = sum_radius / sum_weight;
+    }
+    else
+    {
+      new_radius[i] = v.skel_radius;
+    }
+  }
 
-			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
-			if (dist2 > skel_radius2)
-			{
-				continue;
-			}
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[i];
 
-			//double proj_dist = abs((dual_v.P() - t.P()) * dual_v.N());
-			double proj_dist = abs((v.P() - t.P()) * dual_v.N());
+    v.skel_radius = new_radius[i];
 
-			if (proj_dist > farthest_proj_dist[i])
-			{
-				farthest_proj_dist[i] = proj_dist;
-			}
-		}
-	}
-
-	for (int i = 0; i < dual_samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-		CVertex& v = samples->vert[i];
-
-		double move_dist = farthest_proj_dist[i] * 0.5;
-		data_term[i] = v.P() - v.N() * move_dist;
-	}
-
-	// compute repulsion term
-	vector<Point3f> regular_term(dual_samples->vert.size());
-
-	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
-	repulsion_weight_sum.assign(samples->vn, 0);
-
-	//bool need_density = para->getBool("Need Compute Density");
-	bool need_density = false;
-
-	double radius = para->getDouble("CGrid Radius");
-	double radius2 = radius * radius;
-	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
-	double repulsion_power = para->getDouble("Repulsion Power");
-
-
-	//Timer time;
-	time.start("Sample Original neighbor");
-	GlobalFun::computeBallNeighbors(dual_samples, NULL,	radius, box);
-	time.end();
-
-	for (int i = 0; i < dual_samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-
-		if (dual_v.neighbors.empty())
-		{
-			continue;
-		}
-
-		for (int j = 0; j < dual_v.neighbors.size(); j++)
-		{
-			CVertex& dual_t = dual_samples->vert[dual_v.neighbors[j]];
-			Point3f diff = dual_v.P() - dual_t.P();
-
-			double dist2 = diff.SquaredNorm();
-			double len = sqrt(dist2);
-			if (len <= 0.001 * radius) len = radius*0.001;
-
-			double w = exp(dist2*iradius16);
-			double rep = w * pow(1.0 / len, repulsion_power);
-
-// 			if (need_density)
-// 			{
-// 				rep *= samples_density[dual_t.m_index];
-// 			}
-
-			repulsion[i] += diff * rep;
-			repulsion_weight_sum[i] += rep;
-		}
-
-		if (repulsion_weight_sum[i] > 1e-10)
-		{
-			regular_term[i] = repulsion[i] / repulsion_weight_sum[i];
-		}
-	}
-
-	for (int i = 0; i < dual_samples->vert.size(); i++)
-	{
-		CVertex& dual_v = dual_samples->vert[i];
-
-		dual_v.P() = data_term[i] + regular_term[i] * 0.25;
-	}
+    Point3f direction = (dual_v.P() - v.P()).Normalize();
+    dual_v.P() = v.P() + direction * v.skel_radius;
+  }
 }
+
+// void WLOP::runInnerPointsRegularization()
+// {
+// 	cout << "runInnerPointsRegularization" << endl;
+// 
+// 	double max_skel_radius = 0.0;
+// 
+// 	for (int i = 0; i < samples->vert.size(); i++)
+// 	{
+// 		CVertex& v = samples->vert[i];
+// 
+// 		if (v.skel_radius > max_skel_radius)
+// 		{
+// 			max_skel_radius = v.skel_radius;
+// 		}
+// 	}
+// 	cout << "Max skel radius:  " << max_skel_radius << endl;
+// 
+// 	Timer time;
+// 	time.start("Sample Original neighbor");
+// 	GlobalFun::computeBallNeighbors(dual_samples, samples,
+// 		                              max_skel_radius * 0.5, box);
+// 	time.end();
+// 
+// 	vector<double> farthest_proj_dist(dual_samples->vert.size(), 0.0);
+// 	vector<Point3f> data_term(dual_samples->vert.size());
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		CVertex& v = samples->vert[i]; 
+// 		double threshold = v.skel_radius * 0.5;
+// 		double skel_radius2 = threshold * threshold;
+// 
+// 		for (int j = 0; j < dual_v.original_neighbors.size(); j++)
+// 		{
+// 			int idx = dual_v.original_neighbors[j];
+// 			CVertex& t = samples->vert[idx];
+// 
+// 			double dist2 = GlobalFun::computeEulerDistSquare(v.P(), t.P());
+// 			if (dist2 > skel_radius2)
+// 			{
+// 				continue;
+// 			}
+// 
+// 			//double proj_dist = abs((dual_v.P() - t.P()) * dual_v.N());
+// 			double proj_dist = abs((v.P() - t.P()) * dual_v.N());
+// 
+// 			if (proj_dist > farthest_proj_dist[i])
+// 			{
+// 				farthest_proj_dist[i] = proj_dist;
+// 			}
+// 		}
+// 	}
+// 
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 		CVertex& v = samples->vert[i];
+// 
+// 		double move_dist = farthest_proj_dist[i] * 0.5;
+// 		data_term[i] = v.P() - v.N() * move_dist;
+// 	}
+// 
+// 	// compute repulsion term
+// 	vector<Point3f> regular_term(dual_samples->vert.size());
+// 
+// 	repulsion.assign(samples->vn, vcg::Point3f(0, 0, 0));
+// 	repulsion_weight_sum.assign(samples->vn, 0);
+// 
+// 	//bool need_density = para->getBool("Need Compute Density");
+// 	bool need_density = false;
+// 
+// 	double radius = para->getDouble("CGrid Radius");
+// 	double radius2 = radius * radius;
+// 	double iradius16 = -para->getDouble("H Gaussian Para") / radius2;
+// 	double repulsion_power = para->getDouble("Repulsion Power");
+// 
+// 
+// 	//Timer time;
+// 	time.start("Sample Original neighbor");
+// 	GlobalFun::computeBallNeighbors(dual_samples, NULL,	radius, box);
+// 	time.end();
+// 
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 
+// 		if (dual_v.neighbors.empty())
+// 		{
+// 			continue;
+// 		}
+// 
+// 		for (int j = 0; j < dual_v.neighbors.size(); j++)
+// 		{
+// 			CVertex& dual_t = dual_samples->vert[dual_v.neighbors[j]];
+// 			Point3f diff = dual_v.P() - dual_t.P();
+// 
+// 			double dist2 = diff.SquaredNorm();
+// 			double len = sqrt(dist2);
+// 			if (len <= 0.001 * radius) len = radius*0.001;
+// 
+// 			double w = exp(dist2*iradius16);
+// 			double rep = w * pow(1.0 / len, repulsion_power);
+// 
+// // 			if (need_density)
+// // 			{
+// // 				rep *= samples_density[dual_t.m_index];
+// // 			}
+// 
+// 			repulsion[i] += diff * rep;
+// 			repulsion_weight_sum[i] += rep;
+// 		}
+// 
+// 		if (repulsion_weight_sum[i] > 1e-10)
+// 		{
+// 			regular_term[i] = repulsion[i] / repulsion_weight_sum[i];
+// 		}
+// 	}
+// 
+// 	for (int i = 0; i < dual_samples->vert.size(); i++)
+// 	{
+// 		CVertex& dual_v = dual_samples->vert[i];
+// 
+// 		dual_v.P() = data_term[i] + regular_term[i] * 0.25;
+// 	}
+// }
 
 void WLOP::runSearchNeighborhood()
 {
