@@ -742,7 +742,7 @@ void WlopParaDlg::copySamplesToDualSamples()
     dual_samples->vert[i].moving_speed = 1.0;
     dual_samples->vert[i].is_fixed_sample = false;
     dual_samples->vert[i].is_boundary = false;
-
+    dual_samples->vert[i].recompute_m_render();
 	}
 	dual_samples->vn = dual_samples->vert.size();
 }
