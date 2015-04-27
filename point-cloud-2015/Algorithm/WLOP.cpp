@@ -439,6 +439,15 @@ void WLOP::run()
 	if (para->getBool("Run Compute Dual Index"))
 	{
 		computeDualIndex(samples, dual_samples);
+
+    for (int i = 0; i < dual_samples->vert.size(); i++)
+    {
+      CVertex& dual_v = dual_samples->vert[i];
+      if (i < 5)
+      {
+        cout << "dual neighbor size7 " << dual_v.neighbors.size() << endl;
+      }
+    }
 		//runComputeEigenNeighborhood(samples, original);
 		return;
 	}
@@ -1466,8 +1475,10 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double length_threshold_dist2 = length_threshold_dist * length_threshold_dist;
 	double iradius16_length = -4.0 / length_threshold_dist2;
 
-	double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
-	double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
+	//double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+  double sigma = 45;
+
+  double sigma_threshold = pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2);
 
 	int similarity_KNN = para->getDouble("KNN For Similarity");
 
@@ -4918,6 +4929,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
     return;
   }
 
+  use_proj_dist = false;
 
   bool use_progressive_search = para->getBool("Use Progressive Search Index");
   double search_dual_index_para = para->getDouble("Search Dual Index Para");
@@ -4951,56 +4963,61 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 450);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 410);
+  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 410, false, "test");
 
-  for (int i = 0; i < samples->vert.size(); i++)
+  for (int loop = 0; loop < 5; loop++)
   {
-    CVertex& v = samples->vert[i];
-    CVertex& dual_v = dual_samples->vert[v.dual_index];
-
-    double min_dist2;
-    if (use_proj_dist)
+    for (int i = 0; i < samples->vert.size(); i++)
     {
-      min_dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_v.P(), v.N());
-    }
-    else
-    {
-      min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_v.P());
-    }
+      CVertex& v = samples->vert[i];
+      CVertex& dual_v = dual_samples->vert[v.dual_index];
 
-    int dual_idx = v.dual_index;
-
-    for (int j = 0; j < dual_v.neighbors.size(); j++)
-    {
-      int index = dual_v.neighbors[j];
-      CVertex& dual_t = dual_samples->vert[index];
-
-      double dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
-
+      double min_dist2;
       if (use_proj_dist)
       {
-        dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_t.P(), v.N());
-
+        min_dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_v.P(), v.N());
       }
       else
       {
-        dist2 = GlobalFun::computeEulerDistSquare(v.P(), dual_t.P());
+        min_dist2 = GlobalFun::computeEulerDist(v.P(), dual_v.P());
       }
 
-      if (dist2 < min_dist2)
+      int best_idx = v.dual_index;
+
+      for (int j = 0; j < dual_v.neighbors.size(); j++)
       {
-        min_dist2 = dist2;
-        dual_idx = index;
+        int index = dual_v.neighbors[j];
+        CVertex& dual_t = dual_samples->vert[index];
+
+        double dist2;
+
+        if (use_proj_dist)
+        {
+          dist2 = GlobalFun::computeProjPlusPerpenDist(v.P(), dual_t.P(), v.N());
+        }
+        else
+        {
+          dist2 = GlobalFun::computeEulerDist(v.P(), dual_t.P());
+        }
+
+        if (dist2 < min_dist2)
+        {
+          min_dist2 = dist2;
+          best_idx = index;
+        }
       }
-    }
 
-    v.dual_index = dual_idx;
+      v.dual_index = best_idx;
 
-    if (i < 5)
-    {
-      cout << "dual neighbor size" << dual_v.neighbors.size() << endl;
+      if (i < 5)
+      {
+        cout << "dual neighbor size end " << dual_v.neighbors.size() << endl;
+      }
     }
   }
+
+
 
 //   GlobalFun::computeBallNeighbors(dual_samples, NULL, search_dual_index_para * para->getDouble("CGrid Radius"), dual_samples->bbox);
 //   bool use_cloest = global_paraMgr.glarea.getBool("Show Cloest Dual Connection");

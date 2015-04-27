@@ -639,8 +639,34 @@ void GLArea::runPointCloudAlgorithm(PointCloudAlgorithm& algorithm)
 	starttime = clock();
 
 	algorithm.setInput(&dataMgr);
+
+  CMesh* dual_samples = dataMgr.getCurrentDualSamples();
+
+  for (int j = 0; j < dual_samples->vert.size(); j++)
+  {
+    CVertex& dual_v = dual_samples->vert[j];
+    if (j < 5)
+    {
+      cout << "dual neighbor size5 " << dual_v.neighbors.size() << endl;
+    }
+  }
+
+
 	algorithm.run();
+
+  for (int j = 0; j < dual_samples->vert.size(); j++)
+  {
+    CVertex& dual_v = dual_samples->vert[j];
+    if (j < 5)
+    {
+      cout << "dual neighbor size6 " << dual_v.neighbors.size() << endl;
+    }
+  }
+
+
 	algorithm.clear();
+
+
 
 	stoptime = clock();
 	timeused = stoptime - starttime;
@@ -1288,11 +1314,7 @@ void GLArea::runWlop()
       break;
     }
 
-
-		
 		runPointCloudAlgorithm(wlop);
-
-
 
 // 		int sleep_time = 100;
 // 		QTime dieTime = QTime::currentTime().addMSecs(sleep_time);

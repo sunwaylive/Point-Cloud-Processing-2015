@@ -1151,7 +1151,7 @@ void WlopParaDlg::applyEllipsoidFitting()
 
 void WlopParaDlg::applyInnerPointsRegularization()
 {
-  m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+
 	m_paras->wLop.setValue("Run Inner Points Regularization", BoolValue(true));
 	area->runWlop();
 	m_paras->wLop.setValue("Run Inner Points Regularization", BoolValue(false));

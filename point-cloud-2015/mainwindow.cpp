@@ -703,6 +703,18 @@ void MainWindow::showClosestDualConnection(bool _val)
 		global_paraMgr.wLop.setValue("Run Compute Dual Index", BoolValue(true));
 		area->runWlop();
 		global_paraMgr.wLop.setValue("Run Compute Dual Index", BoolValue(false));
+
+    CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+    GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 410);
+// 
+//     for (int i = 0; i < dual_samples->vert.size(); i++)
+//     {
+//       CVertex& dual_v = dual_samples->vert[i];
+//       if (i < 5)
+//       {
+//         cout << "dual neighbor size" << dual_v.neighbors.size() << endl;
+//       }
+//     }
 	}
 	else
 	{
@@ -716,6 +728,17 @@ void MainWindow::showClosestDualConnection(bool _val)
 	}
 
 	emit area->needUpdateStatus();
+
+//   CMesh* samples = area->dataMgr.getCurrentDualSamples();
+// 
+//   for (int i = 0; i < samples->vert.size(); i++)
+//   {
+//     CVertex& dual_v = samples->vert[i];
+//     if (i < 5)
+//     {
+//       cout << "dual neighbor size2" << dual_v.neighbors.size() << endl;
+//     }
+//   }
 
 // 	CMesh* samples = area->dataMgr.getCurrentSamples();
 // 	CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
