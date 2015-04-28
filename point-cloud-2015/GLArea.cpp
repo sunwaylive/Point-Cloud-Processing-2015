@@ -2304,6 +2304,16 @@ void GLArea::cleanPick()
 		return;
 	}
 
+  if (para->getBool("Show Radius"))
+  {
+    for (int i = 0; i < pickList.size(); i++)
+    {
+      //cout << "mark " << endl;
+      samples->vert[pickList[i]].is_fixed_sample = true;
+    }
+    return;
+  }
+
 
   for (int i = 0; i < pickList.size(); i++)
   {

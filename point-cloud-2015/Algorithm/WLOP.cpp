@@ -1332,6 +1332,11 @@ void WLOP::runPostprocessingDlength()
 
     v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
 
+    if (v.is_fixed_sample)
+    {
+      v.moving_speed = 0;
+      continue;
+    }
     if (v.eigen_confidence > confidence_threshold)
     {
       //real_steps[i] = 0;
@@ -1407,13 +1412,12 @@ void WLOP::runPostprocessingDlength()
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
+    CVertex& dual_v = dual_samples->vert[v.dual_index];
 
     if (v.moving_speed < 1e-5)
     {
       continue;
     }
-
-    CVertex& dual_v = dual_samples->vert[v.dual_index];
 
     double sum_radius = 0;
     double sum_weight = 0;
@@ -1424,6 +1428,14 @@ void WLOP::runPostprocessingDlength()
     {
       CVertex& t = samples->vert[v.neighbors[j]];
       CVertex& dual_t = dual_samples->vert[t.dual_index];
+
+      double dist1 = GlobalFun::computeEulerDist(v.P(), t.P());
+      double dist2 = GlobalFun::computeEulerDist(dual_v.P(), dual_t.P());
+      if (dist2 > (dist1 * 1.5))
+      {
+        continue;
+      }
+
 
       weight = 1.;
 

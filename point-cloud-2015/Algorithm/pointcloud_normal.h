@@ -51,7 +51,12 @@ public:
         for (int i = 0; i < neighbours; i++)
         {
             int neightId = tree.getNeighborId(i);
-            if(Distance(vi->cP(),m.vert[neightId].cP())<maxDist)
+
+            if (vi->cN() * m.vert[neightId].cN() < 0)
+            {
+              continue;
+            }
+            if ( Distance(vi->cP(), m.vert[neightId].cP()) < maxDist)
             ptVec.push_back(m.vert[neightId].cP());
         }
         Plane3f plane;

@@ -109,8 +109,27 @@ void NormalParaDlg::reorientateNormal()
 
 void NormalParaDlg::applyNormalSmoothing()
 {
-	if (global_paraMgr.glarea.getBool("Show Normal"))
-	{
+  bool use_previous_orientation = global_paraMgr.norSmooth.getBool("Run Anistropic PCA");
+
+//   if (use_previous_orientation)
+//   {
+//     CMesh* samples = area->dataMgr.getCurrentSamples();
+//     GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 1, false, "corrent Nuul normal");
+// 
+//     for (int i = 0; i < samples->vert.size(); i++)
+//     {
+//       CVertex& v = samples->vert[i];
+//       if (GlobalFun::computeEulerDistSquare(v.N(), Point3f(0,0,0)) < 1e-8  )
+//       {
+//         v.N() = samples->vert[v.neighbors[0]];
+//       }
+//     }
+//     return;
+//   }
+	//if (global_paraMgr.glarea.getBool("Show Normal"))
+  if (1)
+  {
+
 		area->runNormalSmoothing();
 		area->dataMgr.recomputeQuad();
 		area->updateGL();
@@ -151,7 +170,8 @@ void NormalParaDlg::applyNormalSmoothing()
 void NormalParaDlg::applyPCANormal()
 {
 	bool use_previous_orientation = global_paraMgr.norSmooth.getBool("Run Anistropic PCA");
-	if (m_paras->norSmooth.getBool("Run Anistropic PCA"))
+	//if (m_paras->norSmooth.getBool("Run Anistropic PCA"))
+  if (false)
 	{
 		area->runNormalSmoothing();
 	}
@@ -192,14 +212,23 @@ void NormalParaDlg::applyPCANormal()
 
 		 if (use_previous_orientation)
 		 {
-			 for (int i = 0; i < samples->vert.size(); i++)
-			 {
-				 CVertex& v = samples->vert[i];
-				 if (v.N() * remember_normal[i] < 0)
-				 {
-					 v.N() *= -1;
-				 }
-			 }
+        for (int i = 0; i < samples->vert.size(); i++)
+        {
+          CVertex& v = samples->vert[i];
+          if (v.is_fixed_sample)
+          {
+            v.N() = remember_normal[i];
+          }
+
+        }
+// 			 for (int i = 0; i < samples->vert.size(); i++)
+// 			 {
+// 				 CVertex& v = samples->vert[i];
+// 				 if (v.N() * remember_normal[i] < 0)
+// 				 {
+// 					 v.N() *= -1;
+// 				 }
+// 			 }
 		 }
 
 	}
