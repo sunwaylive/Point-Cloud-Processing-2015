@@ -52,10 +52,10 @@ public:
         {
             int neightId = tree.getNeighborId(i);
 
-            if (vi->cN() * m.vert[neightId].cN() < 0)
-            {
-              continue;
-            }
+//             if (vi->cN() * m.vert[neightId].cN() < 0)
+//             {
+//               continue;
+//             }
             if ( Distance(vi->cP(), m.vert[neightId].cP()) < maxDist)
             ptVec.push_back(m.vert[neightId].cP());
         }

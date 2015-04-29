@@ -59,6 +59,9 @@ public:
 	
 	void runEllipsoidFitting();
 
+  void runNormalSmooth();
+
+
 protected:
 	WLOP(){}
 

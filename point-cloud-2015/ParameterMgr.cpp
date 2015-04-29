@@ -319,8 +319,12 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Run Move Sample", false));
 	wLop.addParam(new RichBool("Run Move Skel", false));
 
+  wLop.addParam(new RichBool("Run Normal Smooth In WLOP", false));
+
+
 	wLop.addParam(new RichBool("Compute Eigen Directions", false));
 	wLop.addParam(new RichBool("Compute Eigen Neighborhood", false));
+
 
 
 	// generating inner points

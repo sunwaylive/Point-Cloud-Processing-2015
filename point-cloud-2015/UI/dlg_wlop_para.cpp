@@ -1459,10 +1459,6 @@ void WlopParaDlg::oneKEY()
 		m_paras->wLop.setValue("Need Compute Density", BoolValue(true));
 
 
-		//m_paras->glarea.setValue("Show Cloest Dual Connection", BoolValue(true));
-		
-    //applyComputeConfidence();
-
 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
 		CMesh* samples;
 		samples = area->dataMgr.getCurrentSamples();
@@ -1482,6 +1478,11 @@ void WlopParaDlg::oneKEY()
 				v.N() *= -1;
 			}
 		}
+
+//     m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+//     m_paras->wLop.setValue("Run Normal Smooth In WLOP", BoolValue(true));
+//     area->runWlop();
+//     m_paras->wLop.setValue("Run Normal Smooth In WLOP", BoolValue(false));
 
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyComputeConfidence();

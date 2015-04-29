@@ -202,7 +202,11 @@ void WLOP::initVertexes(bool clear_neighbor)
 
 void WLOP::run()
 {
-
+  
+  if (para->getBool("Run Normal Smooth In WLOP"))
+  {
+    runNormalSmoothing();
+  }
 
   if (para->getBool("Run Projection"))
   {
@@ -444,10 +448,10 @@ void WLOP::run()
     for (int i = 0; i < dual_samples->vert.size(); i++)
     {
       CVertex& dual_v = dual_samples->vert[i];
-      if (i < 5)
-      {
-        cout << "dual neighbor size7 " << dual_v.neighbors.size() << endl;
-      }
+//       if (i < 5)
+//       {
+//         cout << "dual neighbor size7 " << dual_v.neighbors.size() << endl;
+//       }
     }
 		//runComputeEigenNeighborhood(samples, original);
 		return;
@@ -5025,10 +5029,10 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
 
       v.dual_index = best_idx;
 
-      if (i < 5)
-      {
-        cout << "dual neighbor size end " << dual_v.neighbors.size() << endl;
-      }
+//       if (i < 5)
+//       {
+//         cout << "dual neighbor size end " << dual_v.neighbors.size() << endl;
+//       }
     }
   }
 
@@ -5405,5 +5409,59 @@ void WLOP::runEvaluation()
 
     Point3f c = GlobalFun::scale2color(v.eigen_confidence, sample_cofidence_color_scale, iso_value_shift, true);
     v.C().SetRGB(255. * c[0], 255. * c[1], 255. * c[2]);
+  }
+}
+
+
+void WLOP::runNormalSmooth()
+{
+  double sigma = global_paraMgr.norSmooth.getDouble("Sharpe Feature Bandwidth Sigma");
+  double radius = para->getDouble("CGrid Radius");
+
+  double radius2 = radius * radius;
+  double iradius16 = -4 / radius2;
+
+
+  if (!global_paraMgr.wLop.getBool("Use Adaptive Sample Neighbor"))
+  {
+    GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+  }
+  //GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
+
+  vector<Point3f> normal_sum;
+  vector<double>  normal_weight_sum;
+  normal_sum.assign(samples->vert.size(), Point3f(0., 0., 0.));
+  normal_weight_sum.assign(samples->vert.size(), 0);
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+
+      Point3f diff = v.P() - t.P();
+      double dist2 = diff.SquaredNorm();
+
+      double rep;
+
+      Point3f vm(v.N());
+      Point3f tm(t.N());
+      Point3f d = vm - tm;
+      double psi = exp(-pow(1 - vm*tm, 2) / pow(max(1e-8, 1 - cos(sigma / 180.0*3.1415926)), 2));
+      double theta = exp(dist2*iradius16);
+      rep = psi * theta;
+      rep = max(rep, 1e-10);
+
+      normal_weight_sum[i] += rep;
+      normal_sum[i] += tm * rep;
+    }
+
+    if (normal_weight_sum[i] > 1e-6)
+    {
+      v.N() = normal_sum[i] / normal_weight_sum[i];
+      v.N().Normalize();
+    }
   }
 }
