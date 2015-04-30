@@ -572,16 +572,16 @@ void MainWindow::saveSnapshot()
 
 void MainWindow::saveView()
 {
-   Timer timer;
-   timer.start("walk");
-   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
-   GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 250);
-   timer.end();
-
-  return;
+//    Timer timer;
+//    timer.start("walk");
+//    CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+//    GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 250);
+//    timer.end();
+// 
+//   return;
 
   CMesh* samples = area->dataMgr.getCurrentSamples();
-  double percentage = 0.02;
+  double percentage = 0.01;
   GlobalFun::removeOutliersBaseOnDistance(samples, 10, percentage);
   //GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
 

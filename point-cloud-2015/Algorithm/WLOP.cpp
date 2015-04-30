@@ -1312,6 +1312,12 @@ void WLOP::runPostprocessingDlength()
 {
   //runComputeConfidence();
 
+  bool limit_post = false;
+  if (global_paraMgr.glarea.getBool("Show Eigen Directions"))
+  {
+    limit_post = true;
+  }
+
   double confidence_threshold = para->getDouble("Protect High Confidence Para");
   double step_size = para->getDouble("Increasing Step Size");
 
@@ -1336,7 +1342,7 @@ void WLOP::runPostprocessingDlength()
 
     v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
 
-    if (v.is_fixed_sample)
+    if (!limit_post && v.is_fixed_sample)
     {
       v.moving_speed = 0;
       continue;
@@ -1385,6 +1391,11 @@ void WLOP::runPostprocessingDlength()
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
+
+    if (limit_post && !v.is_fixed_sample)
+    {
+      continue;
+    }
 
     v.moving_speed = real_steps[i];
     CVertex& dual_v = dual_samples->vert[v.dual_index];
@@ -1458,6 +1469,11 @@ void WLOP::runPostprocessingDlength()
   {
     CVertex& v = samples->vert[i];
     if (v.moving_speed < 1e-5)
+    {
+      continue;
+    }
+
+    if (limit_post && !v.is_fixed_sample)
     {
       continue;
     }
@@ -5367,6 +5383,7 @@ void WLOP::runEvaluation()
   double sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
   double iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
 
+  ofstream outfile("evaluation.txt");
 //   for (int i = 0; i < samples->vert.size(); i++)
 //   {
 //     CVertex& v = samples->vert[i];
@@ -5385,6 +5402,8 @@ void WLOP::runEvaluation()
 //     //GLColor tem_c = 
 //   }
 
+
+
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
@@ -5394,13 +5413,38 @@ void WLOP::runEvaluation()
     v.eigen_confidence = dist;
     v.nearest_neighbor_dist = dist;
 
+   
     //     if (i < 20)
     //     {
     //       cout << c[0] << ", " << c[1] << ", " << c[2] << ", " << endl;
     //     }
     //GLColor tem_c = 
   }
+  
 
+  double evaluation_min = 0.00;
+  double evaluation_max = 0.25;
+  double evaluation_range = evaluation_max - evaluation_min;
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+
+    if (v.eigen_confidence < evaluation_min)
+    {
+      v.eigen_confidence = evaluation_min;
+    }
+    if (v.eigen_confidence > evaluation_max)
+    {
+      v.eigen_confidence = evaluation_max;
+    }
+
+    v.eigen_confidence = (v.eigen_confidence - evaluation_min) / evaluation_range;
+
+    //outfile << v.eigen_confidence << endl;
+  }
+
+
+  outfile.close();
   //GlobalFun::normalizeConfidence(samples->vert, 0.);
 
   for (int i = 0; i < samples->vert.size(); i++)

@@ -152,10 +152,10 @@ void ParameterMgr::initGlareaParameter()
   glarea.addParam(new RichBool("Fix ply mode", false));
 
 
- 	//glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
- 	//glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
-    glarea.addParam(new RichDouble("Sample Confidence Color Scale", 1.0));
-    glarea.addParam(new RichDouble("Point ISO Value Shift", 0.0));
+ 	glarea.addParam(new RichDouble("Sample Confidence Color Scale", 0.5));
+ 	glarea.addParam(new RichDouble("Point ISO Value Shift", -0.5));
+  //glarea.addParam(new RichDouble("Sample Confidence Color Scale", 1.0));
+  //glarea.addParam(new RichDouble("Point ISO Value Shift", 0.0));
 
 	glarea.addParam(new RichDouble("Show Confidence Percentage", 0.8));
 }
