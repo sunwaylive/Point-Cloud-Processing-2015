@@ -521,11 +521,12 @@ void GLArea::paintGL()
 
   if (para->getBool("Show Radius")&& !(takeSnapTile && para->getBool("No Snap Radius"))) 
   {
-		if (!para->getBool("Pick Dual Point"))
-		{
-			drawNeighborhoodRadius();
-		}
-    
+// 		if (!para->getBool("Pick Dual Point"))
+// 		{
+// 			drawNeighborhoodRadius();
+// 		}
+    drawNeighborhoodRadius();
+
   }
 
 	if (show_something)

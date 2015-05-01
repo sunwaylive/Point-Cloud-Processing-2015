@@ -3570,6 +3570,18 @@ void WLOP::runInnerPointsRegularization()
     for (int j = 0; j < v.neighbors.size(); j++)
     {
       CVertex& t = samples->vert[v.neighbors[j]];
+      CVertex& dual_t = dual_samples->vert[v.neighbors[j]];
+
+      if (!dual_t.is_fixed_sample)
+      {
+        continue;
+      }
+
+      if ( (-v.N()) * (-t.N()) < 0.  )
+      {
+        continue;
+      }
+
       double radius = t.skel_radius;
       sum_weight += 1.0;
       sum_radius += radius;
@@ -3587,8 +3599,15 @@ void WLOP::runInnerPointsRegularization()
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
+    
     CVertex& v = samples->vert[i];
     CVertex& dual_v = dual_samples->vert[i];
+
+
+    if (!dual_v.is_fixed_sample)
+    {
+      continue;
+    }
 
     v.skel_radius = new_radius[i];
 
@@ -4397,7 +4416,7 @@ void WLOP::runSelfProjection()
 
 //   double static_radius = para->getDouble("Local Neighbor Size For Surface Points") * 0.5;
 //   GlobalFun::computeBallNeighbors(samples, NULL, static_radius, samples->bbox);
-  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 8, false,"runSelfProjection");
+  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 15, false,"runSelfProjection");
 
   for (int k = 0; k < 5; k++)
   {
@@ -4448,7 +4467,9 @@ void WLOP::runSelfProjection()
           continue;
         }
 
-        double dist = GlobalFun::computeEulerDist(v.P(), t.P());
+        //double dist = GlobalFun::computeEulerDist(v.P(), t.P());
+        double dist = GlobalFun::computeEulerDist(dual_t.P(), t.P());
+
         if (dist < min_dist)
         {
           min_dist = dist;
@@ -5413,6 +5434,8 @@ void WLOP::runEvaluation()
     v.eigen_confidence = dist;
     v.nearest_neighbor_dist = dist;
 
+    outfile << v.eigen_confidence << endl;
+
    
     //     if (i < 20)
     //     {
@@ -5440,7 +5463,6 @@ void WLOP::runEvaluation()
 
     v.eigen_confidence = (v.eigen_confidence - evaluation_min) / evaluation_range;
 
-    //outfile << v.eigen_confidence << endl;
   }
 
 
