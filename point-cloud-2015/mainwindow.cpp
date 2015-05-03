@@ -581,9 +581,15 @@ void MainWindow::saveView()
 //   return;
 
   CMesh* samples = area->dataMgr.getCurrentSamples();
-  double percentage = 0.01;
-  GlobalFun::removeOutliersBaseOnDistance(samples, 10, percentage);
-  //GlobalFun::removeOutliersBaseOnNormal(samples, 50, percentage);
+  double percentage = 0.001;
+  if (global_paraMgr.glarea.getBool("Show Radius"))
+  {
+    GlobalFun::removeOutliersBaseOnDistance(samples, 8, percentage);
+  }
+  else
+  {
+    GlobalFun::removeOutliersBaseOnNormal(samples, 12, percentage);
+  }
 
 
 // 	ofstream outpara("outpara.paras");
