@@ -1248,7 +1248,8 @@ vector<double> GlobalFun::computeBilateralConfidence(CMesh *mesh, double radius,
 			CVertex& t = mesh->vert[(*neighbors)[j]];
 			double dist2 = (v.P() - t.P()).SquaredNorm();
 			double den = exp(dist2*iradius16);
-			double normal_diff = exp(-pow(1 - v.N()*t.N(), 2) / sigma_threshold);
+			//double normal_diff = exp(-pow(1 - v.N()*t.N(), 2) / sigma_threshold);
+      double normal_diff = 1.0;
 
 			v.eigen_confidence += den * normal_diff;
 		}

@@ -731,6 +731,37 @@ void Upsampler::pointsExtrapoaltion()
 }
 
 
+void Upsampler::improveNeighborhood()
+{
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& dual_v = samples->vert[v.dual_index];
+
+    vector<int> new_neighborhood;
+    for (int j = 0; j < v.neighbors.size(); j++)
+    {
+      CVertex& t = samples->vert[v.neighbors[j]];
+      CVertex& dual_t = dual_samples->vert[t.dual_index];
+
+      double dist1 = GlobalFun::computeEulerDist(v.P(), t.P());
+      double dist2 = GlobalFun::computeEulerDist(dual_v.P(), dual_t.P());
+      if (dist2 != (dist1 * 1.5))
+      {
+        cout << "not good" << endl;
+        continue;
+      }
+
+      new_neighborhood.push_back(v.neighbors[j]);
+    }
+
+    v.neighbors = new_neighborhood;
+
+  }
+
+}
+
+
 void Upsampler::insertPointsByThreshold()
 {
 	cout << "insertPointsByThreshold" << endl;
@@ -741,6 +772,13 @@ void Upsampler::insertPointsByThreshold()
   int oldSize = samples->vert.size();
 
   int max_add_number = para->getInt("Number of Add Point");
+
+
+  if (use_adaptive_upsampling)
+  {
+    improveNeighborhood();
+  }
+
 
   while(1)
   {
