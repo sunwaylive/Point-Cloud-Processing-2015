@@ -266,6 +266,9 @@ void ParameterMgr::initWLopParameter()
 
   wLop.addParam(new RichBool("Run 4PCS", false));
 
+  wLop.addParam(new RichBool("Copy SkelPoints To InnerPoints", false));
+  wLop.addParam(new RichBool("Update Connection", false));
+
   wLop.addParam(new RichBool("Original Combine Sample", false));
   wLop.addParam(new RichBool("Need Averaging Movement", false));
 	wLop.addParam(new RichBool("Need Similarity", false));

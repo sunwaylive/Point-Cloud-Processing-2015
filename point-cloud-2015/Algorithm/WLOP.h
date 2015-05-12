@@ -128,6 +128,9 @@ private:
 
   void runEvaluation();
 
+  void runCopySkelPointsToInnerPoints();
+  void runUpdateConnection();
+
 private:
 	RichParameterSet* para;
 

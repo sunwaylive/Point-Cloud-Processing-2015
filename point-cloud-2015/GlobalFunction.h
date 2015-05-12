@@ -112,6 +112,7 @@ namespace GlobalFun
 
   void computeRandomwalkNeighborhood(CMesh *mesh, int one_ring_knn, int max_knn);
 
+  void computeRandomwalkNeighborhoodFowTwoSets(CMesh *original, CMesh *sample, int one_ring_knn, int max_knn);
 
   Point3f scale2color(double value, double scale_threshold, double shift, bool need_negative);
 }

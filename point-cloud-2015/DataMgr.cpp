@@ -2291,6 +2291,33 @@ void DataMgr::switchSampleOriginal()
 	replaceMesh(temp_mesh, samples, false);
 }
 
+
+void DataMgr::switchSkelDualSample()
+{
+  CMesh temp_mesh;
+  replaceMeshDual(dual_samples, temp_mesh, false);
+  replaceMeshDual(skel_points, dual_samples, true);
+  replaceMeshDual(temp_mesh, skel_points, false);
+
+  for (int i = 0; i < skel_points.vert.size(); i++)
+  {
+    CVertex& v = skel_points.vert[i];
+    v.is_skel_point = true;
+    v.is_dual_sample = false;
+
+    //      v.is_fixed_sample = false;
+  }
+
+  for (int i = 0; i < dual_samples.vert.size(); i++)
+  {
+    CVertex& v = dual_samples.vert[i];
+    v.is_dual_sample = true;
+    v.is_skel_point = false;
+
+    //      v.is_fixed_sample = false;
+  }
+}
+
 void DataMgr::switchSampleDualSample()
 {
   CMesh temp_mesh;

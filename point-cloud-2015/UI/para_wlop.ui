@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1865,6 +1865,45 @@
      </property>
      <property name="text">
       <string>4PCS</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Copy_SkelPoints_To_InnerPoints">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>160</y>
+       <width>181</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Copy SkelPoints To InnerPoints</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Update_Connection">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>300</y>
+       <width>181</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Update_Connection</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Switch_Skel_and_Inner_Points">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>230</y>
+       <width>181</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Switch Skel and Inner Points</string>
      </property>
     </widget>
    </widget>

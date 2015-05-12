@@ -487,6 +487,17 @@ void WLOP::run()
     return;
   }
 
+  if (para->getBool("Copy SkelPoints To InnerPoints"))
+  {
+    runCopySkelPointsToInnerPoints();
+    return;
+  }
+
+  if (para->getBool("Update Connection"))
+  {
+    runUpdateConnection();
+    return;
+  }
 
 	//int nTimes = para->getDouble("Num Of Iterate Time");
 	for(int i = 0; i < 1; i++)
@@ -4976,6 +4987,47 @@ void WLOP::computeInitialNeighborSize()
 	GlobalFun::computeBallNeighbors(samples, NULL, para->getDouble("CGrid Radius"), samples->bbox);
 }
 
+void WLOP::runUpdateConnection()
+{
+  cout << "runCopySkelPointsToInnerPoints" << endl;
+
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, skel_points->vert, 1, false, "runUpdateConnection");
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 300);
+
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    CVertex& skel_v = skel_points->vert[i];
+    CVertex& nearest_inner_v = dual_samples->vert[skel_v.neighbors[0]];
+
+    double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), skel_v.P());
+    double min_index = -1;
+
+    for (int j = 0; j < nearest_inner_v.neighbors.size(); j++)
+    {
+      int inner_index = nearest_inner_v.neighbors[j];
+      CVertex& inner_t = dual_samples->vert[inner_index];
+
+      double dist2 = GlobalFun::computeEulerDistSquare(inner_t.P(), v.P());
+
+      if (dist2 < min_dist2)
+      {
+        min_dist2 = dist2;
+        min_index = inner_index;
+      }
+    }
+
+    if (min_index > 0)
+    {
+      CVertex& min_inner_v = dual_samples->vert[min_index];
+      skel_v.P() = min_inner_v.P();
+    }
+
+  }
+
+
+}
+
 
 void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_dist)
 {
@@ -5531,3 +5583,10 @@ void WLOP::runNormalSmooth()
     }
   }
 }
+
+
+void WLOP::runCopySkelPointsToInnerPoints()
+{
+  cout << "runCopySkelPointsToInnerPoints" << endl;
+}
+

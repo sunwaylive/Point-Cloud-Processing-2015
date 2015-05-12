@@ -112,7 +112,9 @@ class WlopParaDlg : public QFrame
 
 
 		void copySamplesToDualSamples();
-		void copyDualSamplesToSkel();
+		
+    void copyDualSamplesToSkel();
+    void copySkelSamplesToDual();
 
 
     void applySkelWlop();
@@ -159,6 +161,11 @@ class WlopParaDlg : public QFrame
 
 		void applyTangentialMotion();
 		void applyDLengthAdjustment();
+
+    void runCopySkelPointsToInnerPoints();
+    void runSwitchSkelandInner_Points();
+
+    void runUpdateConnection();
 
 
 	private:

@@ -82,6 +82,7 @@ public:
   
 	void switchSampleDualSample();
 	void switchSampleOriginal();
+  void switchSkelDualSample();
 
 	void loadDefaultSphere();
 

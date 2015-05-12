@@ -208,6 +208,8 @@ void WlopParaDlg::initConnects()
 
 	connect(ui->detect_kite_points, SIGNAL(clicked()), this, SLOT(applyDetectKitePoints()));
 
+  connect(ui->Copy_SkelPoints_To_InnerPoints, SIGNAL(clicked()), this, SLOT(runCopySkelPointsToInnerPoints()));
+  connect(ui->Update_Connection, SIGNAL(clicked()), this, SLOT(runUpdateConnection()));
 
 	connect(ui->pushButton_progressive_neighborhood, SIGNAL(clicked()), this, SLOT(applyProgressiveNeighborhood()));
 	connect(ui->pushButton_ellipsoid_fitting, SIGNAL(clicked()), this, SLOT(applyEllipsoidFitting()));
@@ -244,6 +246,7 @@ void WlopParaDlg::initConnects()
 	connect(ui->dlength_adjustment, SIGNAL(clicked()), this, SLOT(applyDLengthAdjustment()));
 
   connect(ui->run_4PCS, SIGNAL(clicked()), this, SLOT(apply4PCS()));
+  connect(ui->Switch_Skel_and_Inner_Points, SIGNAL(clicked()), this, SLOT(runSwitchSkelandInner_Points()));
 
 }
 
@@ -748,6 +751,25 @@ void WlopParaDlg::copySamplesToDualSamples()
 }
 
 
+void WlopParaDlg::copySkelSamplesToDual()
+{
+  CMesh* skel_points = area->dataMgr.getCurrentSkelPoints();
+  CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+
+  dual_samples->vert.resize(skel_points->vert.size());
+  for (int i = 0; i < skel_points->vert.size(); i++)
+  {
+    skel_points->vert[i].m_index = i;
+    dual_samples->vert[i].P() = skel_points->vert[i].P();
+    dual_samples->vert[i].N() = skel_points->vert[i].N();
+
+    dual_samples->vert[i].is_dual_sample = true;
+    dual_samples->vert[i].is_skel_point = false;
+  }
+
+  dual_samples->vn = dual_samples->vert.size();
+}
+
 void WlopParaDlg::copyDualSamplesToSkel()
 {
 	CMesh* skel_points = area->dataMgr.getCurrentSkelPoints();
@@ -1050,7 +1072,33 @@ void WlopParaDlg::applyInnerPointsClassification()
 // 	m_paras->wLop.setValue("Run Inner Points Classification", BoolValue(false));
 }
 
+void WlopParaDlg::runCopySkelPointsToInnerPoints()
+{
+//   m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+//   m_paras->wLop.setValue("Copy SkelPoints To InnerPoints", BoolValue(true));
+//   area->runWlop();
+//   m_paras->wLop.setValue("Copy SkelPoints To InnerPoints", BoolValue(false));
+  copySkelSamplesToDual();
+  return;
+}
 
+void WlopParaDlg::runSwitchSkelandInner_Points()
+{
+  area->cleanPickPoints();
+  area->dataMgr.switchSkelDualSample();
+  return;
+}
+
+
+void WlopParaDlg::runUpdateConnection()
+{
+  m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+  m_paras->wLop.setValue("Update Connection", BoolValue(true));
+  area->runWlop();
+  m_paras->wLop.setValue("Update Connection", BoolValue(false));
+
+  return;
+}
 
 void WlopParaDlg::applyEllipsoidFitting()
 {

@@ -1287,6 +1287,79 @@ void GlobalFun::computeAverageDistToInput(CMesh *mesh, CMesh *input, int k)
   }
 }
 
+void GlobalFun::computeRandomwalkNeighborhoodFowTwoSets(CMesh *original, CMesh *sample, int one_ring_knn, int max_knn)
+{
+//   if (original->vert.size() < max_knn - 3)
+//   {
+//     cout << "not enough points" << endl;
+//     return;
+//   }
+// 
+//   computeAnnNeigbhors(original->vert, sample->vert, one_ring_knn, false, "computeRandomwalkNeighborhood");
+// 
+//   vector< vector<int>> temp_neighbors;
+//   for (int i = 0; i < sample->vert.size(); i++)
+//   {
+//     CVertex& v = sample->vert[i];
+//     vector<int>* neighbors = &v.neighbors;
+//     set<int> final_neighbors;
+//     queue<int> neighbors_queue;
+// 
+//     v.is_skel_virtual = true;
+//     for (int j = 0; j < v.neighbors.size(); j++)
+//     {
+//       original->vert[(*neighbors)[j]].is_skel_virtual = true;
+// 
+//       final_neighbors.insert((*neighbors)[j]);
+//       neighbors_queue.push((*neighbors)[j]);
+//     }
+// 
+//     while (!neighbors_queue.empty())
+//     {
+//       int neighbor_index = neighbors_queue.front();
+//       neighbors_queue.pop();
+// 
+//       CVertex& t = original->vert[neighbor_index];
+// 
+//       for (int k = 0; k < t.neighbors.size(); k++)
+//       {
+//         if (original->vert[t.neighbors[k]].is_skel_virtual)
+//         {
+//           continue;
+//         }
+// 
+//         neighbors_queue.push(t.neighbors[k]);
+//         final_neighbors.insert(t.neighbors[k]);
+//         mesh->vert[t.neighbors[k]].is_skel_virtual = true;
+//       }
+// 
+//       if (final_neighbors.size() > max_knn)
+//       {
+//         break;
+//       }
+//     }
+// 
+//     vector<int> new_neighbors;
+//     set<int>::iterator iter;
+//     v.is_skel_virtual = false;
+//     for (iter = final_neighbors.begin(); iter != final_neighbors.end(); ++iter)
+//     {
+//       new_neighbors.push_back(*iter);
+//       mesh->vert[*iter].is_skel_virtual = false;
+//     }
+//     temp_neighbors.push_back(new_neighbors);
+//   }
+// 
+//   for (int i = 0; i < mesh->vert.size(); i++)
+//   {
+//     CVertex& v = mesh->vert[i];
+//     v.neighbors = temp_neighbors[i];
+//   }
+
+
+
+}
+
 void GlobalFun::computeRandomwalkNeighborhood(CMesh *mesh, int one_ring_knn, int max_knn)
 {
   if (mesh->vert.size() < max_knn - 3)
