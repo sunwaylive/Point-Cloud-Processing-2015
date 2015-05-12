@@ -1532,6 +1532,9 @@ void WlopParaDlg::oneKEY()
 //     area->runWlop();
 //     m_paras->wLop.setValue("Run Normal Smooth In WLOP", BoolValue(false));
 
+    m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+    runUpdateConnection();
+
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyComputeConfidence();
 
@@ -1540,6 +1543,9 @@ void WlopParaDlg::oneKEY()
 
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyWlop();
+
+    m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+    runUpdateConnection();
 
 
 //// 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");

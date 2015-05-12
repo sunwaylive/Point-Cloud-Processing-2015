@@ -1508,7 +1508,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 	double simi_neighbor_radius_para = para->getDouble("Similarity Term Neighbor Para");
 	double length_threshold = para->getDouble("Similarity Length Outlier Threshold");
 
-	computeDualIndex(samples, dual_samples);
+	//computeDualIndex(samples, dual_samples);
 
 	double radius = para->getDouble("CGrid Radius") * simi_neighbor_radius_para;
 	double radius2 = radius * radius;
@@ -1687,7 +1687,7 @@ void WLOP::computeSampleSimilarityTerm(CMesh* samples)
 
   cout << "computed new d-length" << endl;
 
-	computeDualIndex(samples, dual_samples);
+	//computeDualIndex(samples, dual_samples);
   cout << "updated dual index" << endl;
 
 
@@ -3118,7 +3118,7 @@ void WLOP::runRegularizeSamples()
 
 void WLOP::runRegularizeNormals(CMesh* samples, CMesh* dual_samples)
 {
-	computeDualIndex(samples, dual_samples);
+	//computeDualIndex(samples, dual_samples);
 
  	GlobalFun::computeBallNeighbors(dual_samples, NULL, para->getDouble("CGrid Radius"), dual_samples->bbox);
  	GlobalFun::computeEigenWithTheta(dual_samples, para->getDouble("CGrid Radius") / sqrt(para->getDouble("H Gaussian Para")));
@@ -4992,7 +4992,7 @@ void WLOP::runUpdateConnection()
   cout << "runCopySkelPointsToInnerPoints" << endl;
 
   GlobalFun::computeAnnNeigbhors(dual_samples->vert, skel_points->vert, 1, false, "runUpdateConnection");
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 300);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 100);
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
