@@ -54,7 +54,12 @@ void Upsampler::setInput(DataMgr* pData)
 
 void Upsampler::run()
 {
-  also_insert_dual_points = global_paraMgr.glarea.getBool("Show Skeltal Points");
+  //also_insert_dual_points = global_paraMgr.glarea.getBool("Show Skeltal Points");
+//   if ()
+//   {
+//   }
+  also_insert_dual_points = true;
+
   use_adaptive_upsampling = global_paraMgr.upsampling.getBool("Use Adaptive Upsampling");
 
   if (para->getBool("Use Upsample On Skeletal Points"))
@@ -774,10 +779,10 @@ void Upsampler::insertPointsByThreshold()
   int max_add_number = para->getInt("Number of Add Point");
 
 
-  if (use_adaptive_upsampling)
-  {
-    improveNeighborhood();
-  }
+//   if (use_adaptive_upsampling)
+//   {
+//     improveNeighborhood();
+//   }
 
 
   while(1)

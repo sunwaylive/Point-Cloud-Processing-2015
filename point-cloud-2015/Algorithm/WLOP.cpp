@@ -5019,7 +5019,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 110);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 310);
   //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 410, false, "test");
 
   for (int loop = 0; loop < 5; loop++)
