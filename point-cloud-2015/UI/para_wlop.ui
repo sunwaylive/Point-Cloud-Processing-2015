@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1743,7 +1743,7 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>570</y>
+       <y>620</y>
        <width>261</width>
        <height>31</height>
       </rect>
@@ -1847,6 +1847,19 @@
      </property>
      <property name="text">
       <string>Use_original_averaging KNN</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="evaluation2">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>710</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Evaluation2</string>
      </property>
     </widget>
    </widget>

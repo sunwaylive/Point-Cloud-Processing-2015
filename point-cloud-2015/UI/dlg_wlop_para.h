@@ -167,6 +167,8 @@ class WlopParaDlg : public QFrame
 
     void runUpdateConnection();
 
+    void applyEvaluation2();
+
 
 	private:
 		bool run_backward_first;

@@ -247,6 +247,7 @@ void WlopParaDlg::initConnects()
 
   connect(ui->run_4PCS, SIGNAL(clicked()), this, SLOT(apply4PCS()));
   connect(ui->Switch_Skel_and_Inner_Points, SIGNAL(clicked()), this, SLOT(runSwitchSkelandInner_Points()));
+  connect(ui->evaluation2, SIGNAL(clicked()), this, SLOT(applyEvaluation2()));
 
 }
 
@@ -1579,4 +1580,166 @@ void WlopParaDlg::oneKEY()
 }
 
 
+class Range
+{
+public:
+  Range();
+  Range(double a, double b):min(a), max(b){};
 
+  ~Range();
+
+  double min;
+  double max;
+
+private:
+
+};
+
+Range::Range()
+{
+}
+
+Range::~Range()
+{
+}
+
+void WlopParaDlg::applyEvaluation2()
+{
+  ifstream infile1("evaluation1.txt");
+  ifstream infile2("evaluation2.txt");
+  ifstream infile3("evaluation3.txt");
+
+  ofstream outfile("evaluation_percentages.txt");
+
+  vector<double> values1;
+  vector<double> values2;
+  vector<double> values3;
+
+  double temp;
+  int size1 = 0;
+  int size2 = 0;
+  int size3 = 0;
+
+  while (!infile1.eof())
+  {
+    infile1 >> temp;
+    values1.push_back(temp);
+    size1++;
+  }
+  infile1.close();
+
+  while (!infile2.eof())
+  {
+    infile2 >> temp;
+    values2.push_back(temp);
+    size2++;
+  }
+  infile2.close();
+
+  while (!infile3.eof())
+  {
+    infile3 >> temp;
+    values3.push_back(temp);
+    size3++;
+  }
+  infile3.close();
+
+  CMesh* samples = area->dataMgr.getCurrentSamples();
+  cout << "Diag size1: " << samples->bbox.Diag() * 0.01 << endl;
+  cout << "Diag size2: " << samples->bbox.Diag() * 0.02 << endl;
+  cout << "Diag size3: " << samples->bbox.Diag() * 0.03 << endl;
+  cout << "Diag size0: " << samples->bbox.Diag() << endl;
+  //cout << "Diag size1: " << samples->bbox.Diag() << endl;
+
+
+
+  Range range1(0, 0.033664);
+  Range range2(0.033664, 0.067328);
+  Range range3(0.067328, 0.100992);
+  Range range4(0.100992, 10);
+
+  vector<Range> ranges;
+  ranges.push_back(range1);
+  ranges.push_back(range2);
+  ranges.push_back(range3);
+  ranges.push_back(range4);
+
+  vector<double> range_numbers(4, 0.0);
+
+  vector <vector<double>> results;
+
+
+  vector<double> result1;
+  vector<double> result2;
+  vector<double> result3;
+
+  for (int i = 0; i < size1; i++)
+  {
+    for (int j = 0; j < ranges.size(); j++)
+    {
+      if (values1[i] >= ranges[j].min && values1[i] < ranges[j].max)
+      {
+        range_numbers[j] += 1.0;
+        break;
+      }
+    }
+  }
+
+  for (int i = 0; i < range_numbers.size(); i++)
+  {
+    //outfile << range_numbers[i] / size1 << "    ";
+    result1.push_back(range_numbers[i] / size1);
+  }
+  results.push_back(result1);
+
+
+  range_numbers.assign(4, 0.0);
+  for (int i = 0; i < size1; i++)
+  {
+    for (int j = 0; j < ranges.size(); j++)
+    {
+      if (values2[i] >= ranges[j].min && values2[i] < ranges[j].max)
+      {
+        range_numbers[j] += 1.0;
+        break;
+      }
+    }
+  }
+
+  for (int i = 0; i < range_numbers.size(); i++)
+  {
+    result2.push_back(range_numbers[i] / size2);
+  }
+  results.push_back(result2);
+
+
+
+  range_numbers.assign(4, 0.0);
+  for (int i = 0; i < size1; i++)
+  {
+    for (int j = 0; j < ranges.size(); j++)
+    {
+      if (values3[i] >= ranges[j].min && values3[i] < ranges[j].max)
+      {
+        range_numbers[j] += 1.0;
+        break;
+      }
+    }
+  }
+
+  for (int i = 0; i < range_numbers.size(); i++)
+  {
+    result3.push_back(range_numbers[i] / size3);
+  }
+  results.push_back(result3);
+
+  for (int i = 0; i < range_numbers.size(); i++)
+  {
+    for (int j = 0; j < results.size(); j++)
+    {
+      outfile << results[j][i] << "\t ";
+    }
+    outfile << endl;
+  }
+  outfile.close();
+}
