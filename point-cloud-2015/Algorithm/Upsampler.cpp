@@ -112,11 +112,11 @@ void Upsampler::run()
   }
 
 
-  if (also_insert_dual_points)
-  {
-    assert(samples->vert.size() == dual_samples->vert.size());
-    assert(skel_points->vert.size() == dual_samples->vert.size());
-  }
+//   if (also_insert_dual_points)
+//   {
+//     assert(samples->vert.size() == dual_samples->vert.size());
+//     assert(skel_points->vert.size() == dual_samples->vert.size());
+//   }
 
   if (para->getBool("Use Constant Threshold"))
   {
@@ -545,6 +545,7 @@ void Upsampler::runConstantUpsampling()
       CVertex newv;
       newv.P() = (v.P() + t.P()) / 2.0;  // mass center
       newv.m_index = samples->vert.size();
+      newv.dual_index = samples->vert.size();
 
       if (do_upsample_on_skeltal_points)
       {
@@ -554,19 +555,19 @@ void Upsampler::runConstantUpsampling()
 
       if (also_insert_dual_points)
       {
-        CVertex& dual_v = dual_samples->vert[v.m_index];
-        CVertex& dual_t = dual_samples->vert[t.m_index];
-
-        CVertex new_dual_v;
-        new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
-        new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
-
-        new_dual_v.m_index = dual_samples->vert.size();
-        new_dual_v.dual_index = new_dual_v.m_index;
-        new_dual_v.is_dual_sample = true;
-
-        // add new point
-        dual_samples->vert.push_back(new_dual_v);
+//         CVertex& dual_v = dual_samples->vert[v.m_index];
+//         CVertex& dual_t = dual_samples->vert[t.m_index];
+// 
+//         CVertex new_dual_v;
+//         new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
+//         new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
+// 
+//         new_dual_v.m_index = dual_samples->vert.size();
+//         new_dual_v.dual_index = new_dual_v.m_index;
+//         new_dual_v.is_dual_sample = true;
+// 
+//         // add new point
+//         dual_samples->vert.push_back(new_dual_v);
 
         CVertex& skel_v = skel_points->vert[v.m_index];
         CVertex& skel_t = skel_points->vert[t.m_index];
@@ -864,19 +865,19 @@ void Upsampler::insertPointsByThreshold()
 
       if (also_insert_dual_points)
       {
-        CVertex& dual_v = dual_samples->vert[v.m_index];
-        CVertex& dual_t = dual_samples->vert[t.m_index];
-
-        CVertex new_dual_v;
-        new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
-        new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
-
-        new_dual_v.m_index = dual_samples->vert.size();
-        new_dual_v.dual_index = new_dual_v.m_index;
-        new_dual_v.is_dual_sample = true;
-
-        // add new point
-        dual_samples->vert.push_back(new_dual_v);
+//         CVertex& dual_v = dual_samples->vert[v.m_index];
+//         CVertex& dual_t = dual_samples->vert[t.m_index];
+// 
+//         CVertex new_dual_v;
+//         new_dual_v.P() = (dual_v.P() + dual_t.P()) / 2.0;  // mass center
+//         new_dual_v.N() = (dual_v.N() + dual_t.N()) / 2.0;  // mass center
+// 
+//         new_dual_v.m_index = dual_samples->vert.size();
+//         new_dual_v.dual_index = new_dual_v.m_index;
+//         new_dual_v.is_dual_sample = true;
+// 
+//         // add new point
+//         dual_samples->vert.push_back(new_dual_v);
 
 
 

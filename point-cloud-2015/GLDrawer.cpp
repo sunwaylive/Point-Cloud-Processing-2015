@@ -251,10 +251,14 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 
 
-	if (v.is_dual_sample /*|| v.is_fixed_sample*/)
-	{
-		return cGreen;
-	}
+//   if (v.is_dual_sample /*|| v.is_fixed_sample*/&& !bUseConfidenceColor)
+// 	{
+// 		return cGreen;
+// 	}
+  if (v.is_dual_sample)
+  {
+    return cBlue;
+  }
 
   if (v.is_skel_point /*|| v.is_fixed_sample*/ )
   {

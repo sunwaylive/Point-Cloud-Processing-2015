@@ -800,6 +800,9 @@
    <property name="text">
     <string>Reorient Pick</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+D</string>
+   </property>
   </action>
   <action name="actionClean_Pick">
    <property name="text">

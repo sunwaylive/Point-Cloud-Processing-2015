@@ -2293,7 +2293,7 @@ vector<Point3f> WLOP::computeNewSamplePositions(int& error_x)
         }
         else
         {
-          cout << "maybe no neighbor for repulsion" << endl;
+          //cout << "maybe no neighbor for repulsion" << endl;
           v.is_skel_virtual = true;
         }
 
@@ -2429,14 +2429,14 @@ void WLOP::runEstimateParameters()
   }
   double avg_dist = sum_dist / samples->vert.size();
 
-  global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(avg_dist * 0.05));
+  global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(avg_dist * 0.01));
   global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(avg_dist * 1.5));
-  global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(avg_dist * 4.0));
+  global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(avg_dist * 6.0));
 
 
-  cout << "Increasing Step Size" << avg_dist * 0.005 << endl;
-  cout << "Local Neighbor Size For Inner Points" << avg_dist * 1.5 << endl;
-  cout << "Increasing Step Size" << avg_dist * 5.0 << endl;
+  cout << "Increasing Step Size" << global_paraMgr.wLop.getDouble("Increasing Step Size") << endl;
+  cout << "Local Neighbor Size For Inner Points" << global_paraMgr.wLop.getDouble("Local Neighbor Size For Inner Points") << endl;
+  cout << "Local Neighbor Size For Surface Points" << global_paraMgr.wLop.getDouble("Local Neighbor Size For Surface Points") << endl;
 
 }
 
@@ -4427,8 +4427,10 @@ void WLOP::runSelfProjection()
 
 //   double static_radius = para->getDouble("Local Neighbor Size For Surface Points") * 0.5;
 //   GlobalFun::computeBallNeighbors(samples, NULL, static_radius, samples->bbox);
-  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 15, false,"runSelfProjection");
-
+  
+  int pca_knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+  GlobalFun::computeAnnNeigbhors(samples->vert, samples->vert, 15 + pca_knn, false, "runSelfProjection");
+  
   for (int k = 0; k < 5; k++)
   {
     int unsettle_number = 0;
@@ -4975,12 +4977,12 @@ void WLOP::computeInitialNeighborSize()
 	}
 	double average_dist = sum_dist / sum_n;
 
-	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 3.0));
+	global_paraMgr.setGlobalParameter("CGrid Radius", DoubleValue(average_dist * 5.0));
 	global_paraMgr.upsampling.setValue("Dist Threshold", DoubleValue(average_dist * average_dist));
 	
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 3.0));
-	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 5.0));
-	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.5));
+// 	global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(average_dist * 3.0));
+// 	global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(average_dist * 5.0));
+//	global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(average_dist * 0.5));
 	global_paraMgr.wLop.setValue("Average Closest Dist", DoubleValue(average_dist));
 
 
@@ -4992,7 +4994,8 @@ void WLOP::runUpdateConnection()
   cout << "runCopySkelPointsToInnerPoints" << endl;
 
   GlobalFun::computeAnnNeigbhors(dual_samples->vert, skel_points->vert, 1, false, "runUpdateConnection");
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 100);
+  //GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 150);
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 150, false, "runUpdateConnection");
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
@@ -5000,7 +5003,8 @@ void WLOP::runUpdateConnection()
     CVertex& skel_v = skel_points->vert[i];
     CVertex& nearest_inner_v = dual_samples->vert[skel_v.neighbors[0]];
 
-    double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), skel_v.P());
+    //double min_dist2 = GlobalFun::computeEulerDistSquare(v.P(), skel_v.P());
+    double min_dist2 = 100000;
     double min_index = -1;
 
     for (int j = 0; j < nearest_inner_v.neighbors.size(); j++)
@@ -5071,7 +5075,7 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 310);
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 210);
   //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 410, false, "test");
 
   for (int loop = 0; loop < 5; loop++)
@@ -5498,7 +5502,10 @@ void WLOP::runEvaluation()
   
 
   double evaluation_min = 0.00;
+  //double evaluation_max = 0.5;
+  //double evaluation_max = 0.15;
   double evaluation_max = 0.25;
+
   double evaluation_range = evaluation_max - evaluation_min;
   for (int i = 0; i < samples->vert.size(); i++)
   {

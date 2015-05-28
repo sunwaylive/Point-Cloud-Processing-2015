@@ -588,7 +588,7 @@ void MainWindow::saveView()
   }
   else
   {
-    GlobalFun::removeOutliersBaseOnNormal(samples, 12, percentage);
+    GlobalFun::removeOutliersBaseOnNormal(samples, 8, percentage);
   }
 
 

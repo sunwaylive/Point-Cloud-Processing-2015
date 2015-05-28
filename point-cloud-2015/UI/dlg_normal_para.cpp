@@ -77,12 +77,53 @@ void NormalParaDlg::isAPCA(bool _val)
 
 void NormalParaDlg::reorientateNormal()
 {
+  bool use_previous_orientation = global_paraMgr.norSmooth.getBool("Run Anistropic PCA");
+
+
 	if (area->dataMgr.isSamplesEmpty())
 	{
 		return;
 	}
 
+
+
 	CMesh* samples = area->dataMgr.getCurrentSamples();
+  CMesh* original = area->dataMgr.getCurrentOriginal();
+
+  if (use_previous_orientation && !original->vert.empty())
+  {
+    GlobalFun::computeAnnNeigbhors(original->vert, samples->vert, 1, false, "reorientateNormal()");
+
+
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+      CVertex& o = original->vert[v.neighbors[0]];
+
+      if (v.N() * o.N() < 0)
+      {
+        v.N() *= -1;
+      }
+    }
+      return;
+  }
+
+  bool only_selected_reorient = global_paraMgr.drawer.getBool("Show Segmentation Color");
+  if (only_selected_reorient)
+  {
+    for (int i = 0; i < samples->vert.size(); i++)
+    {
+      CVertex& v = samples->vert[i];
+
+      if (v.is_fixed_sample)
+      {
+        v.N() *= -1;
+      }
+    }
+
+    return;
+  }
+
 	if (global_paraMgr.glarea.getBool("Show Samples"))
 	{
 		samples = area->dataMgr.getCurrentSamples();
@@ -104,6 +145,7 @@ void NormalParaDlg::reorientateNormal()
 	for (int i = 0; i < samples->vert.size(); i++)
 	{
 		samples->vert[i].N() *= -1;
+    samples->vert[i].N().Normalize();
 	}
 }
 
@@ -212,23 +254,23 @@ void NormalParaDlg::applyPCANormal()
 
 		 if (use_previous_orientation)
 		 {
-        for (int i = 0; i < samples->vert.size(); i++)
-        {
-          CVertex& v = samples->vert[i];
-          if (v.is_fixed_sample)
-          {
-            v.N() = remember_normal[i];
-          }
-
-        }
-// 			 for (int i = 0; i < samples->vert.size(); i++)
-// 			 {
-// 				 CVertex& v = samples->vert[i];
-// 				 if (v.N() * remember_normal[i] < 0)
-// 				 {
-// 					 v.N() *= -1;
-// 				 }
-// 			 }
+//         for (int i = 0; i < samples->vert.size(); i++)
+//         {
+//           CVertex& v = samples->vert[i];
+//           if (v.is_fixed_sample)
+//           {
+//             v.N() = remember_normal[i];
+//           }
+// 
+//         }
+ 			 for (int i = 0; i < samples->vert.size(); i++)
+ 			 {
+ 				 CVertex& v = samples->vert[i];
+ 				 if (v.N() * remember_normal[i] < 0)
+ 				 {
+ 					 v.N() *= -1;
+ 				 }
+ 			 }
 		 }
 
 	}

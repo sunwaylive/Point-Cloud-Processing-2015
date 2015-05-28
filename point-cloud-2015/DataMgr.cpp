@@ -628,66 +628,66 @@ double DataMgr::getInitRadiuse()
  	int i = 0;
 
 
-  	while (want_sample_num > inserted_number)
-  	{
-      vector<int> new_Card;
-      for (int i = 0; i < nCard.size(); i++)
-      {
-        int index = nCard[i];
-
-        CVertex& v = original.vert[index];
-        double probability = 1 - v.eigen_confidence;
-        probability = pow(probability, 3.0);
-        //double probability = v.eigen_confidence;
-
-        double r = (rand() % 1000) * 0.001;
-
-        if (i < 5)
-        {
-          cout << "density confidence: " << probability << endl;
-        }
-
-        if (r < probability)
-        {
-          samples.vert.push_back(v);
-          samples.bbox.Add(v.P());
-
-          inserted_number++;
-
-          if (want_sample_num <= inserted_number)
-          {
-            break;
-          }
-        }
-        else
-        {
-          new_Card.push_back(index);
-        }
-      }
-
-      if (new_Card.empty())
-      {
-        break;
-      }
-
-      nCard = new_Card;
-
-  	}
+//   	while (want_sample_num > inserted_number)
+//   	{
+//       vector<int> new_Card;
+//       for (int i = 0; i < nCard.size(); i++)
+//       {
+//         int index = nCard[i];
+// 
+//         CVertex& v = original.vert[index];
+//         double probability = 1 - v.eigen_confidence;
+//         probability = pow(probability, 3.0);
+//         //double probability = v.eigen_confidence;
+// 
+//         double r = (rand() % 1000) * 0.001;
+// 
+//         if (i < 5)
+//         {
+//           cout << "density confidence: " << probability << endl;
+//         }
+// 
+//         if (r < probability)
+//         {
+//           samples.vert.push_back(v);
+//           samples.bbox.Add(v.P());
+// 
+//           inserted_number++;
+// 
+//           if (want_sample_num <= inserted_number)
+//           {
+//             break;
+//           }
+//         }
+//         else
+//         {
+//           new_Card.push_back(index);
+//         }
+//       }
+// 
+//       if (new_Card.empty())
+//       {
+//         break;
+//       }
+// 
+//       nCard = new_Card;
+// 
+//   	}
  
-//     	for (int i = 0; i < samples.vn; i++)
-//     	{
-//     		int index = nCard[i]; //could be not random!
-//     
-//     		if (!use_random_downsample)
-//     		{
-//     			index = i;
-//     		}
-//     
-//     		CVertex& v = original.vert[index];
-//     		v.dual_index = i;
-//     		samples.vert.push_back(v);
-//     		samples.bbox.Add(v.P());
-//     	}
+     	for (int i = 0; i < samples.vn; i++)
+     	{
+     		int index = nCard[i]; //could be not random!
+     
+     		if (!use_random_downsample)
+     		{
+     			index = i;
+     		}
+     
+     		CVertex& v = original.vert[index];
+     		v.dual_index = i;
+     		samples.vert.push_back(v);
+     		samples.bbox.Add(v.P());
+     	}
   
   	CMesh::VertexIterator vi;
   	for (vi = samples.vert.begin(); vi != samples.vert.end(); ++vi)
