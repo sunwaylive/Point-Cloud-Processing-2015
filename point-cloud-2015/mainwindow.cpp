@@ -701,7 +701,9 @@ void MainWindow::showTargets(bool _val)
 
 void MainWindow::showClosestDualConnection(bool _val)
 {
-	global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));
+
   global_paraMgr.glarea.setValue("Show Cloest Dual Connection", BoolValue(_val));
 
 	if (_val && !area->dataMgr.isSkeletalPointsEmpty())

@@ -194,7 +194,10 @@ void GLArea::paintGL()
 
 		global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(dual_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
 
-		//global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
+    if (!para->getBool("Show Eigen Directions"))
+    {
+      global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
+    }
 	}
 
 	glLoadIdentity();
@@ -561,7 +564,12 @@ void GLArea::paintGL()
 
 		global_paraMgr.drawer.setValue("Normal Line Width", DoubleValue(normal_width / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
 		global_paraMgr.drawer.setValue("Sample Dot Size", DoubleValue(dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
-		//global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
+		
+    
+    if (!para->getBool("Show Eigen Directions"))
+    {
+      global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
+    }
 
 		global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(dual_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
 

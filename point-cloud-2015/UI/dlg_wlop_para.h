@@ -97,6 +97,8 @@ class WlopParaDlg : public QFrame
 		void use_Only_Do_Avergage(bool _val);
 		void use_Use_Confidence_To_Merge(bool _val);
 
+    void use_remember_neighborhood(bool _val);
+
 		//
 		void applyWlop();
     void applyDualWlop();

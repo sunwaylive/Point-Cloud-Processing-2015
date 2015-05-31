@@ -192,6 +192,9 @@ public:
 	vector< vector<double>> neighbor_weights;
 	vector< vector<int>> const_surface_neighbors;
 
+  vector< vector<int>> const_dual_neighbors;
+
+
 	void computeConstNeighborhoodUsingKNN(int knn);
 	void computeConstNeighborhoodUsingRadius(double radius);
 

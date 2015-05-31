@@ -134,6 +134,9 @@ void WlopParaDlg::initConnects()
 	connect(ui->Only_Do_Avergage, SIGNAL(clicked(bool)), this, SLOT(use_Only_Do_Avergage(bool)));
 	connect(ui->Use_Confidence_To_Merge, SIGNAL(clicked(bool)), this, SLOT(use_Use_Confidence_To_Merge(bool)));
 
+  connect(ui->Use_Remember_dual_neighborhood, SIGNAL(clicked(bool)), this, SLOT(use_remember_neighborhood(bool)));
+
+
   connect(ui->run_4PCS, SIGNAL(valueChanged(double)), this, SLOT(apply4PCS(double)));
 
   if(!connect(ui->Use_Elliptical_Original_Neighbor,SIGNAL(clicked(bool)),this,SLOT(useEllipticalOriginalNeighbor(bool))))
@@ -353,6 +356,9 @@ bool WlopParaDlg::initWidgets()
 	ui->Only_Do_Avergage->setCheckState(state);
 	state = m_paras->wLop.getBool("Use Confidence To Merge") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
 	ui->Use_Confidence_To_Merge->setCheckState(state);
+
+  state = m_paras->wLop.getBool("Use Remember Dual Neighborhood") ? (Qt::CheckState::Checked) : (Qt::CheckState::Unchecked);
+  ui->Use_Remember_dual_neighborhood->setCheckState(state);
 
 	update();
 	repaint();
@@ -667,6 +673,30 @@ void WlopParaDlg::use_Use_Confidence_To_Merge(bool _val)
 	m_paras->wLop.setValue("Use Confidence To Merge", BoolValue(_val));
 }
 
+void WlopParaDlg::use_remember_neighborhood(bool _val)
+{
+  m_paras->wLop.setValue("Use Remember Dual Neighborhood", BoolValue(_val));
+
+  if (_val)
+  {
+    Timer time;
+    time.start("use_remember_neighborhood");
+    CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
+    GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 150, false, "runUpdateConnection");
+    time.end();
+
+    vector< vector<int>>& const_dual_neighbors = area->wlop.const_dual_neighbors;
+    const_dual_neighbors.resize(dual_samples->vert.size());
+    for (int i = 0; i < dual_samples->vert.size(); i++)
+    {
+      const_dual_neighbors[i] = dual_samples->vert[i].neighbors;
+    }
+  }
+
+
+}
+
+
 // apply
 void WlopParaDlg::applyWlop()
 {
@@ -932,7 +962,9 @@ void WlopParaDlg::applyAnisotropicLop()
 
 void WlopParaDlg::applyStepForward()
 {
-	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));
+
   m_paras->wLop.setValue("Run Step Forward", BoolValue(true));
   area->runWlop();
   m_paras->wLop.setValue("Run Step Forward", BoolValue(false));
@@ -1093,6 +1125,7 @@ void WlopParaDlg::runSwitchSkelandInner_Points()
 
 void WlopParaDlg::runUpdateConnection()
 {
+  m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
   m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
   m_paras->wLop.setValue("Update Connection", BoolValue(true));
   area->runWlop();
@@ -1498,7 +1531,7 @@ void WlopParaDlg::oneKEY()
 	double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");
 	m_paras->wLop.setValue("Num Of Iterate Time", DoubleValue(1));
 
-	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+	//m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 
 	for (int i = 0; i < iter_time; i++)
 	{
@@ -1533,8 +1566,9 @@ void WlopParaDlg::oneKEY()
 //     area->runWlop();
 //     m_paras->wLop.setValue("Run Normal Smooth In WLOP", BoolValue(false));
 
-//     m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
-//     runUpdateConnection();
+     m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+     m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+     runUpdateConnection();
 
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyComputeConfidence();
@@ -1545,8 +1579,8 @@ void WlopParaDlg::oneKEY()
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyWlop();
 
-    m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
-    runUpdateConnection();
+//    m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
+//    runUpdateConnection();
 
 
 //// 		int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
@@ -1575,7 +1609,8 @@ void WlopParaDlg::oneKEY()
 	}
 
 
-	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
+  global_paraMgr.wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));
 
 }
 

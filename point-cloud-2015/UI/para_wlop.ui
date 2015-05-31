@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -362,7 +362,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>710</y>
+       <y>690</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -375,7 +375,7 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>710</y>
+       <y>690</y>
        <width>121</width>
        <height>31</height>
       </rect>
@@ -388,13 +388,26 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>750</y>
+       <y>730</y>
        <width>311</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
       <string>Use_Elliptical_Original_Neighbor （need normal weight）</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="Use_Remember_dual_neighborhood">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>750</y>
+       <width>311</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Use_Remember_dual_neighborhood</string>
      </property>
     </widget>
    </widget>

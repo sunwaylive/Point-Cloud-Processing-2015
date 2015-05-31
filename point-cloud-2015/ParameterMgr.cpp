@@ -328,6 +328,7 @@ void ParameterMgr::initWLopParameter()
 	wLop.addParam(new RichBool("Compute Eigen Directions", false));
 	wLop.addParam(new RichBool("Compute Eigen Neighborhood", false));
 
+  wLop.addParam(new RichBool("Use Remember Dual Neighborhood", false));
 
 
 	// generating inner points

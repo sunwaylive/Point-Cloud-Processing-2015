@@ -5001,12 +5001,28 @@ void WLOP::computeInitialNeighborSize()
 
 void WLOP::runUpdateConnection()
 {
-  cout << "runCopySkelPointsToInnerPoints" << endl;
-
+  cout << "runUpdateConnection" << endl;
+  Timer time;
+  time.start("runUpdateConnection");
   GlobalFun::computeAnnNeigbhors(dual_samples->vert, skel_points->vert, 1, false, "runUpdateConnection");
   //GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 150);
-  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 250, false, "runUpdateConnection");
+  
+  if (para->getBool("Use Remember Dual Neighborhood"))
+  {
+    for (int i = 0; i < dual_samples->vert.size(); i++)
+    {
+      CVertex& dual_v = dual_samples->vert[i];
+      dual_v.neighbors = const_dual_neighbors[i];
+    }
+  }
+  else
+  { 
+    GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 250, false, "runUpdateConnection");
+  }
   //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 1250, false, "runUpdateConnection");
+  time.end();
+
+  cout << "dual size: " << dual_samples->vert.size() << endl;
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
@@ -5021,6 +5037,14 @@ void WLOP::runUpdateConnection()
     for (int j = 0; j < nearest_inner_v.neighbors.size(); j++)
     {
       int inner_index = nearest_inner_v.neighbors[j];
+
+      if (inner_index < 0 || inner_index >= dual_samples->vert.size())
+      {
+        cout << "wrong index " << inner_index << endl;
+        continue;
+      }
+
+
       CVertex& inner_t = dual_samples->vert[inner_index];
 
       double dist2 = GlobalFun::computeEulerDistSquare(inner_t.P(), v.P());
