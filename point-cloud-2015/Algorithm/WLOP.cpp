@@ -1323,9 +1323,12 @@ void WLOP::runPostprocessingDlength()
 {
   //runComputeConfidence();
 
+  computeDualIndex(samples, dual_samples);
+
   bool limit_post = false;
   if (global_paraMgr.glarea.getBool("Show Eigen Directions"))
   {
+    cout << "use limit post" << endl;
     limit_post = true;
   }
 
@@ -1353,7 +1356,7 @@ void WLOP::runPostprocessingDlength()
 
     v.skel_radius = GlobalFun::computeEulerDist(v.P(), dual_v.P());
 
-    if (!limit_post && v.is_fixed_sample)
+    if (limit_post && v.is_fixed_sample)
     {
       v.moving_speed = 0;
       continue;
@@ -1392,7 +1395,14 @@ void WLOP::runPostprocessingDlength()
       real_step2[i] += t.moving_speed;
     }
 
-    real_step2[i] /= v.neighbors.size();
+    if (!v.neighbors.empty())
+    {
+      real_step2[i] /= v.neighbors.size();
+    }
+    else
+    {
+      real_step2[i] = step_size;
+    }
   }
   for (int i = 0; i < samples->vert.size(); i++)
   {
@@ -1403,7 +1413,7 @@ void WLOP::runPostprocessingDlength()
   {
     CVertex& v = samples->vert[i];
 
-    if (limit_post && !v.is_fixed_sample)
+    if (limit_post && v.is_fixed_sample)
     {
       continue;
     }
@@ -1462,7 +1472,6 @@ void WLOP::runPostprocessingDlength()
         continue;
       }
 
-
       weight = 1.;
 
       sum_radius += t.skel_radius * weight;
@@ -1484,7 +1493,7 @@ void WLOP::runPostprocessingDlength()
       continue;
     }
 
-    if (limit_post && !v.is_fixed_sample)
+    if (limit_post && v.is_fixed_sample)
     {
       continue;
     }
@@ -2429,7 +2438,7 @@ void WLOP::runEstimateParameters()
   }
   double avg_dist = sum_dist / samples->vert.size();
 
-  global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(avg_dist * 0.01));
+  global_paraMgr.wLop.setValue("Increasing Step Size", DoubleValue(avg_dist * 0.2));
   global_paraMgr.wLop.setValue("Local Neighbor Size For Inner Points", DoubleValue(avg_dist * 1.5));
   global_paraMgr.wLop.setValue("Local Neighbor Size For Surface Points", DoubleValue(avg_dist * 6.0));
 
@@ -2595,14 +2604,14 @@ void WLOP::runComputeConfidence()
  	}
 
 
-  ofstream outfile("confident.txt");
+  //ofstream outfile("confident.txt");
   for (int i = 0; i < samples->vert.size(); i++)
   {
     CVertex& v = samples->vert[i];
-    outfile << v.eigen_confidence << endl;
+   // outfile << v.eigen_confidence << endl;
 
   }
-  outfile.close();
+  //outfile.close();
 	cout << "finshed compute confidence#######" << endl;
 
 }
@@ -3559,7 +3568,8 @@ void WLOP::runEllipsoidFitting()
 
 void WLOP::runInnerPointsRegularization()
 {
-  double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+  //double local_radius = para->getDouble("Local Neighbor Size For Surface Points");
+  double local_radius = para->getDouble("CGrid Radius");
   computeConstNeighborhoodUsingRadius(local_radius);
 
   for (int i = 0; i < samples->vert.size(); i++)
@@ -4995,7 +5005,8 @@ void WLOP::runUpdateConnection()
 
   GlobalFun::computeAnnNeigbhors(dual_samples->vert, skel_points->vert, 1, false, "runUpdateConnection");
   //GlobalFun::computeRandomwalkNeighborhood(dual_samples, 6, 150);
-  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 150, false, "runUpdateConnection");
+  GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 250, false, "runUpdateConnection");
+  //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 1250, false, "runUpdateConnection");
 
   for (int i = 0; i < samples->vert.size(); i++)
   {
@@ -5075,7 +5086,9 @@ void WLOP::computeDualIndex(CMesh* samples, CMesh* dual_samples, bool use_proj_d
   timer.start("computeDualIndex");
 
   // random walk
-  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 210);
+  //GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 210);
+
+  GlobalFun::computeRandomwalkNeighborhood(dual_samples, 10, 1510);
   //GlobalFun::computeAnnNeigbhors(dual_samples->vert, dual_samples->vert, 410, false, "test");
 
   for (int loop = 0; loop < 5; loop++)
@@ -5504,7 +5517,7 @@ void WLOP::runEvaluation()
   double evaluation_min = 0.00;
   //double evaluation_max = 0.5;
   //double evaluation_max = 0.15;
-  double evaluation_max = 0.25;
+  double evaluation_max = 0.1;
 
   double evaluation_range = evaluation_max - evaluation_min;
   for (int i = 0; i < samples->vert.size(); i++)
