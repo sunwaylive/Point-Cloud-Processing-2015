@@ -198,6 +198,8 @@ void GLArea::paintGL()
     {
       global_paraMgr.drawer.setValue("Original Dot Size", DoubleValue(original_dot_size * SnapResolutionScale * SnapResolutionScale * snapDrawScal));
     }
+
+    global_paraMgr.glarea.setValue("Doing Snapshot", BoolValue(true));
 	}
 
 	glLoadIdentity();
@@ -573,6 +575,9 @@ void GLArea::paintGL()
 
 		global_paraMgr.drawer.setValue("Dual Sample Dot Size", DoubleValue(dual_dot_size / (SnapResolutionScale * SnapResolutionScale * snapDrawScal)));
 
+    global_paraMgr.glarea.setValue("Doing Snapshot", BoolValue(false));
+
+
 	}
 
 	}
@@ -713,6 +718,7 @@ void GLArea::openByDrop(QString fileName)
 	}
 	if (fileName.endsWith("paras"))
 	{
+    cout << "read parameters:: " << fileName.toStdString().c_str() << endl;
 		ifstream inpara(fileName.toStdString().c_str());
 		global_paraMgr.inputAllParameters(inpara);
 		inpara.close();
@@ -1260,9 +1266,9 @@ void GLArea::saveSnapshot()
 // 			saveView(skel_file_name);
 
 			skel_file_name.replace(".skel", ".paras");
-			ifstream inpara(skel_file_name.toStdString().c_str());
-			global_paraMgr.inputAllParameters(inpara);
-			inpara.close();
+			ofstream outpara(skel_file_name.toStdString().c_str());
+      global_paraMgr.outputAllParameters(outpara);
+			outpara.close();
 		}
 
 	}
@@ -1348,7 +1354,8 @@ void GLArea::runWlop()
 	{
 		if (!global_paraMgr.wLop.getBool("Run Regularize Normals")
 			&& !global_paraMgr.wLop.getBool("Run Compute Confidence")
-			&& !global_paraMgr.wLop.getBool("Run Move Backward"))
+			&& !global_paraMgr.wLop.getBool("Run Move Backward")
+      && !global_paraMgr.wLop.getBool("Update Connection"))
 		{
 			saveSnapshot();
 

@@ -18,6 +18,8 @@ WlopParaDlg::WlopParaDlg(QWidget *p, ParameterMgr * _paras, GLArea * _area) : QF
 
 	run_backward_first = false;
 
+  normal_regular_time = 1.0;
+
 	initConnects();
 }
 
@@ -116,6 +118,9 @@ void WlopParaDlg::initConnects()
 	connect(ui->Eigen_Directional_Threshold, SIGNAL(valueChanged(double)), this, SLOT(Eigen_Directional_Threshold(double)));
 	connect(ui->Save_Move_Dist_Along_Normal_Para, SIGNAL(valueChanged(double)), this, SLOT(Save_Move_Dist_Along_Normal_Para(double)));
 	connect(ui->Big_Repulsion_Power, SIGNAL(valueChanged(double)), this, SLOT(Big_Repulsion_Power(double)));
+
+  connect(ui->progressive_min_knn, SIGNAL(valueChanged(double)), this, SLOT(normalRegularTimes(double)));
+
 
 	connect(ui->Similarity_KNN, SIGNAL(valueChanged(double)), this, SLOT(Similarity_KNN(double)));
 
@@ -534,6 +539,13 @@ void WlopParaDlg::Data_Outweigh_Similarity_Para(double _val)
 void WlopParaDlg::Similarity_KNN(double _val)
 {
 	m_paras->wLop.setValue("KNN For Similarity", DoubleValue(_val));
+}
+
+void WlopParaDlg::normalRegularTimes(double _val)
+{
+  normal_regular_time = _val;
+
+  cout << "regular times  " << normal_regular_time << endl;
 }
 
 void WlopParaDlg::isDensity(bool _val)
@@ -1271,6 +1283,12 @@ void WlopParaDlg::applyMoveBackward()
 // 	
 // 	copyDualSamplesToSkel();
 
+  if (m_paras->glarea.getBool("SnapShot Each Iteration"))
+  {
+    area->saveSnapshot();
+  }
+
+
   CMesh* dual_samples = area->dataMgr.getCurrentDualSamples();
   double step_size = m_paras->wLop.getDouble("Increasing Step Size");
 
@@ -1330,6 +1348,12 @@ void WlopParaDlg::applyNormalSmoothing()
 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 	}
 
+
+//   if (m_paras->glarea.getBool("SnapShot Each Iteration"))
+//   {
+//     area->saveSnapshot();
+//   }
+
 	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Normal Smoothing", BoolValue(true));
 	area->runWlop();
@@ -1367,6 +1391,11 @@ void WlopParaDlg::applySelfPorjection()
 // 		area->runWlop();
 // 		m_paras->wLop.setValue("Run Move Backward", BoolValue(false));
 // 	}
+
+//   if (m_paras->glarea.getBool("SnapShot Each Iteration"))
+//   {
+//     area->saveSnapshot();
+//   }
 
 	m_paras->wLop.setValue("Dual Samples Represent Inner Points", BoolValue(true));
 	m_paras->wLop.setValue("Run Self Projection", BoolValue(true));
@@ -1424,7 +1453,34 @@ void WlopParaDlg::applyDLengthAdjustment()
 {
 	m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 	m_paras->wLop.setValue("Run DLength Adjustment", BoolValue(true));
+
+  cout << "update normal ???" << endl;
+
+  int knn = global_paraMgr.norSmooth.getInt("PCA KNN");
+  CMesh* samples;
+  samples = area->dataMgr.getCurrentSamples();
+  vector<Point3f> remember_normal(samples->vert.size());
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    remember_normal[i] = samples->vert[i].N();
+  }
+  vcg::tri::PointCloudNormal<CMesh>::Param pca_para;
+  pca_para.fittingAdjNum = knn;
+  vcg::tri::PointCloudNormal<CMesh>::Compute(*samples, pca_para, NULL);
+  for (int i = 0; i < samples->vert.size(); i++)
+  {
+    CVertex& v = samples->vert[i];
+    if (v.N() * remember_normal[i] < 0)
+    {
+      v.N() *= -1;
+    }
+    v.recompute_m_render();
+  }
+
+
 	area->runWlop();
+
+
 
 
 //   double iter_time = m_paras->wLop.getDouble("Num Of Iterate Time");
@@ -1532,6 +1588,8 @@ void WlopParaDlg::oneKEY()
 	m_paras->wLop.setValue("Num Of Iterate Time", DoubleValue(1));
 
 	//m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+  Timer time;
+  time.start("!!!!Total time one key!!!!");
 
 	for (int i = 0; i < iter_time; i++)
 	{
@@ -1573,8 +1631,13 @@ void WlopParaDlg::oneKEY()
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyComputeConfidence();
 
-		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
-		applyRegularizeNormals();
+
+    for (int t = 0; t < int(normal_regular_time); t++)
+    {
+      m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
+      applyRegularizeNormals();
+    }
+
 
 		m_paras->wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(true));
 		applyWlop();
@@ -1608,6 +1671,7 @@ void WlopParaDlg::oneKEY()
 
 	}
 
+  time.end();
 
   global_paraMgr.wLop.setValue("Dual Samples Represent Skeltal Points", BoolValue(false));
   global_paraMgr.wLop.setValue("Dual Samples Represent Inner Points", BoolValue(false));

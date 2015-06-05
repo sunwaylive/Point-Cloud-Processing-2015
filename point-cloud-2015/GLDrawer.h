@@ -111,6 +111,9 @@ private:
   bool useDifferBranchColor;
 	bool showRadius;
 
+  bool showEigens;
+  bool doingSnapshot;
+
 	double original_draw_width;
 	double sample_draw_width;
 	double dual_sample_draw_width;

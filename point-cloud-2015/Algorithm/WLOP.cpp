@@ -5527,7 +5527,7 @@ void WLOP::runEvaluation()
     v.eigen_confidence = dist;
     v.nearest_neighbor_dist = dist;
 
-    outfile << v.eigen_confidence << endl;
+    //outfile << v.eigen_confidence << endl;
 
    
     //     if (i < 20)

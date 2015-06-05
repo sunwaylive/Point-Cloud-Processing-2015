@@ -68,6 +68,7 @@ class WlopParaDlg : public QFrame
 		void Data_Outweigh_Similarity_Para(double _val);
 		void Similarity_KNN(double _val);
 
+    void normalRegularTimes(double _val);
 
 
 		void isDensity(bool _val);
@@ -181,4 +182,6 @@ class WlopParaDlg : public QFrame
 
 		CalculationThread calculation_thread;
 
+
+    double normal_regular_time;
 };

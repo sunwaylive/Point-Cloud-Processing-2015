@@ -121,6 +121,7 @@ void ParameterMgr::initGlareaParameter()
 	glarea.addParam(new RichBool("Multiply Pick Point", false) );
 	glarea.addParam(new RichBool("Random Erase", false));
 
+  glarea.addParam(new RichBool("Doing Snapshot", false));
 
   glarea.addParam(new RichDouble("Picked Index", 0));
 	glarea.addParam(new RichBool("Show Cloest Dual Connection", true));
@@ -351,7 +352,7 @@ void ParameterMgr::initWLopParameter()
 
 	wLop.addParam(new RichDouble("Average Dist To Input Threshold", 0.11889));
 	wLop.addParam(new RichDouble("Choose ADT Threshold Percentage", 0.9));
-	wLop.addParam(new RichDouble("Original Confidence KNN", 75));
+	wLop.addParam(new RichDouble("Original Confidence KNN", 55));
 
 	wLop.addParam(new RichDouble("Confidence Power", 3.0));
 

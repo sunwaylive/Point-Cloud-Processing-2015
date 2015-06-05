@@ -22,6 +22,7 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 
 	showRadius = global_paraMgr.glarea.getBool("Show Radius");
 
+  showEigens = global_paraMgr.glarea.getBool("Show Eigen Directions");
 
 	original_draw_width = para->getDouble("Original Draw Width");
 	sample_draw_width = para->getDouble("Sample Draw Width");
@@ -47,8 +48,12 @@ void GLDrawer::updateDrawer(vector<int>& pickList)
 	bUseConfidenceColor = global_paraMgr.drawer.getBool("Show Confidence Color");
 	bUseSegmentaionColor = global_paraMgr.drawer.getBool("Show Segmentation Color");
 
+  doingSnapshot = global_paraMgr.glarea.getBool("Doing Snapshot");
+
+
 	sample_cofidence_color_scale = global_paraMgr.glarea.getDouble("Sample Confidence Color Scale");
 	iso_value_shift = global_paraMgr.glarea.getDouble("Point ISO Value Shift");
+
 
 	skel_bone_color = para->getColor("Skeleton Bone Color");
 	skel_node_color = para->getColor("Skeleton Node Color");
@@ -257,10 +262,20 @@ GLColor GLDrawer::getColorByType(const CVertex& v)
 
 
 
-   if (v.is_dual_sample /*|| v.is_fixed_sample*/&& !bUseConfidenceColor)
+   if (v.is_dual_sample /*|| v.is_fixed_sample*/&& !showEigens /*!bUseConfidenceColor*/)
  	{
  		return cGreen;
  	}
+
+   if (v.is_dual_sample /*|| v.is_fixed_sample*/&& showEigens &&  !doingSnapshot/*!bUseConfidenceColor*/)
+   {
+     return cGreen;
+   }
+
+   if (v.is_dual_sample /*|| v.is_fixed_sample*/&& showEigens/*!bUseConfidenceColor*/)
+   {
+     return cBlue;
+   }
 
 
   if (v.is_skel_point /*|| v.is_fixed_sample*/ )
@@ -1145,3 +1160,7 @@ GLColor GLDrawer::isoValue2color(double iso_value,
 		mixed_color.Y() / float(step_size),
 		mixed_color.Z() / float(step_size));
 }
+
+
+
+

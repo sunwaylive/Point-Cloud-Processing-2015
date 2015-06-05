@@ -128,7 +128,7 @@ private: // For pick points function
 
   NeighborDisk picked_disk;
 
-private: // For snapshot
+public: // For snapshot
 	int tileCol, tileRow, totalCols, totalRows;
 	QImage snapBuffer;
 	bool takeSnapTile;
@@ -157,6 +157,8 @@ private: // For snapshot
 
 public:
 	void saveSnapshot();
+
+  void doSnapshot();
 
 	void changeColor(QString paraName);
 
